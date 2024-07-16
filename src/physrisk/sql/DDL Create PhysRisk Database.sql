@@ -42,7 +42,37 @@ CREATE TABLE osc_physrisk_hazards.hazard (
 	CONSTRAINT pk_hazard PRIMARY KEY ( hazard_id )
  );
 
-CREATE TABLE osc_physrisk_assets.asset_identifier ( 
+CREATE TABLE osc_physrisk_assets.fact_portfolio ( 
+	portfolio_id                UUID  DEFAULT gen_random_uuid () NOT NULL,
+	description_full  varchar(8096)    ,
+	description_short  varchar(256)  NOT NULL  ,
+	name_fullyqualified varchar(256)    ,
+	name          varchar(100)  NOT NULL  ,
+	creation_time       timestamptz  NOT NULL  ,
+	creator_user_id      bigint    ,
+	last_modification_time timestamptz    ,
+	last_modifier_user_id bigint    ,
+	is_deleted          boolean  NOT NULL  ,
+	deleter_user_id     bigint    ,
+	deletion_time      timestamptz    ,
+	culture        varchar(5)  NOT NULL  ,
+	checksum        text    ,
+	external_id         varchar(36)    ,
+	seq_num         integer  NOT NULL  ,
+	translated_from_id   UUID  ,
+	is_active       boolean  NOT NULL  ,
+	creator_user_name   varchar(256)    ,
+	last_modifier_user_name varchar(256)    ,
+	deleter_user_name    varchar(256)    ,
+	tenant_id           integer  NOT NULL  ,
+	tenant_name         text  NOT NULL  ,
+	is_published        boolean  NOT NULL  ,
+	publisher_id        bigint    ,
+	published_date      timestamptz    ,
+	CONSTRAINT pk_fact_portfolio PRIMARY KEY (portfolio_id )
+ );
+
+CREATE TABLE osc_physrisk_assets.fact_asset ( 
 	asset_id                UUID  DEFAULT gen_random_uuid () NOT NULL,
 	description_full  varchar(8096)    ,
 	description_short  varchar(256)  NOT NULL  ,
@@ -69,48 +99,18 @@ CREATE TABLE osc_physrisk_assets.asset_identifier (
 	is_published        boolean  NOT NULL  ,
 	publisher_id        bigint    ,
 	published_date      timestamptz    ,
+    portfolio_id UUID NOT NULL,
 	location      	GEOGRAPHY  NOT NULL  ,
 	gers_id			UUID,
 	h3_index H3INDEX NOT NULL,
     h3_resolution INT2 NOT NULL,
-	CONSTRAINT pk_asset_identifiers PRIMARY KEY ( asset_id ),
-    CONSTRAINT ck_asset_identifiers_h3_resolution CHECK (h3_resolution >= 0 AND h3_resolution <= 15)
- );
-
- CREATE TABLE osc_physrisk_assets.asset_descriptors ( 
-	asset_descriptor_id                UUID  DEFAULT gen_random_uuid () NOT NULL,
-	asset_id                UUID  NOT NULL,
-	description_full  varchar(8096)    ,
-	description_short  varchar(256)  NOT NULL  ,
-	name_fullyqualified varchar(256)    ,
-	name          varchar(100)  NOT NULL  ,
-	creation_time       timestamptz  NOT NULL  ,
-	creator_user_id      bigint    ,
-	last_modification_time timestamptz    ,
-	last_modifier_user_id bigint    ,
-	is_deleted          boolean  NOT NULL  ,
-	deleter_user_id     bigint    ,
-	deletion_time      timestamptz    ,
-	culture        varchar(5)  NOT NULL  ,
-	checksum        text    ,
-	external_id         varchar(36)    ,
-	seq_num         integer  NOT NULL  ,
-	translated_from_id   UUID ,
-	is_active       boolean  NOT NULL  ,
-	creator_user_name   varchar(256)    ,
-	last_modifier_user_name varchar(256)    ,
-	deleter_user_name    varchar(256)    ,
-	tenant_id           integer  NOT NULL  ,
-	tenant_name         text  NOT NULL  ,
-	is_published        boolean  NOT NULL  ,
-	publisher_id        bigint    ,
-	published_date      timestamptz    ,
 	asset_type	varchar(256),
 	asset_class varchar(256),
 	owner_bloomberg_id	varchar(12) DEFAULT NULL,
 	owner_lei_id varchar(20) DEFAULT NULL,
-	CONSTRAINT pk_asset_descriptors PRIMARY KEY ( asset_descriptor_id ),
-	CONSTRAINT fk_asset_descriptors_asset_id FOREIGN KEY ( asset_id ) REFERENCES osc_physrisk_assets.asset_identifier(asset_id)
+	CONSTRAINT pk_fact_asset PRIMARY KEY ( asset_id ),
+	CONSTRAINT fk_fact_asset_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.fact_portfolio(portfolio_id),
+    CONSTRAINT ck_fact_asset_h3_resolution CHECK (h3_resolution >= 0 AND h3_resolution <= 15)
  );
 
 
@@ -142,7 +142,7 @@ CREATE TABLE osc_physrisk_scenarios.dim_scenario_type (
  ); 
 
 CREATE TABLE osc_physrisk_risk_analysis.dim_impact_type ( 
-	impact_type_id UUID  DEFAULT gen_random_uuid () NOT NULL,
+	impact_type_id integer NOT NULL,
 	description_full   varchar(8096)    ,
 	description_short  varchar(256)  NOT NULL  ,
 	name_fullyqualified varchar(256)    ,
@@ -167,6 +167,49 @@ CREATE TABLE osc_physrisk_risk_analysis.dim_impact_type (
 	published_date      timestamptz  ,
 	CONSTRAINT pk_dim_impact_type PRIMARY KEY ( impact_type_id )
  ); 
+
+CREATE TABLE osc_physrisk_risk_analysis.fact_portfolio_analysis ( 
+	portfolio_analysis_id UUID  DEFAULT gen_random_uuid () NOT NULL,
+	description_full   varchar(8096)    ,
+	description_short  varchar(256)  NOT NULL  ,
+	name_fullyqualified varchar(256)    ,
+	name          varchar(100)  NOT NULL  ,
+	creation_time       timestamptz  NOT NULL  ,
+	creator_user_id      bigint    ,
+	last_modification_time timestamptz    ,
+	last_modifier_user_id bigint    ,
+	is_deleted          boolean  NOT NULL  ,
+	deleter_user_id      bigint    ,
+	deletion_time       timestamptz    ,
+	culture            varchar(5)  NOT NULL  ,
+	checksum           text    ,
+	external_id         varchar(36)    ,
+	seq_num             integer  NOT NULL  ,
+	translated_from_id   UUID,
+	is_active           boolean  NOT NULL  ,
+	creator_user_name    varchar(256)    ,
+	last_modifier_user_name varchar(256)    ,
+	deleter_user_name    varchar(256)    ,
+	tenant_id           integer  NOT NULL  ,
+	tenant_name         text  NOT NULL  ,
+	is_published        boolean  NOT NULL  ,
+	publisher_id        bigint    ,
+	published_date      timestamptz    ,
+	portfolio_id            UUID  NOT NULL  ,
+	scenario_type_id integer NOT NULL,
+    scenario_year smallint,
+	hazard_id UUID NOT NULL,
+    impact_type_id integer NOT NULL,
+    value_at_risk float,
+	annual_exceedence_probability float,
+	average_annual_loss float,
+    currency_alphabetic_code char(3),
+	CONSTRAINT pk_fact_portfolio_analysis PRIMARY KEY ( portfolio_analysis_id ),
+	CONSTRAINT fk_fact_portfolio_analysis_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.fact_portfolio(portfolio_id),
+	CONSTRAINT fk_fact_portfolio_analysis_scenario_type_id FOREIGN KEY ( scenario_type_id ) REFERENCES osc_physrisk_scenarios.dim_scenario_type(scenario_type_id),
+	CONSTRAINT fk_fact_portfolio_analysis_impact_type_id FOREIGN KEY ( impact_type_id ) REFERENCES osc_physrisk_risk_analysis.dim_impact_type(impact_type_id),
+	CONSTRAINT fk_fact_portfolio_analysis_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_hazards.hazard(hazard_id)     
+ );
 
 CREATE TABLE osc_physrisk_risk_analysis.fact_asset_analysis ( 
 	asset_analysis_id UUID  DEFAULT gen_random_uuid () NOT NULL,
@@ -202,13 +245,15 @@ CREATE TABLE osc_physrisk_risk_analysis.fact_asset_analysis (
 	h3_index H3INDEX NOT NULL,
     h3_resolution INT2 NOT NULL,
 	scenario_type_id integer NOT NULL,
+    scenario_year smallint,
 	hazard_id UUID NOT NULL,
-    impact_type_id UUID NOT NULL,
+    impact_type_id integer NOT NULL,
     value_at_risk float,
+    currency_alphabetic_code char(3),
 	probability float,
 	CONSTRAINT pk_fact_asset_analysis PRIMARY KEY ( asset_analysis_id ),
     CONSTRAINT ck_fact_asset_analysis_h3_resolution CHECK (h3_resolution >= 0 AND h3_resolution <= 15),
-	CONSTRAINT fk_fact_asset_analysis_asset_id FOREIGN KEY ( asset_id ) REFERENCES osc_physrisk_assets.asset_identifier(asset_id),
+	CONSTRAINT fk_fact_asset_analysis_asset_id FOREIGN KEY ( asset_id ) REFERENCES osc_physrisk_assets.fact_asset(asset_id),
 	CONSTRAINT fk_fact_asset_analysis_scenario_type_id FOREIGN KEY ( scenario_type_id ) REFERENCES osc_physrisk_scenarios.dim_scenario_type(scenario_type_id),
 	CONSTRAINT fk_fact_asset_analysis_impact_type_id FOREIGN KEY ( impact_type_id ) REFERENCES osc_physrisk_risk_analysis.dim_impact_type(impact_type_id),
 	CONSTRAINT fk_fact_asset_analysis_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_hazards.hazard(hazard_id)     
@@ -277,6 +322,18 @@ INSERT INTO osc_physrisk.osc_physrisk_scenarios.dim_scenario_type
 VALUES 
 	(9, 'RCP8.5 - Rising radiative forcing pathway leading to 8.5 W/m2 in 2100. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP8.5', 'RCP8.5', 'RCP8.5','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',1,NULL, 'y', 'OS-C', 'OS-C', 'OS-C','y', 1,'2024-07-15T00:00:01Z')
 ;
+
+INSERT INTO osc_physrisk.osc_physrisk_risk_analysis.dim_impact_type
+	(impact_type_id, description_full, description_short, name_fullyqualified, "name", creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, is_published, publisher_id, published_date)
+VALUES 
+	(1, 'Damage', 'Damage', 'Damage', 'Damage','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'checksum',1,NULL, 't', 'OS-C', 'OS-C',NULL, 't',1 ,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_risk_analysis.dim_impact_type
+	(impact_type_id, description_full, description_short, name_fullyqualified, "name", creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, is_published, publisher_id, published_date)
+VALUES 
+	(2, 'Disruption', 'Disruption', 'Disruption', 'Disruption','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'checksum',1,NULL, 't', 'OS-C', 'OS-C',NULL, 't',1 ,'2024-07-15T00:00:01Z')
+;
+
 -- DATA IN ENGLISH ENDS
 -- DATA IN FRENCH STARTS
 INSERT INTO osc_physrisk.osc_physrisk_scenarios.dim_scenario_type
