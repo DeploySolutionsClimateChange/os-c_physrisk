@@ -383,7 +383,7 @@ VALUES
 INSERT INTO osc_physrisk.osc_physrisk_scenario.dim_scenario_type
 	(scenario_type_id, description_full, description_short, name_fullyqualified, "name",tags,  creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, is_published, publisher_id, published_date)
 VALUES 
-	(0, 'History (before 2014). See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'History (before 2014)', 'History (- 2014)', 'History (- 2014)','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',1,0, 'y', 'OS-C', 'OS-C', 'OS-C','y', 1,'2024-07-15T00:00:01Z')
+	(0, 'History (before 2014). See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'History (before 2014)', 'History (- 2014)', 'History (- 2014)','key1=>value3_en,key2=>value4_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',1,0, 'y', 'OS-C', 'OS-C', 'OS-C','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_scenario.dim_scenario_type
 	(scenario_type_id, description_full, description_short, name_fullyqualified, "name", tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, is_published, publisher_id, published_date)
@@ -393,7 +393,7 @@ VALUES
 INSERT INTO osc_physrisk.osc_physrisk_scenario.dim_scenario_type
 	(scenario_type_id, description_full, description_short, name_fullyqualified, "name",tags,  creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, is_published, publisher_id, published_date)
 VALUES 
-	(2, 'SSP1-2.6 - low GHG emissions: CO2 emissions cut to net zero around 2075. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP1-2.6', 'SSP1-2.6', 'SSP1-2.6','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',1,2, 'y', 'OS-C', 'OS-C', 'OS-C','y', 1,'2024-07-15T00:00:01Z')
+	(2, 'SSP1-2.6 - low GHG emissions: CO2 emissions cut to net zero around 2075. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP1-2.6', 'SSP1-2.6', 'SSP1-2.6','key1=>value3_en,key2=>value4_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',1,2, 'y', 'OS-C', 'OS-C', 'OS-C','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_scenario.dim_scenario_type
 	(scenario_type_id, description_full, description_short, name_fullyqualified, "name", tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, is_published, publisher_id, published_date)
@@ -408,7 +408,7 @@ VALUES
 INSERT INTO osc_physrisk.osc_physrisk_scenario.dim_scenario_type
 	(scenario_type_id, description_full, description_short, name_fullyqualified, "name", tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, is_published, publisher_id, published_date)
 VALUES 
-	(5, 'SSP5-8.5 - very high GHG emissions: CO2 emissions triple by 2075. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP5-8.5', 'SSP5-8.5', 'SSP5-8.5','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',1,5, 'y', 'OS-C', 'OS-C', 'OS-C','y', 1,'2024-07-15T00:00:01Z')
+	(5, 'SSP5-8.5 - very high GHG emissions: CO2 emissions triple by 2075. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP5-8.5', 'SSP5-8.5', 'SSP5-8.5','key1=>value5_en,key2=>value6_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',1,5, 'y', 'OS-C', 'OS-C', 'OS-C','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_scenario.dim_scenario_type
 	(scenario_type_id, description_full, description_short, name_fullyqualified, "name", tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, is_published, publisher_id, published_date)
@@ -571,6 +571,10 @@ SELECT * FROM osc_physrisk.osc_physrisk_scenario.dim_scenario_type WHERE culture
 SELECT a."name" as "English Name",  b.culture as "Translated Culture",  b."name" as "Translated Name", b.description_full as "Translated Description", b.tags as "Translated Tags" FROM osc_physrisk.osc_physrisk_scenario.dim_scenario_type a 
 INNER JOIN osc_physrisk.osc_physrisk_scenario.dim_scenario_type b ON a.scenario_type_id = b.translated_from_id
 WHERE b.culture='es'  ;
+
+-- QUERY BY TAGS
+SELECT a."name",  a.description_full, a.tags FROM osc_physrisk.osc_physrisk_scenario.dim_scenario_type a
+WHERE a.tags -> 'key1'='value1_en' OR a.tags -> 'key2'='value4_en'  ;
 
 -- SAMPLE CHECKSUM UPDATE
 --UPDATE osc_physrisk.osc_physrisk_scenario.dim_scenario_type
