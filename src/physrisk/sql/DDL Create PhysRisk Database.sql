@@ -601,7 +601,216 @@ INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
 VALUES 
 	('6ba57474-6c7a-4ea3-aca8-25e30f27cec1', 'Flood depth/baseline, with subsidence (WRI)', 'Flood depth/baseline, with subsidence (WRI)', 'Flood depth/baseline, with subsidence (WRI)', 'Flood depth/baseline, with subsidence (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 2)
 ;
-
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('e0b5afc2-eed8-4760-9667-c14fdbf374db', 'Days with average temperature above 25°C/ACCESS-CM2', 'Days with average temperature above 25°C/ACCESS-CM2', 'Days with average temperature above 25°C/ACCESS-CM2', 'Days with average temperature above 25°C/ACCESS-CM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('b795a8af-12cc-4773-83ee-a50badd1fe74', 'Days with average temperature above 25°C/CMCC-ESM2', 'Days with average temperature above 25°C/CMCC-ESM2', 'Days with average temperature above 25°C/CMCC-ESM2', 'Days with average temperature above 25°C/CMCC-ESM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('81213608-0a01-42b0-a54f-a070fb104b95', 'Days with average temperature above 25°C/CNRM-CM6-1', 'Days with average temperature above 25°C/CNRM-CM6-1', 'Days with average temperature above 25°C/CNRM-CM6-1', 'Days with average temperature above 25°C/CNRM-CM6-1', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('98692238-6a8f-4e58-a779-9f96eeaf1abd', 'Days with average temperature above 25°C/MIROC6', 'Days with average temperature above 25°C/MIROC6', 'Days with average temperature above 25°C/MIROC6', 'Days with average temperature above 25°C/MIROC6', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('3dbf253a-d880-4440-baa5-3e4a9fcac355', 'Days with average temperature above 25°C/ESM1-2-LR', 'Days with average temperature above 25°C/ESM1-2-LR', 'Days with average temperature above 25°C/ESM1-2-LR', 'Days with average temperature above 25°C/ESM1-2-LR', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('5fcca03b-ffff-4632-b896-78ceb9777e4b', 'Days with average temperature above 25°C/NorESM2-MM', 'Days with average temperature above 25°C/NorESM2-MM', 'Days with average temperature above 25°C/NorESM2-MM', 'Days with average temperature above 25°C/NorESM2-MM', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('77f04d46-303f-40f2-a892-d0068d6ab64a', 'Days with average temperature above 30°C/ACCESS-CM2', 'Days with average temperature above 30°C/ACCESS-CM2', 'Days with average temperature above 30°C/ACCESS-CM2', 'Days with average temperature above 30°C/ACCESS-CM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('c47e4dfa-e850-4060-aed9-af9100c65986', 'Days with average temperature above 30°C/CMCC-ESM2', 'Days with average temperature above 30°C/CMCC-ESM2', 'Days with average temperature above 30°C/CMCC-ESM2', 'Days with average temperature above 30°C/CMCC-ESM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('ba1e06be-1cf5-4b5d-8f93-8f64e47af2b8', 'Days with average temperature above 30°C/CNRM-CM6-1', 'Days with average temperature above 30°C/CNRM-CM6-1', 'Days with average temperature above 30°C/CNRM-CM6-1', 'Days with average temperature above 30°C/CNRM-CM6-1', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('b882a67c-acea-4dbe-9939-1594775e6f78', 'Days with average temperature above 30°C/MIROC6', 'Days with average temperature above 30°C/MIROC6', 'Days with average temperature above 30°C/MIROC6', 'Days with average temperature above 30°C/MIROC6', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('0ae16260-45b7-48fe-924e-a2bd2bc25f39', 'Days with average temperature above 30°C/ESM1-2-LR', 'Days with average temperature above 30°C/ESM1-2-LR', 'Days with average temperature above 30°C/ESM1-2-LR', 'Days with average temperature above 30°C/ESM1-2-LR', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('151fe933-f1be-4fb1-bcaf-d534a5023c78', 'Days with average temperature above 30°C/NorESM2-MM', 'Days with average temperature above 30°C/NorESM2-MM', 'Days with average temperature above 30°C/NorESM2-MM', 'Days with average temperature above 30°C/NorESM2-MM', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('96e6fcc5-d843-4f59-9746-2d0d341b6bdc', 'Days with average temperature above 35°C/ACCESS-CM2', 'Days with average temperature above 35°C/ACCESS-CM2', 'Days with average temperature above 35°C/ACCESS-CM2', 'Days with average temperature above 35°C/ACCESS-CM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('2c485594-5220-4e5e-85f0-3e67a09bacd9', 'Days with average temperature above 35°C/CMCC-ESM2', 'Days with average temperature above 35°C/CMCC-ESM2', 'Days with average temperature above 35°C/CMCC-ESM2', 'Days with average temperature above 35°C/CMCC-ESM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('db9a09b3-3386-4081-bf0c-79b6c8ebd38e', 'Days with average temperature above 35°C/CNRM-CM6-1', 'Days with average temperature above 35°C/CNRM-CM6-1', 'Days with average temperature above 35°C/CNRM-CM6-1', 'Days with average temperature above 35°C/CNRM-CM6-1', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('3f77c47d-9a26-4a3f-a289-ecf56678ec69', 'Days with average temperature above 35°C/MIROC6', 'Days with average temperature above 35°C/MIROC6', 'Days with average temperature above 35°C/MIROC6', 'Days with average temperature above 35°C/MIROC6', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('f197975a-acea-4514-acbf-35cb070b0b5c', 'Days with average temperature above 35°C/ESM1-2-LR', 'Days with average temperature above 35°C/ESM1-2-LR', 'Days with average temperature above 35°C/ESM1-2-LR', 'Days with average temperature above 35°C/ESM1-2-LR', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('d4d610b4-060e-4212-9b0c-05fe551a0128', 'Days with average temperature above 35°C/NorESM2-MM', 'Days with average temperature above 35°C/NorESM2-MM', 'Days with average temperature above 35°C/NorESM2-MM', 'Days with average temperature above 35°C/NorESM2-MM', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('f38a4529-0b9e-4a31-9b16-f6e070a4f001', 'Days with average temperature above 40°C/ACCESS-CM2', 'Days with average temperature above 40°C/ACCESS-CM2', 'Days with average temperature above 40°C/ACCESS-CM2', 'Days with average temperature above 40°C/ACCESS-CM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('bae5ce0d-079c-44c8-87f2-705e13806371', 'Days with average temperature above 40°C/CMCC-ESM2', 'Days with average temperature above 40°C/CMCC-ESM2', 'Days with average temperature above 40°C/CMCC-ESM2', 'Days with average temperature above 40°C/CMCC-ESM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('19049eb2-9270-4b1b-9aea-8e2c610ea6b0', 'Days with average temperature above 40°C/CNRM-CM6-1', 'Days with average temperature above 40°C/CNRM-CM6-1', 'Days with average temperature above 40°C/CNRM-CM6-1', 'Days with average temperature above 40°C/CNRM-CM6-1', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('a35f8652-5736-4b83-b9ec-2bcd53dd2b75', 'Days with average temperature above 40°C/MIROC6', 'Days with average temperature above 40°C/MIROC6', 'Days with average temperature above 40°C/MIROC6', 'Days with average temperature above 40°C/MIROC6', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('6a23417d-27fc-49f5-9147-43f9a761e13d', 'Days with average temperature above 40°C/ESM1-2-LR', 'Days with average temperature above 40°C/ESM1-2-LR', 'Days with average temperature above 40°C/ESM1-2-LR', 'Days with average temperature above 40°C/ESM1-2-LR', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('9fd1aafe-d942-4dd7-8b5f-cc3983d12616', 'Days with average temperature above 40°C/NorESM2-MM', 'Days with average temperature above 40°C/NorESM2-MM', 'Days with average temperature above 40°C/NorESM2-MM', 'Days with average temperature above 40°C/NorESM2-MM', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('801009ff-7135-4252-a956-8f32cd9fb17d', 'Days with average temperature above 45°C/ACCESS-CM2', 'Days with average temperature above 45°C/ACCESS-CM2', 'Days with average temperature above 45°C/ACCESS-CM2', 'Days with average temperature above 45°C/ACCESS-CM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('ea8be4c4-a3f0-441f-b1cd-b4de8b9e885c', 'Days with average temperature above 45°C/CMCC-ESM2', 'Days with average temperature above 45°C/CMCC-ESM2', 'Days with average temperature above 45°C/CMCC-ESM2', 'Days with average temperature above 45°C/CMCC-ESM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('69053bee-35fd-45bd-9dd1-8fe485ae7715', 'Days with average temperature above 45°C/CNRM-CM6-1', 'Days with average temperature above 45°C/CNRM-CM6-1', 'Days with average temperature above 45°C/CNRM-CM6-1', 'Days with average temperature above 45°C/CNRM-CM6-1', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('1f48f1f2-03ab-43b8-9185-038fd656ebcd', 'Days with average temperature above 45°C/MIROC6', 'Days with average temperature above 45°C/MIROC6', 'Days with average temperature above 45°C/MIROC6', 'Days with average temperature above 45°C/MIROC6', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('8960452e-86b1-4134-b03d-5bea69079fcc', 'Days with average temperature above 45°C/ESM1-2-LR', 'Days with average temperature above 45°C/ESM1-2-LR', 'Days with average temperature above 45°C/ESM1-2-LR', 'Days with average temperature above 45°C/ESM1-2-LR', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('3676521f-16ee-4ce6-b8b4-d00aaba44281', 'Days with average temperature above 45°C/NorESM2-MM', 'Days with average temperature above 45°C/NorESM2-MM', 'Days with average temperature above 45°C/NorESM2-MM', 'Days with average temperature above 45°C/NorESM2-MM', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('8bfe29fb-85e3-4497-b340-ad3f4eadfc3f', 'Days with average temperature above 50°C/ACCESS-CM2', 'Days with average temperature above 50°C/ACCESS-CM2', 'Days with average temperature above 50°C/ACCESS-CM2', 'Days with average temperature above 50°C/ACCESS-CM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('fb684a2f-ce48-4d02-ba49-9c5cd49654df', 'Days with average temperature above 50°C/CMCC-ESM2', 'Days with average temperature above 50°C/CMCC-ESM2', 'Days with average temperature above 50°C/CMCC-ESM2', 'Days with average temperature above 50°C/CMCC-ESM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('56fb7c3a-7d9c-41d2-ab1d-37bab5544748', 'Days with average temperature above 50°C/CNRM-CM6-1', 'Days with average temperature above 50°C/CNRM-CM6-1', 'Days with average temperature above 50°C/CNRM-CM6-1', 'Days with average temperature above 50°C/CNRM-CM6-1', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('12a84609-f114-4975-a90a-aed809452897', 'Days with average temperature above 50°C/MIROC6', 'Days with average temperature above 50°C/MIROC6', 'Days with average temperature above 50°C/MIROC6', 'Days with average temperature above 50°C/MIROC6', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('22ce6754-f68b-4f96-b083-8bb2a5c4deb6', 'Days with average temperature above 50°C/ESM1-2-LR', 'Days with average temperature above 50°C/ESM1-2-LR', 'Days with average temperature above 50°C/ESM1-2-LR', 'Days with average temperature above 50°C/ESM1-2-LR', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('ec4c8b74-816a-4260-8321-fc03b6850c37', 'Days with average temperature above 50°C/NorESM2-MM', 'Days with average temperature above 50°C/NorESM2-MM', 'Days with average temperature above 50°C/NorESM2-MM', 'Days with average temperature above 50°C/NorESM2-MM', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('7f06ac9f-f6ac-467a-9a88-d14a91465141', 'Days with average temperature above 55°C/ACCESS-CM2', 'Days with average temperature above 55°C/ACCESS-CM2', 'Days with average temperature above 55°C/ACCESS-CM2', 'Days with average temperature above 55°C/ACCESS-CM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('c9edfa0d-5450-4de5-8680-4a26874cac2d', 'Days with average temperature above 55°C/CMCC-ESM2', 'Days with average temperature above 55°C/CMCC-ESM2', 'Days with average temperature above 55°C/CMCC-ESM2', 'Days with average temperature above 55°C/CMCC-ESM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('431a89ea-17bd-4dee-a2af-9ba18e737fe5', 'Days with average temperature above 55°C/CNRM-CM6-1', 'Days with average temperature above 55°C/CNRM-CM6-1', 'Days with average temperature above 55°C/CNRM-CM6-1', 'Days with average temperature above 55°C/CNRM-CM6-1', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('158038b5-1f09-471a-ac5b-85aae409148b', 'Days with average temperature above 55°C/MIROC6', 'Days with average temperature above 55°C/MIROC6', 'Days with average temperature above 55°C/MIROC6', 'Days with average temperature above 55°C/MIROC6', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('a5810ce7-eec7-4881-a182-33e0e3156a26', 'Days with average temperature above 55°C/ESM1-2-LR', 'Days with average temperature above 55°C/ESM1-2-LR', 'Days with average temperature above 55°C/ESM1-2-LR', 'Days with average temperature above 55°C/ESM1-2-LR', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('41705043-bdad-4d2d-ab2b-3d884375b52d', 'Days with average temperature above 55°C/NorESM2-MM', 'Days with average temperature above 55°C/NorESM2-MM', 'Days with average temperature above 55°C/NorESM2-MM', 'Days with average temperature above 55°C/NorESM2-MM', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 3)
+;
 
 -- DATA IN ENGLISH ENDS
 -- DATA IN FRENCH STARTS
@@ -810,4 +1019,9 @@ WHERE haz.hazard_id = 2
 --UPDATE osc_physrisk.osc_physrisk_scenario.dim_scenario_type
 --	SET checksum = md5(concat('Unknown/Not Selected', 'Unknown/Not Selected', 'Unknown/Not Selected', 'Unknown/Not Selected')) WHERE scenario_type_id = -1
 --;
+
+
+
+
+
 
