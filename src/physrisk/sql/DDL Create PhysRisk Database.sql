@@ -202,6 +202,8 @@ CREATE TABLE osc_physrisk_asset.fact_portfolio (
 	is_published        boolean  NOT NULL  ,
 	publisher_id        bigint    ,
 	published_date      timestamptz    ,
+    value_total decimal,
+    value_currency_alphabetic_code char(3),
 	CONSTRAINT pk_fact_portfolio PRIMARY KEY (portfolio_id )
  );
 
@@ -234,17 +236,20 @@ CREATE TABLE osc_physrisk_asset.fact_asset (
 	publisher_id        bigint    ,
 	published_date      timestamptz    ,
     portfolio_id UUID NOT NULL,
-	location      	GEOGRAPHY  NOT NULL  ,
-	gers_id			UUID,
-	h3_index H3INDEX NOT NULL,
-    h3_resolution INT2 NOT NULL,
+	geo_location_name      	varchar(512),
+    geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
+	geo_gers_id			UUID,
+	geo_h3_index H3INDEX NOT NULL,
+    geo_h3_resolution INT2 NOT NULL,
 	asset_type	varchar(256),
 	asset_class varchar(256),
 	owner_bloomberg_id	varchar(12) DEFAULT NULL,
 	owner_lei_id varchar(20) DEFAULT NULL,
+    value_total decimal,
+    value_currency_alphabetic_code char(3),
 	CONSTRAINT pk_fact_asset PRIMARY KEY ( asset_id ),
 	CONSTRAINT fk_fact_asset_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_asset.fact_portfolio(portfolio_id),
-    CONSTRAINT ck_fact_asset_h3_resolution CHECK (h3_resolution >= 0 AND h3_resolution <= 15)
+    CONSTRAINT ck_fact_asset_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15)
  );
 
 -- SCHEMA osc_physrisk_risk_analysis
@@ -310,10 +315,11 @@ CREATE TABLE osc_physrisk_risk_analysis.fact_portfolio_impact (
     scenario_year smallint,
 	hazard_id	UUID NOT NULL,
     impact_type_id integer NOT NULL,
-    value_at_risk decimal,
 	annual_exceedence_probability decimal,
 	average_annual_loss decimal,
-    currency_alphabetic_code char(3),
+    value_total decimal,
+    value_at_risk decimal,
+    value_currency_alphabetic_code char(3),
 	CONSTRAINT pk_fact_portfolio_analysis PRIMARY KEY ( portfolio_analysis_id ),
 	CONSTRAINT fk_fact_portfolio_analysis_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_asset.fact_portfolio(portfolio_id),
 	CONSTRAINT fk_fact_portfolio_analysis_scenario_type_id FOREIGN KEY ( scenario_type_id ) REFERENCES osc_physrisk_scenario.scenario_type(scenario_type_id),
@@ -350,18 +356,19 @@ CREATE TABLE osc_physrisk_risk_analysis.fact_asset_impact (
 	publisher_id        bigint    ,
 	published_date      timestamptz    ,
 	asset_id            UUID  NOT NULL  ,
-	location varchar(256),  
-    coordinates      	GEOGRAPHY  NOT NULL  ,
-	gers_id			UUID,
-	h3_index H3INDEX NOT NULL,
-    h3_resolution INT2 NOT NULL,
+	geo_location_name      	varchar(512),
+    geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
+	geo_gers_id			UUID,
+	geo_h3_index H3INDEX NOT NULL,
+    geo_h3_resolution INT2 NOT NULL,
 	scenario_type_id integer NOT NULL,
     scenario_year smallint,
 	hazard_id	UUID NOT NULL,
     hazard_intensity decimal,
     impact_type_id integer NOT NULL,
+    value_total decimal,
     value_at_risk decimal,
-    currency_alphabetic_code char(3),
+    value_currency_alphabetic_code char(3),
     return_periods jsonb,
     parameter    decimal,
     impact_mean    decimal,
@@ -371,7 +378,7 @@ CREATE TABLE osc_physrisk_risk_analysis.fact_asset_impact (
     impact_exc_values    decimal[],
 	probability decimal,
 	CONSTRAINT pk_fact_asset_analysis PRIMARY KEY ( asset_analysis_id ),
-    CONSTRAINT ck_fact_asset_analysis_h3_resolution CHECK (h3_resolution >= 0 AND h3_resolution <= 15),
+    CONSTRAINT ck_fact_asset_analysis_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
 	CONSTRAINT fk_fact_asset_analysis_asset_id FOREIGN KEY ( asset_id ) REFERENCES osc_physrisk_asset.fact_asset(asset_id),
 	CONSTRAINT fk_fact_asset_analysis_scenario_type_id FOREIGN KEY ( scenario_type_id ) REFERENCES osc_physrisk_scenario.scenario_type(scenario_type_id),
 	CONSTRAINT fk_fact_asset_analysis_impact_type_id FOREIGN KEY ( impact_type_id ) REFERENCES osc_physrisk_risk_analysis.impact_type(impact_type_id),
@@ -444,28 +451,28 @@ VALUES
 INSERT INTO osc_physrisk.osc_physrisk_risk_analysis.impact_type
 	(impact_type_id, description_full, description_short, name_fullyqualified, "name", tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, is_published, publisher_id, published_date)
 VALUES 
-	(1, 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'checksum',1,1, 't', 'OS-C', 'OS-C',NULL, 't',1 ,'2024-07-15T00:00:01Z')
+	(-1, 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'checksum',1,1, 't', 'OS-C', 'OS-C',NULL, 't',1 ,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_risk_analysis.impact_type
 	(impact_type_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, is_published, publisher_id, published_date, accounting_category)
 VALUES 
-	(2, 'Asset repairs and construction', 'Asset repairs and construction', 'Asset repairs and construction','Asset repairs and construction', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'checksum',1,1, 't', 'OS-C', 'OS-C',NULL, 't',1 ,'2024-07-15T00:00:01Z','Capex' );
+	(1, 'Asset repairs and construction', 'Asset repairs and construction', 'Asset repairs and construction','Asset repairs and construction', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'checksum',1,1, 't', 'OS-C', 'OS-C',NULL, 't',1 ,'2024-07-15T00:00:01Z','Capex' );
 INSERT INTO osc_physrisk.osc_physrisk_risk_analysis.impact_type
 	(impact_type_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, is_published, publisher_id, published_date, accounting_category)
 VALUES 
-	(3, 'Revenue loss due to asset restoration', 'Revenue loss due to asset restoration', 'Revenue loss due to asset restoration','Revenue loss due to asset restoration', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'checksum',1,1, 't', 'OS-C', 'OS-C',NULL, 't',1 ,'2024-07-15T00:00:01Z','Revenue' );
+	(2, 'Revenue loss due to asset restoration', 'Revenue loss due to asset restoration', 'Revenue loss due to asset restoration','Revenue loss due to asset restoration', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'checksum',1,1, 't', 'OS-C', 'OS-C',NULL, 't',1 ,'2024-07-15T00:00:01Z','Revenue' );
 INSERT INTO osc_physrisk.osc_physrisk_risk_analysis.impact_type
 	(impact_type_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, is_published, publisher_id, published_date, accounting_category)
 VALUES 
-	(4, 'Revenue loss due to productivity impact', 'Revenue loss due to productivity impact', 'Revenue loss due to productivity impact','Revenue loss due to productivity impact', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'checksum',1,1, 't', 'OS-C', 'OS-C',NULL, 't',1 ,'2024-07-15T00:00:01Z','Revenue' );
+	(3, 'Revenue loss due to productivity impact', 'Revenue loss due to productivity impact', 'Revenue loss due to productivity impact','Revenue loss due to productivity impact', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'checksum',1,1, 't', 'OS-C', 'OS-C',NULL, 't',1 ,'2024-07-15T00:00:01Z','Revenue' );
 INSERT INTO osc_physrisk.osc_physrisk_risk_analysis.impact_type
 	(impact_type_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, is_published, publisher_id, published_date, accounting_category)
 VALUES 
-	(5, 'Recurring cost increase (chronic)', 'Recurring cost increase (chronic)', 'Recurring cost increase (chronic)','Recurring cost increase (chronic)', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'checksum',1,1, 't', 'OS-C', 'OS-C',NULL, 't',1 ,'2024-07-15T00:00:01Z','OpEx' );
+	(4, 'Recurring cost increase (chronic)', 'Recurring cost increase (chronic)', 'Recurring cost increase (chronic)','Recurring cost increase (chronic)', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'checksum',1,1, 't', 'OS-C', 'OS-C',NULL, 't',1 ,'2024-07-15T00:00:01Z','OpEx' );
 INSERT INTO osc_physrisk.osc_physrisk_risk_analysis.impact_type
 	(impact_type_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, is_published, publisher_id, published_date, accounting_category)
 VALUES 
-	(6, 'Recurring cost increase (acute)', 'Recurring cost increase (acute)', 'Recurring cost increase (acute)','Recurring cost increase (acute)', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'checksum',1,1, 't', 'OS-C', 'OS-C',NULL, 't',1 ,'2024-07-15T00:00:01Z','OpEx' );
+	(5, 'Recurring cost increase (acute)', 'Recurring cost increase (acute)', 'Recurring cost increase (acute)','Recurring cost increase (acute)', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'checksum',1,1, 't', 'OS-C', 'OS-C',NULL, 't',1 ,'2024-07-15T00:00:01Z','OpEx' );
 INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard
 	(hazard_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date)
 VALUES 
@@ -976,9 +983,9 @@ SELECT
 	tags,
 	culture,
 	asset_id,
-	"location",
-	coordinates,
-	gers_id,
+	geo_location_name,
+	geo_location_coordinates,
+	geo_gers_id,
 	h3_index,
 	h3_resolution,
 	scenario_type_id,
