@@ -466,9 +466,6 @@ INSERT INTO osc_physrisk.osc_physrisk_risk_analysis.dim_impact_type
 	(impact_type_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, is_published, publisher_id, published_date, accounting_category)
 VALUES 
 	(6, 'Recurring cost increase (acute)', 'Recurring cost increase (acute)', 'Recurring cost increase (acute)','Recurring cost increase (acute)', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'checksum',1,1, 't', 'OS-C', 'OS-C',NULL, 't',1 ,'2024-07-15T00:00:01Z','OpEx' );
-
-
-
 INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard
 	(hazard_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date)
 VALUES 
@@ -524,7 +521,46 @@ INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard
 VALUES 
 	(10, 'Water Risk', 'Water Risk', 'Water Risk', 'Water Risk', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z')
 ;
-
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('57a7df66-420d-4730-9669-1547f8200272', 'Flood depth (TUDelft)', 'Flood depth (TUDelft)', 'Flood depth (TUDelft)', 'Flood depth (TUDelft)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 1)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('5fb27cc6-ee01-4133-b2e9-6c1f22ed5b40', 'Flood depth/GFDL-ESM2M (WRI)', 'Flood depth/GFDL-ESM2M (WRI)', 'Flood depth/GFDL-ESM2M (WRI)', 'Flood depth/GFDL-ESM2M (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 1)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('79555143-ba2a-47b0-bbe7-7aac3685dedb', 'Flood depth/HadGEM2-ES (WRI)', 'Flood depth/HadGEM2-ES (WRI)', 'Flood depth/HadGEM2-ES (WRI)', 'Flood depth/HadGEM2-ES (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 1)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('6fe5ccb1-5d38-4a3e-b0a5-d4cc70981035', 'Flood depth/IPSL-CM5A-LR (WRI)', 'Flood depth/IPSL-CM5A-LR (WRI)', 'Flood depth/IPSL-CM5A-LR (WRI)', 'Flood depth/IPSL-CM5A-LR (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 1)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('e4f10569-95be-4b5b-8d34-763eb95e730b', 'Flood depth/MIROC-ESM-CHEM (WRI)', 'Flood depth/MIROC-ESM-CHEM (WRI)', 'Flood depth/MIROC-ESM-CHEM (WRI)', 'Flood depth/MIROC-ESM-CHEM (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 1)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('690e01eb-f7e6-4fbf-84e4-f8195656abb3', 'Flood depth/NorESM1-M (WRI)', 'Flood depth/NorESM1-M (WRI)', 'Flood depth/NorESM1-M (WRI)', 'Flood depth/NorESM1-M (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 1)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('5f396b97-badc-40d2-b0b3-c8be8f3053ba', 'Flood depth/baseline (WRI)', 'Flood depth/baseline (WRI)', 'Flood depth/baseline (WRI)', 'Flood depth/baseline (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 1)
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard_indicator
+	(hazard_indicator_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, hazard_id)
+VALUES 
+	('901cbd14-9223-4d36-8ab4-658945d913a4', 'Standard of protection (TUDelft)', 'Standard of protection (TUDelft)', 'Standard of protection (TUDelft)', 'Standard of protection (TUDelft)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z', 1)
+;
 -- DATA IN ENGLISH ENDS
 -- DATA IN FRENCH STARTS
 INSERT INTO osc_physrisk.osc_physrisk_scenario.dim_scenario_type
@@ -713,6 +749,12 @@ FROM
 	osc_physrisk.osc_physrisk_risk_analysis.fact_asset_impact
 ;
 
+-- VIEW RIVERINE HAZARD INDICATORS
+SELECT	*
+FROM
+	osc_physrisk.osc_physrisk_hazard.hazard_indicator hi INNER JOIN osc_physrisk.osc_physrisk_hazard.hazard haz ON hi.hazard_id = haz.hazard_id
+WHERE haz."name" = 'Riverine Inundation' -- more likely written as WHERE haz.hazard_id = 1
+;
 
 -- SAMPLE CHECKSUM UPDATE
 --UPDATE osc_physrisk.osc_physrisk_scenario.dim_scenario_type
