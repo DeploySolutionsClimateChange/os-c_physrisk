@@ -15,7 +15,7 @@ CREATE SCHEMA IF NOT EXISTS osc_physrisk_risk_analysis;
 -- SETUP TABLES
 -- SCHEMA osc_physrisk_hazard
 CREATE TABLE osc_physrisk_hazard.hazard ( 
-	hazard_id	UUID  DEFAULT gen_random_uuid () NOT NULL,
+	hazard_id	integer  NOT NULL,
 	name        varchar(100)  NOT NULL  ,
 	name_fullyqualified varchar(256)    ,
 	description_full   varchar(8096)    ,
@@ -42,8 +42,9 @@ CREATE TABLE osc_physrisk_hazard.hazard (
 	is_published       boolean  NOT NULL  ,
 	publisher_id        bigint    ,
 	published_date      timestamptz    ,
-	oed_input_abbreviation      varchar(5)  NOT NULL,
-	oed_grouped_peril_code boolean NOT NULL,
+	oed_peril_code integer,
+	oed_input_abbreviation      varchar(5) ,
+	oed_grouped_peril_code boolean,
 	CONSTRAINT pk_hazard PRIMARY KEY ( hazard_id )
  );
 
@@ -75,7 +76,7 @@ CREATE TABLE osc_physrisk_hazard.hazard_indicator (
 	is_published       boolean  NOT NULL  ,
 	publisher_id        bigint    ,
 	published_date      timestamptz    ,
-	hazard_id	UUID  NOT NULL,
+	hazard_id	integer  NOT NULL,
 	CONSTRAINT pk_hazard_indicator PRIMARY KEY ( hazard_indicator_id ),
 	CONSTRAINT fk_hazard_indicator_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_hazard.hazard(hazard_id)
  );
@@ -307,11 +308,11 @@ CREATE TABLE osc_physrisk_risk_analysis.fact_portfolio_impact (
 	portfolio_id            UUID  NOT NULL  ,
 	scenario_type_id integer NOT NULL,
     scenario_year smallint,
-	hazard_id UUID NOT NULL,
+	hazard_id integer NOT NULL,
     impact_type_id integer NOT NULL,
-    value_at_risk float,
-	annual_exceedence_probability float,
-	average_annual_loss float,
+    value_at_risk decimal,
+	annual_exceedence_probability decimal,
+	average_annual_loss decimal,
     currency_alphabetic_code char(3),
 	CONSTRAINT pk_fact_portfolio_analysis PRIMARY KEY ( portfolio_analysis_id ),
 	CONSTRAINT fk_fact_portfolio_analysis_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_asset.fact_portfolio(portfolio_id),
@@ -356,12 +357,19 @@ CREATE TABLE osc_physrisk_risk_analysis.fact_asset_impact (
     h3_resolution INT2 NOT NULL,
 	scenario_type_id integer NOT NULL,
     scenario_year smallint,
-	hazard_id UUID NOT NULL,
+	hazard_id integer NOT NULL,
+    hazard_intensity decimal,
     impact_type_id integer NOT NULL,
-    value_at_risk float,
-    impact_value float,
+    value_at_risk decimal,
     currency_alphabetic_code char(3),
-	probability float,
+    return_periods jsonb,
+    parameter    decimal,
+    impact_mean    decimal,
+    impact_distr_bin_edges    decimal[],
+    impact_distr_p    decimal[],
+    impact_exc_exceed_p    decimal[],
+    impact_exc_values    decimal[],
+	probability decimal,
 	CONSTRAINT pk_fact_asset_analysis PRIMARY KEY ( asset_analysis_id ),
     CONSTRAINT ck_fact_asset_analysis_h3_resolution CHECK (h3_resolution >= 0 AND h3_resolution <= 15),
 	CONSTRAINT fk_fact_asset_analysis_asset_id FOREIGN KEY ( asset_id ) REFERENCES osc_physrisk_asset.fact_asset(asset_id),
@@ -459,6 +467,63 @@ INSERT INTO osc_physrisk.osc_physrisk_risk_analysis.dim_impact_type
 VALUES 
 	(6, 'Recurring cost increase (acute)', 'Recurring cost increase (acute)', 'Recurring cost increase (acute)','Recurring cost increase (acute)', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'checksum',1,1, 't', 'OS-C', 'OS-C',NULL, 't',1 ,'2024-07-15T00:00:01Z','OpEx' );
 
+
+
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard
+	(hazard_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date)
+VALUES 
+	(-1, 'Unknown hazard/Not selected', 'Unknown hazard/Not selected', 'Unknown hazard/Not selected', 'Unknown hazard/Not selected', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard
+	(hazard_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date)
+VALUES 
+	(1, 'Riverine Inundation', 'Riverine Inundation', 'Riverine Inundation', 'Riverine Inundation', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard
+	(hazard_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date)
+VALUES 
+	(2, 'Coastal Inundation', 'Coastal Inundation', 'Coastal Inundation', 'Coastal Inundation', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard
+	(hazard_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date)
+VALUES 
+	(3, 'Chronic Heat', 'Chronic Heat', 'Chronic Heat', 'Chronic Heat', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard
+	(hazard_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date)
+VALUES 
+	(4, 'Fire', 'Fire', 'Fire', 'Fire', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard
+	(hazard_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date)
+VALUES 
+	(5, 'Drought', 'Drought', 'Drought', 'Drought', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard
+	(hazard_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date)
+VALUES 
+	(6, 'Precipitation', 'Precipitation', 'Precipitation', 'Precipitation', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard
+	(hazard_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date)
+VALUES 
+	(7, 'Hail', 'Hail', 'Hail', 'Hail', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard
+	(hazard_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date)
+VALUES 
+	(8, 'Wind', 'Wind', 'Wind', 'Wind', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard
+	(hazard_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date)
+VALUES 
+	(9, 'Combined Inundation', 'Combined Inundation', 'Combined Inundation', 'Combined Inundation', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_hazard.hazard
+	(hazard_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date)
+VALUES 
+	(10, 'Water Risk', 'Water Risk', 'Water Risk', 'Water Risk', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1, NULL,'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-15T00:00:01Z')
+;
 
 -- DATA IN ENGLISH ENDS
 -- DATA IN FRENCH STARTS
@@ -594,12 +659,63 @@ WHERE b.culture='es'  ;
 SELECT a."name",  a.description_full, a.tags FROM osc_physrisk.osc_physrisk_scenario.dim_scenario_type a
 WHERE a.tags -> 'key1'='value1_en' OR a.tags -> 'key2'='value4_en'  ;
 
+-- SHOW IMPACT ANALYSIS RESULTS
+SELECT
+	portfolio_analysis_id,
+	"name",
+	name_fullyqualified,
+	description_full,
+	description_short,
+	tags,
+	portfolio_id,
+	scenario_type_id,
+	scenario_year,
+	hazard_id,
+	impact_type_id,
+	value_at_risk,
+	annual_exceedence_probability,
+	average_annual_loss,
+	currency_alphabetic_code
+FROM
+	osc_physrisk.osc_physrisk_risk_analysis.fact_portfolio_impact
+;
+
+SELECT
+	asset_analysis_id,
+	"name",
+	name_fullyqualified,
+	description_full,
+	description_short,
+	tags,
+	culture,
+	asset_id,
+	"location",
+	coordinates,
+	gers_id,
+	h3_index,
+	h3_resolution,
+	scenario_type_id,
+	scenario_year,
+	hazard_id,
+	hazard_intensity,
+	impact_type_id,
+	value_at_risk,
+	currency_alphabetic_code,
+	return_periods,
+	"parameter",
+	impact_mean,
+	impact_distr_bin_edges,
+	impact_distr_p,
+	impact_exc_exceed_p,
+	impact_exc_values,
+	probability
+FROM
+	osc_physrisk.osc_physrisk_risk_analysis.fact_asset_impact
+;
+
+
 -- SAMPLE CHECKSUM UPDATE
 --UPDATE osc_physrisk.osc_physrisk_scenario.dim_scenario_type
 --	SET checksum = md5(concat('Unknown/Not Selected', 'Unknown/Not Selected', 'Unknown/Not Selected', 'Unknown/Not Selected')) WHERE scenario_type_id = -1
 --;
-
-
-
-
 
