@@ -969,7 +969,7 @@ SELECT
 	value_at_risk,
 	annual_exceedence_probability,
 	average_annual_loss,
-	currency_alphabetic_code
+	value_currency_alphabetic_code
 FROM
 	osc_physrisk.osc_physrisk_risk_analysis.fact_portfolio_impact
 ;
