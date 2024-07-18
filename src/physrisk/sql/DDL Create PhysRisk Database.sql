@@ -949,11 +949,11 @@ SELECT a."name" as "English Name",  b.culture as "Translated Culture",  b."name"
 INNER JOIN osc_physrisk.osc_physrisk_scenario.scenario_type b ON a.scenario_type_id = b.translated_from_id
 WHERE b.culture='es'  ;
 
--- QUERY BY TAGS
+-- QUERY BY TAGS EXAMPLE
 SELECT a."name",  a.description_full, a.tags FROM osc_physrisk.osc_physrisk_scenario.scenario_type a
 WHERE a.tags -> 'key1'='value1_en' OR a.tags -> 'key2'='value4_en'  ;
 
--- SHOW IMPACT ANALYSIS RESULTS
+-- SHOW IMPACT ANALYSIS EXAMPLE (CURRENTLY EMPTY - tODO MISSING TEST DATA)
 SELECT
 	portfolio_analysis_id,
 	"name",
