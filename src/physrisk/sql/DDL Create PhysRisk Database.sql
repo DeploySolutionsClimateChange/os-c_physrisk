@@ -1,3 +1,9 @@
+-- PHYRISK EXAMPLE DATABASE STRUCTURE
+-- Last Updated: 2024-07-18
+-- Intended to help standardize glossary/metadata as well as field names and constraints
+-- to align with phys-risk/geo-indexer/other related initiatives
+-- speed up application development, help internationalize and display the results of analyses, and more.
+
 -- SETUP EXTENSIONS
 CREATE EXTENSION postgis; -- used for geolocation
 CREATE EXTENSION h3; -- used for Uber H3 geolocation
