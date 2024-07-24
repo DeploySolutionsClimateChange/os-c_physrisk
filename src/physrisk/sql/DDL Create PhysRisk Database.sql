@@ -16,9 +16,39 @@ CREATE SCHEMA IF NOT EXISTS osc_physrisk_hazard;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_vulnerability;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_exposure;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_asset;
+CREATE SCHEMA IF NOT EXISTS osc_physrisk_financial;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_risk_analysis;
 
 -- SETUP TABLES
+-- SCHEMA osc_physrisk_scenario
+CREATE TABLE osc_physrisk_scenario.scenario_type ( 
+	scenario_type_id integer  NOT NULL,
+	name        varchar(256)  NOT NULL  ,
+	name_fullyqualified varchar(256)    ,
+	description_full   text NOT NULL,
+	description_short  varchar(256)  NOT NULL  ,
+    tags hstore,
+	creation_time       timestamptz  NOT NULL  ,
+	creator_user_id      bigint    ,
+	last_modification_time timestamptz    ,
+	last_modifier_user_id bigint    ,
+	is_deleted          boolean  NOT NULL  ,
+	deleter_user_id      bigint    ,
+	deletion_time       timestamptz    ,
+	culture            varchar(5)  NOT NULL  ,
+	checksum           VARCHAR(40),
+	seq_num             integer  NOT NULL  ,
+	translated_from_id   integer,
+	is_active           boolean  NOT NULL  ,
+	creator_user_name    varchar(256)    ,
+	last_modifier_user_name varchar(256)    ,
+	deleter_user_name    varchar(256)    ,
+	is_published        boolean  NOT NULL  ,
+	publisher_id        bigint    ,
+	published_date      timestamptz,
+	CONSTRAINT pk_scenario_type PRIMARY KEY ( scenario_type_id )
+ ); 
+
 -- SCHEMA osc_physrisk_hazard
 CREATE TABLE osc_physrisk_hazard.hazard ( 
 	hazard_id	UUID  DEFAULT gen_random_uuid ()  NOT NULL,
@@ -87,6 +117,38 @@ CREATE TABLE osc_physrisk_hazard.hazard_indicator (
 	CONSTRAINT fk_hazard_indicator_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_hazard.hazard(hazard_id)
  );
 
+ -- SCHEMA osc_physrisk_exposure
+ CREATE TABLE osc_physrisk_exposure.exposure_function ( 
+	exposure_function_id	UUID  DEFAULT gen_random_uuid () NOT NULL,
+	name        varchar(256)  NOT NULL  ,
+	name_fullyqualified varchar(256)    ,
+	description_full   text NOT NULL,
+	description_short  varchar(256)  NOT NULL  ,
+    tags hstore,
+	creation_time     timestamptz  NOT NULL  ,
+	creator_user_id      bigint    ,
+	last_modification_time timestamptz    ,
+	last_modifier_user_id bigint    ,
+	is_deleted      boolean  NOT NULL  ,
+	deleter_user_id      bigint    ,
+	deletion_time       timestamptz    ,
+	culture            varchar(5)  NOT NULL  ,
+	checksum           VARCHAR(40),
+	external_id         varchar(36)    ,
+	seq_num             integer  NOT NULL  ,
+	translated_from_id   UUID,
+	is_active       boolean  NOT NULL  ,
+	creator_user_name   varchar(256)    ,
+	last_modifier_user_name varchar(256)    ,
+	deleter_user_name   varchar(256)    ,
+	tenant_id        integer  NOT NULL  ,
+	tenant_name        text  NOT NULL  ,
+	is_published       boolean  NOT NULL  ,
+	publisher_id        bigint    ,
+	published_date      timestamptz    ,
+	CONSTRAINT pk_exposure_function PRIMARY KEY ( exposure_function_id )
+ );
+
 -- SCHEMA osc_physrisk_vulnerability
 CREATE TABLE osc_physrisk_vulnerability.vulnerability_function ( 
 	vulnerability_function_id	UUID  DEFAULT gen_random_uuid () NOT NULL,
@@ -150,34 +212,6 @@ CREATE TABLE osc_physrisk_vulnerability.damage_function (
 	CONSTRAINT pk_damage_function PRIMARY KEY ( damage_function_id )
  );
 
--- SCHEMA osc_physrisk_scenario
-CREATE TABLE osc_physrisk_scenario.scenario_type ( 
-	scenario_type_id integer  NOT NULL,
-	name        varchar(256)  NOT NULL  ,
-	name_fullyqualified varchar(256)    ,
-	description_full   text NOT NULL,
-	description_short  varchar(256)  NOT NULL  ,
-    tags hstore,
-	creation_time       timestamptz  NOT NULL  ,
-	creator_user_id      bigint    ,
-	last_modification_time timestamptz    ,
-	last_modifier_user_id bigint    ,
-	is_deleted          boolean  NOT NULL  ,
-	deleter_user_id      bigint    ,
-	deletion_time       timestamptz    ,
-	culture            varchar(5)  NOT NULL  ,
-	checksum           VARCHAR(40),
-	seq_num             integer  NOT NULL  ,
-	translated_from_id   integer,
-	is_active           boolean  NOT NULL  ,
-	creator_user_name    varchar(256)    ,
-	last_modifier_user_name varchar(256)    ,
-	deleter_user_name    varchar(256)    ,
-	is_published        boolean  NOT NULL  ,
-	publisher_id        bigint    ,
-	published_date      timestamptz,
-	CONSTRAINT pk_scenario_type PRIMARY KEY ( scenario_type_id )
- ); 
 
 -- SCHEMA osc_physrisk_asset
 CREATE TABLE osc_physrisk_asset.fact_portfolio ( 
@@ -371,19 +405,21 @@ CREATE TABLE osc_physrisk_risk_analysis.fact_asset_impact (
     scenario_year smallint,
 	hazard_id	UUID NOT NULL,
     hazard_intensity decimal,
-    impact_type_id integer NOT NULL,
+	impact_type_id integer NOT NULL,
     value_total decimal,
     value_at_risk decimal,
     value_currency_alphabetic_code char(3),
-    return_periods jsonb,
     parameter    decimal,
-    impact_mean    decimal,
-    impact_distr_bin_edges    decimal[],
-    impact_distr_p    decimal[],
-    impact_exc_exceed_p    decimal[],
-    impact_exc_values    decimal[],
-	probability decimal,
-	CONSTRAINT pk_fact_asset_analysis PRIMARY KEY ( asset_analysis_id ),
+    exposure_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
+	exposure_probability decimal,
+	vulnerability_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
+    vulnerability_impact_mean    decimal,
+    vulnerability_impact_distr_bin_edges    decimal[],
+    vulnerability_impact_distr_p    decimal[],
+    vulnerability_impact_exc_exceed_p    decimal[],
+    vulnerability_impact_exc_values    decimal[],
+	vulnerability_return_periods jsonb,
+    CONSTRAINT pk_fact_asset_analysis PRIMARY KEY ( asset_analysis_id ),
     CONSTRAINT ck_fact_asset_analysis_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
 	CONSTRAINT fk_fact_asset_analysis_asset_id FOREIGN KEY ( asset_id ) REFERENCES osc_physrisk_asset.fact_asset(asset_id),
 	CONSTRAINT fk_fact_asset_analysis_scenario_type_id FOREIGN KEY ( scenario_type_id ) REFERENCES osc_physrisk_scenario.scenario_type(scenario_type_id),
