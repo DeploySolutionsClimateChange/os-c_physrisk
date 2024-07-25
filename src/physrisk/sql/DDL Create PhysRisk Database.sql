@@ -1078,7 +1078,23 @@ SELECT a."name" as "English Name",  b.culture as "Translated Culture",  b."name"
 INNER JOIN osc_physrisk.osc_physrisk_scenarios.scenario b ON a.scenario_id = b.translated_from_id
 WHERE b.culture='es'  ;
 
--- QUERY BY TAGS EXAMPLE
+-- INSERT ASSET PORTFOLIO EXAMPLE
+-- INCLUDING EXAMPLE ASSET WITH OED AND NAICS TAGS
+INSERT INTO osc_physrisk.osc_physrisk_assets.fact_portfolio
+	(portfolio_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, value_total, value_currency_alphabetic_code)
+VALUES 
+	('07c629be-42c6-4dbe-bd56-83e64253368d', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-25T00:00:01Z', 12345678.90, 'USD');
+
+INSERT INTO osc_physrisk.osc_physrisk_assets.fact_asset
+	(asset_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, creator_user_name, last_modifier_user_name, deleter_user_name, tenant_id, tenant_name, is_published, publisher_id, published_date, portfolio_id, geo_location_name, geo_location_coordinates, geo_gers_id, geo_h3_index, geo_h3_resolution, asset_type, asset_class, owner_bloomberg_id, owner_lei_id, value_total, value_currency_alphabetic_code)
+VALUES 
+	('281d68cc-ffd3-4740-acd6-1ea23bce902f', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'naics=>22111,oed:occupancy:oed_code=>1300,oed:occupancy:air_code=>361','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 'OS-C', 'OS-C', NULL, 1,'OS-C','y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '08b2a134d458bfff0200c38196ab869e', '1234', 12, 'Power Generating Utility', 'Industrial', 'BBG000BLNQ16', '', 12345678.90, 'USD')
+;
+-- QUERY BY TAGS EXAMPLE: FIND ASSETS WITH A CERTAIN NAICS OR OED OCCUPANCY VALUE (MULTIPLE TAXONOMIES)
+SELECT a."name",  a.description_full, a.tags FROM osc_physrisk.osc_physrisk_assets.fact_asset a
+WHERE a.tags -> 'naics'='22111' OR a.tags -> 'oed:occupancy:oed_code'='1300' OR a.tags -> 'oed:occupancy:air_code'='361' ;
+
+-- QUERY BY TAGS EXAMPLE: FIND SCENARIOS WITH CERTAIN TAGS
 SELECT a."name",  a.description_full, a.tags FROM osc_physrisk.osc_physrisk_scenarios.scenario a
 WHERE a.tags -> 'key1'='value1_en' OR a.tags -> 'key2'='value4_en'  ;
 
