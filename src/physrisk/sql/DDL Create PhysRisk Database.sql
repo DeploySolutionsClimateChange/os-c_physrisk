@@ -1,8 +1,9 @@
 -- PHYRISK EXAMPLE DATABASE STRUCTURE
--- Last Updated: 2024-07-18
 -- Intended to help standardize glossary/metadata as well as field names and constraints
 -- to align with phys-risk/geo-indexer/other related initiatives
 -- speed up application development, help internationalize and display the results of analyses, and more.
+
+-- Last Updated: 2024-07-25. Added index and analysis tables, new schemas and column naming.
 
 -- SETUP EXTENSIONS
 CREATE EXTENSION postgis; -- used for geolocation
@@ -18,6 +19,7 @@ CREATE SCHEMA IF NOT EXISTS osc_physrisk_exposure_models;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_financial_models;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_assets;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_analysis_results;
+CREATE SCHEMA IF NOT EXISTS osc_physrisk_index_hazards;
 
 -- SETUP TABLES
 -- SCHEMA osc_physrisk_scenarios
@@ -461,6 +463,56 @@ CREATE TABLE osc_physrisk_analysis_results.fact_asset_impact (
 	CONSTRAINT fk_fact_asset_analysis_impact_type_id FOREIGN KEY ( impact_type_id ) REFERENCES osc_physrisk_analysis_results.impact_type(impact_type_id),
 	CONSTRAINT fk_fact_asset_analysis_hazard_id FOREIGN KEY ( analysis_hazard_id ) REFERENCES osc_physrisk_hazards.hazard(hazard_id)     
  );
+
+-- SCHEMA osc_physrisk_index_hazards
+CREATE TABLE osc_physrisk_index_hazards.index_hazard_flood ( 
+	index_hazard_flood_id                UUID  DEFAULT gen_random_uuid () NOT NULL,
+	name        varchar(256)  NOT NULL  ,
+	name_fullyqualified varchar(256)    ,
+	description_full   text NOT NULL,
+	description_short  varchar(256)  NOT NULL  ,
+    tags hstore,
+	creation_time       timestamptz  NOT NULL  ,
+	creator_user_id      bigint    ,
+	last_modification_time timestamptz    ,
+	last_modifier_user_id bigint    ,
+	is_deleted          boolean  NOT NULL  ,
+	deleter_user_id     bigint    ,
+	deletion_time      timestamptz    ,
+	culture        varchar(5)  NOT NULL  ,
+	checksum        varchar(40)    ,
+	external_id         varchar(36)    ,
+	seq_num         integer  NOT NULL  ,
+	translated_from_id   UUID  ,
+	is_active       boolean  NOT NULL  ,
+	creator_user_name   varchar(256)    ,
+	last_modifier_user_name varchar(256)    ,
+	deleter_user_name    varchar(256)    ,
+	tenant_id           integer  NOT NULL  ,
+	tenant_name         text  NOT NULL  ,
+	is_published        boolean  NOT NULL  ,
+	publisher_id        bigint    ,
+	published_date      timestamptz    ,
+    hazard_id UUID NOT NULL,
+	geo_location_name      	varchar(512),
+    geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
+	geo_gers_id			UUID,
+	geo_h3_index H3INDEX NOT NULL,
+    geo_h3_resolution INT2 NOT NULL,
+	analysis_is_historic boolean NOT NULL,
+	result_is_impacted boolean NOT NULL,
+	analysis_scenario_id integer NOT NULL,
+    analysis_scenario_year smallint,
+	analysis_data_source text NOT NULL,
+	result_flood_depth_min decimal NOT NULL,
+	result_flood_depth_max decimal,
+	result_flood_depth_mean decimal,
+	CONSTRAINT pk_index_hazard_flood_id PRIMARY KEY ( index_hazard_flood_id ),
+	CONSTRAINT fk_index_hazard_flood_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_hazards.hazard(hazard_id),	
+	CONSTRAINT fk_index_hazard_flood_analysis_scenario_id FOREIGN KEY ( analysis_scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(scenario_id),
+	CONSTRAINT ck_index_hazard_flood_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15)
+ );
+
 
 -- SETUP PERMISSIONS
 --GRANT USAGE ON SCHEMA "osc.physrisk.data_example.comp_domain" TO physrisk_service;
