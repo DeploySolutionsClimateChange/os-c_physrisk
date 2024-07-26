@@ -55,12 +55,11 @@ ALTER TABLE osc_physrisk_backend.users
 	ADD FOREIGN KEY (last_modifier_user_id) 
 	REFERENCES osc_physrisk_backend.users (id);
 
-CREATE INDEX "IX_osc_physrisk_backend_users_creator_user_id" ON osc_physrisk_backend.users USING btree (creator_user_id);
-CREATE INDEX "IX_osc_physrisk_backend_users_deleter_user_id" ON osc_physrisk_backend.users USING btree (deleter_user_id);
-CREATE INDEX "IX_osc_physrisk_backend_users_last_modifier_user_id" ON osc_physrisk_backend.users USING btree (last_modifier_user_id);
-CREATE INDEX "IX_osc_physrisk_backend_users_email_address" ON osc_physrisk_backend.users USING btree (tenant_id, email_address);
-CREATE INDEX "IX_osc_physrisk_backend_users_tenant_id_username" ON osc_physrisk_backend.users USING btree (tenant_id, username);
-CREATE UNIQUE INDEX "PK_osc_physrisk_backend_users" ON osc_physrisk_backend.users USING btree (id);
+CREATE INDEX "ix_osc_physrisk_backend_users_creator_user_id" ON osc_physrisk_backend.users USING btree (creator_user_id);
+CREATE INDEX "ix_osc_physrisk_backend_users_deleter_user_id" ON osc_physrisk_backend.users USING btree (deleter_user_id);
+CREATE INDEX "ix_osc_physrisk_backend_users_last_modifier_user_id" ON osc_physrisk_backend.users USING btree (last_modifier_user_id);
+CREATE INDEX "ix_osc_physrisk_backend_users_email_address" ON osc_physrisk_backend.users USING btree (tenant_id, email_address);
+CREATE INDEX "ix_osc_physrisk_backend_users_tenant_id_username" ON osc_physrisk_backend.users USING btree (tenant_id, username);
 
 -- SCHEMA osc_physrisk_scenarios
 CREATE TABLE osc_physrisk_scenarios.scenario ( 
@@ -338,7 +337,8 @@ CREATE TABLE osc_physrisk_assets.fact_asset (
 	publisher_id        bigint    ,
 	published_date      timestamptz    ,
     portfolio_id UUID NOT NULL,
-	geo_location_name      	varchar(512),
+	geo_location_name      	varchar(256),
+    geo_location_address      	text,
     geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
 	geo_gers_id			UUID,
 	geo_h3_index H3INDEX NOT NULL,
@@ -356,6 +356,8 @@ CREATE TABLE osc_physrisk_assets.fact_asset (
 	CONSTRAINT fk_fact_asset_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
 	CONSTRAINT fk_fact_asset_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
  );
+
+CREATE INDEX "ix_osc_physrisk_assets_fact_asset_portfolio_id" ON osc_physrisk_assets.fact_asset USING btree (portfolio_id);
 
 -- SCHEMA osc_physrisk_analysis_results
 CREATE TABLE osc_physrisk_analysis_results.impact_type ( 
@@ -456,7 +458,8 @@ CREATE TABLE osc_physrisk_analysis_results.fact_asset_impact (
 	publisher_id        bigint    ,
 	published_date      timestamptz    ,
 	asset_id            UUID  NOT NULL  ,
-	geo_location_name      	varchar(512),
+	geo_location_name      	varchar(256),
+	geo_location_address      	text,
     geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
 	geo_gers_id			UUID,
 	geo_h3_index H3INDEX NOT NULL,
@@ -520,7 +523,8 @@ CREATE TABLE osc_physrisk_index_hazards.index_hazard_flood (
 	publisher_id        bigint    ,
 	published_date      timestamptz    ,
     hazard_id UUID NOT NULL,
-	geo_location_name      	varchar(512),
+	geo_location_name      	varchar(256),
+    geo_location_address      	text ,
     geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
 	geo_gers_id			UUID,
 	geo_h3_index H3INDEX NOT NULL,
