@@ -21,7 +21,6 @@ CREATE SCHEMA IF NOT EXISTS osc_physrisk_exposure_models;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_financial_models;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_assets;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_analysis_results;
-CREATE SCHEMA IF NOT EXISTS osc_physrisk_index_hazards;
 
 -- SETUP TABLES
 -- SCHEMA osc_physrisk_backend
@@ -182,6 +181,55 @@ CREATE TABLE osc_physrisk_hazards.hazard_indicator (
 	CONSTRAINT fk_hazard_indicator_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
 	CONSTRAINT fk_hazard_indicator_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id),
 	CONSTRAINT fk_hazard_indicator_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
+ );
+
+CREATE TABLE osc_physrisk_hazards.index_hazard_flood ( 
+	id                UUID  DEFAULT gen_random_uuid () NOT NULL,
+	name        varchar(256)  NOT NULL  ,
+	name_fullyqualified varchar(256)    ,
+	description_full   text NOT NULL,
+	description_short  varchar(256)  NOT NULL  ,
+    tags hstore,
+	creation_time       timestamptz  NOT NULL  ,
+	creator_user_id      bigint    ,
+	last_modification_time timestamptz    ,
+	last_modifier_user_id bigint    ,
+	is_deleted          boolean  NOT NULL  ,
+	deleter_user_id     bigint    ,
+	deletion_time      timestamptz    ,
+	culture        varchar(5)  NOT NULL  ,
+	checksum        varchar(40)    ,
+	external_id         varchar(36)    ,
+	seq_num         integer  NOT NULL  ,
+	translated_from_id   UUID  ,
+	is_active       boolean  NOT NULL  ,
+	tenant_id           integer  NOT NULL  ,
+	is_published        boolean  NOT NULL  ,
+	publisher_id        bigint    ,
+	published_date      timestamptz    ,
+    hazard_id UUID NOT NULL,
+	geo_location_name      	varchar(256),
+    geo_location_address      	text ,
+    geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
+	geo_gers_id			UUID,
+	geo_h3_index H3INDEX NOT NULL,
+    geo_h3_resolution INT2 NOT NULL,
+	analysis_is_historic boolean NOT NULL,
+	result_is_impacted boolean NOT NULL,
+	analysis_scenario_id integer NOT NULL,
+    analysis_scenario_year smallint,
+	analysis_data_source text NOT NULL,
+	result_flood_depth_min decimal NOT NULL,
+	result_flood_depth_max decimal,
+	result_flood_depth_mean decimal,
+	CONSTRAINT pk_index_hazard_flood_id PRIMARY KEY ( id ),
+	CONSTRAINT fk_index_hazard_flood_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_hazards.hazard(id),	
+	CONSTRAINT fk_index_hazard_flood_analysis_scenario_id FOREIGN KEY ( analysis_scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(id),
+	CONSTRAINT ck_index_hazard_flood_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
+	CONSTRAINT fk_index_hazard_flood_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_index_hazard_flood_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_index_hazard_flood_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id) ,
+	CONSTRAINT fk_index_hazard_flood_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
 
  -- SCHEMA osc_physrisk_exposure_models
@@ -533,55 +581,6 @@ CREATE TABLE osc_physrisk_analysis_results.fact_asset_impact (
 	CONSTRAINT fk_fact_asset_analysis_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
 
--- SCHEMA osc_physrisk_index_hazards
-CREATE TABLE osc_physrisk_index_hazards.index_hazard_flood ( 
-	id                UUID  DEFAULT gen_random_uuid () NOT NULL,
-	name        varchar(256)  NOT NULL  ,
-	name_fullyqualified varchar(256)    ,
-	description_full   text NOT NULL,
-	description_short  varchar(256)  NOT NULL  ,
-    tags hstore,
-	creation_time       timestamptz  NOT NULL  ,
-	creator_user_id      bigint    ,
-	last_modification_time timestamptz    ,
-	last_modifier_user_id bigint    ,
-	is_deleted          boolean  NOT NULL  ,
-	deleter_user_id     bigint    ,
-	deletion_time      timestamptz    ,
-	culture        varchar(5)  NOT NULL  ,
-	checksum        varchar(40)    ,
-	external_id         varchar(36)    ,
-	seq_num         integer  NOT NULL  ,
-	translated_from_id   UUID  ,
-	is_active       boolean  NOT NULL  ,
-	tenant_id           integer  NOT NULL  ,
-	is_published        boolean  NOT NULL  ,
-	publisher_id        bigint    ,
-	published_date      timestamptz    ,
-    hazard_id UUID NOT NULL,
-	geo_location_name      	varchar(256),
-    geo_location_address      	text ,
-    geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
-	geo_gers_id			UUID,
-	geo_h3_index H3INDEX NOT NULL,
-    geo_h3_resolution INT2 NOT NULL,
-	analysis_is_historic boolean NOT NULL,
-	result_is_impacted boolean NOT NULL,
-	analysis_scenario_id integer NOT NULL,
-    analysis_scenario_year smallint,
-	analysis_data_source text NOT NULL,
-	result_flood_depth_min decimal NOT NULL,
-	result_flood_depth_max decimal,
-	result_flood_depth_mean decimal,
-	CONSTRAINT pk_index_hazard_flood_id PRIMARY KEY ( id ),
-	CONSTRAINT fk_index_hazard_flood_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_hazards.hazard(id),	
-	CONSTRAINT fk_index_hazard_flood_analysis_scenario_id FOREIGN KEY ( analysis_scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(id),
-	CONSTRAINT ck_index_hazard_flood_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
-	CONSTRAINT fk_index_hazard_flood_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_index_hazard_flood_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_index_hazard_flood_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id) ,
-	CONSTRAINT fk_index_hazard_flood_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
- );
 
 -- SETUP PERMISSIONS
 --GRANT USAGE ON SCHEMA "osc.physrisk.data_example.comp_domain" TO physrisk_service;
