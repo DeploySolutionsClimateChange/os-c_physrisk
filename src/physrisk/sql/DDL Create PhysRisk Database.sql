@@ -183,7 +183,7 @@ CREATE TABLE osc_physrisk_hazards.hazard_indicator (
 	CONSTRAINT fk_hazard_indicator_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
 
-CREATE TABLE osc_physrisk_hazards.index_hazard_flood ( 
+CREATE TABLE osc_physrisk_hazards.precalculated_flood_indicators ( 
 	id                UUID  DEFAULT gen_random_uuid () NOT NULL,
 	name        varchar(256)  NOT NULL  ,
 	name_fullyqualified varchar(256)    ,
@@ -222,14 +222,14 @@ CREATE TABLE osc_physrisk_hazards.index_hazard_flood (
 	result_flood_depth_min decimal NOT NULL,
 	result_flood_depth_max decimal,
 	result_flood_depth_mean decimal,
-	CONSTRAINT pk_index_hazard_flood_id PRIMARY KEY ( id ),
-	CONSTRAINT fk_index_hazard_flood_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_hazards.hazard(id),	
-	CONSTRAINT fk_index_hazard_flood_analysis_scenario_id FOREIGN KEY ( analysis_scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(id),
-	CONSTRAINT ck_index_hazard_flood_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
-	CONSTRAINT fk_index_hazard_flood_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_index_hazard_flood_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_index_hazard_flood_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id) ,
-	CONSTRAINT fk_index_hazard_flood_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
+	CONSTRAINT pk_precalculated_flood_indicators_id PRIMARY KEY ( id ),
+	CONSTRAINT fk_precalculated_flood_indicators_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_hazards.hazard(id),	
+	CONSTRAINT fk_precalculated_flood_indicators_analysis_scenario_id FOREIGN KEY ( analysis_scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(id),
+	CONSTRAINT ck_precalculated_flood_indicators_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
+	CONSTRAINT fk_precalculated_flood_indicators_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_precalculated_flood_indicators_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_precalculated_flood_indicators_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id) ,
+	CONSTRAINT fk_precalculated_flood_indicators_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
 
  -- SCHEMA osc_physrisk_exposure_models
