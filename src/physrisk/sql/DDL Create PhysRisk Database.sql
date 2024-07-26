@@ -182,7 +182,10 @@ CREATE TABLE osc_physrisk_hazards.hazard_indicator (
 	is_published       boolean  NOT NULL  ,
 	publisher_id        bigint    ,
 	published_date      timestamptz    ,
-	CONSTRAINT pk_exposure_function PRIMARY KEY ( id )
+	CONSTRAINT pk_exposure_function PRIMARY KEY ( id ),
+	CONSTRAINT fk_exposure_function_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_exposure_function_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_exposure_function_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
  );
 
 -- SCHEMA osc_physrisk_vulnerability_models
@@ -210,7 +213,10 @@ CREATE TABLE osc_physrisk_vulnerability_models.vulnerability_function (
 	is_published       boolean  NOT NULL  ,
 	publisher_id        bigint    ,
 	published_date      timestamptz    ,
-	CONSTRAINT pk_vulnerability_function PRIMARY KEY ( id )
+	CONSTRAINT pk_vulnerability_function PRIMARY KEY ( id ),
+	CONSTRAINT fk_vulnerability_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_vulnerability_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_vulnerability_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
  );
 
 CREATE TABLE osc_physrisk_vulnerability_models.damage_function ( 
@@ -237,7 +243,10 @@ CREATE TABLE osc_physrisk_vulnerability_models.damage_function (
 	is_published       boolean  NOT NULL  ,
 	publisher_id        bigint    ,
 	published_date      timestamptz    ,
-	CONSTRAINT pk_damage_function PRIMARY KEY ( id )
+	CONSTRAINT pk_damage_function PRIMARY KEY ( id ),
+	CONSTRAINT fk_damage_function_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_damage_function_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_damage_function_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
  );
 
 -- SCHEMA osc_physrisk_financial_models;
@@ -265,7 +274,10 @@ CREATE TABLE osc_physrisk_financial_models.financial_model (
 	is_published       boolean  NOT NULL  ,
 	publisher_id        bigint    ,
 	published_date      timestamptz    ,
-	CONSTRAINT pk_financial_model PRIMARY KEY ( id )
+	CONSTRAINT pk_financial_model PRIMARY KEY ( id ),
+	CONSTRAINT fk_financial_model_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_financial_model_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_financial_model_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
  );
 
 -- SCHEMA osc_physrisk_assets
@@ -295,7 +307,10 @@ CREATE TABLE osc_physrisk_assets.fact_portfolio (
 	published_date      timestamptz    ,
     value_total decimal,
     value_currency_alphabetic_code char(3),
-	CONSTRAINT pk_fact_portfolio PRIMARY KEY (id )
+	CONSTRAINT pk_fact_portfolio PRIMARY KEY (id ),
+	CONSTRAINT fk_fact_portfolio_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_fact_portfolio_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_fact_portfolio_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
  );
 
 CREATE TABLE osc_physrisk_assets.fact_asset ( 
@@ -336,7 +351,10 @@ CREATE TABLE osc_physrisk_assets.fact_asset (
     value_currency_alphabetic_code char(3),
 	CONSTRAINT pk_fact_asset PRIMARY KEY ( id ),
 	CONSTRAINT fk_fact_asset_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.fact_portfolio(id),
-    CONSTRAINT ck_fact_asset_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15)
+    CONSTRAINT ck_fact_asset_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
+	CONSTRAINT fk_fact_asset_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_fact_asset_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_fact_asset_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
  );
 
 -- SCHEMA osc_physrisk_analysis_results
@@ -363,7 +381,10 @@ CREATE TABLE osc_physrisk_analysis_results.impact_type (
 	publisher_id        bigint    ,
 	published_date      timestamptz  ,
     accounting_category varchar(256),
-	CONSTRAINT pk_impact_type PRIMARY KEY ( id )
+	CONSTRAINT pk_impact_type PRIMARY KEY ( id ),
+	CONSTRAINT fk_impact_type_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_impact_type_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_impact_type_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
  ); 
 
 CREATE TABLE osc_physrisk_analysis_results.fact_portfolio_impact ( 
@@ -404,7 +425,10 @@ CREATE TABLE osc_physrisk_analysis_results.fact_portfolio_impact (
 	CONSTRAINT fk_fact_portfolio_analysis_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.fact_portfolio(id),
 	CONSTRAINT fk_fact_portfolio_analysis_scenario_id FOREIGN KEY ( analysis_scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(id),
 	CONSTRAINT fk_fact_portfolio_analysis_impact_type_id FOREIGN KEY ( impact_type_id ) REFERENCES osc_physrisk_analysis_results.impact_type(id),
-	CONSTRAINT fk_fact_portfolio_analysis_hazard_id FOREIGN KEY ( analysis_hazard_id ) REFERENCES osc_physrisk_hazards.hazard(id)     
+	CONSTRAINT fk_fact_portfolio_analysis_hazard_id FOREIGN KEY ( analysis_hazard_id ) REFERENCES osc_physrisk_hazards.hazard(id)   ,
+	CONSTRAINT fk_fact_portfolio_analysis_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_fact_portfolio_analysis_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_fact_portfolio_analysis_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)  
  );
 
 CREATE TABLE osc_physrisk_analysis_results.fact_asset_impact ( 
@@ -464,7 +488,10 @@ CREATE TABLE osc_physrisk_analysis_results.fact_asset_impact (
 	CONSTRAINT fk_fact_asset_analysis_asset_id FOREIGN KEY ( asset_id ) REFERENCES osc_physrisk_assets.fact_asset(id),
 	CONSTRAINT fk_fact_asset_analysis_scenario_id FOREIGN KEY ( analysis_scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(id),
 	CONSTRAINT fk_fact_asset_analysis_impact_type_id FOREIGN KEY ( impact_type_id ) REFERENCES osc_physrisk_analysis_results.impact_type(id),
-	CONSTRAINT fk_fact_asset_analysis_hazard_id FOREIGN KEY ( analysis_hazard_id ) REFERENCES osc_physrisk_hazards.hazard(id)     
+	CONSTRAINT fk_fact_asset_analysis_hazard_id FOREIGN KEY ( analysis_hazard_id ) REFERENCES osc_physrisk_hazards.hazard(id)    ,
+	CONSTRAINT fk_fact_asset_analysis_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_fact_asset_analysis_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_fact_asset_analysis_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)   
  );
 
 -- SCHEMA osc_physrisk_index_hazards
@@ -509,7 +536,10 @@ CREATE TABLE osc_physrisk_index_hazards.index_hazard_flood (
 	CONSTRAINT pk_index_hazard_flood_id PRIMARY KEY ( id ),
 	CONSTRAINT fk_index_hazard_flood_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_hazards.hazard(id),	
 	CONSTRAINT fk_index_hazard_flood_analysis_scenario_id FOREIGN KEY ( analysis_scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(id),
-	CONSTRAINT ck_index_hazard_flood_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15)
+	CONSTRAINT ck_index_hazard_flood_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
+	CONSTRAINT fk_index_hazard_flood_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_index_hazard_flood_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_index_hazard_flood_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id) 
  );
 
 -- SETUP PERMISSIONS
