@@ -3,7 +3,8 @@
 -- to align with phys-risk/geo-indexer/other related initiatives
 -- speed up application development, help internationalize and display the results of analyses, and more.
 
--- Last Updated: 2024-07-25. Added index and analysis tables, new schemas and column naming.
+-- Last Updated: 2024-07-26. Added some backend functionality such as user table and indexes for performance.
+-- The backend schema User and Tenant tables are derived from ASP.NET Boilerplate tables (https://aspnetboilerplate.com/). That code is available under the MIT license, here: https://github.com/aspnetboilerplate/aspnetboilerplate
 
 -- SETUP EXTENSIONS
 CREATE EXTENSION postgis; -- used for geolocation
@@ -60,6 +61,31 @@ CREATE INDEX "ix_osc_physrisk_backend_users_deleter_user_id" ON osc_physrisk_bac
 CREATE INDEX "ix_osc_physrisk_backend_users_last_modifier_user_id" ON osc_physrisk_backend.users USING btree (last_modifier_user_id);
 CREATE INDEX "ix_osc_physrisk_backend_users_email_address" ON osc_physrisk_backend.users USING btree (tenant_id, email_address);
 CREATE INDEX "ix_osc_physrisk_backend_users_tenant_id_username" ON osc_physrisk_backend.users USING btree (tenant_id, username);
+
+CREATE TABLE osc_physrisk_backend.tenants (
+	id bigint NOT NULL,
+	creation_time       timestamptz  NOT NULL  ,
+	creator_user_id      bigint    ,
+	last_modification_time timestamptz    ,
+	last_modifier_user_id bigint    ,
+	is_deleted          boolean  NOT NULL  ,
+	deleter_user_id      bigint    ,
+	deletion_time       timestamptz    ,
+	tenancy_name varchar(64) NOT NULL,
+	name varchar(128) NOT NULL,
+	is_active       boolean  NOT NULL  ,
+	PRIMARY KEY (id),
+	CONSTRAINT fk_tenants_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_tenants_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_tenants_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
+);
+
+CREATE INDEX "ix_osc_physrisk_backend_tenants_creation_time" ON osc_physrisk_backend.tenants USING btree (creation_time);
+CREATE INDEX "ix_osc_physrisk_backend_tnants_creator_user_id" ON osc_physrisk_backend.tenants USING btree (creator_user_id);
+CREATE INDEX "ix_osc_physrisk_backend_tenants_deleter_user_id" ON osc_physrisk_backend.tenants USING btree (deleter_user_id);
+CREATE INDEX "ix_osc_physrisk_backend_tenants_last_modifier_user_id" ON osc_physrisk_backend.tenants USING btree (last_modifier_user_id);
+CREATE INDEX "ix_osc_physrisk_backend_tenants_tenancy_name" ON osc_physrisk_backend.tenants USING btree (tenancy_name);
+
 
 -- SCHEMA osc_physrisk_scenarios
 CREATE TABLE osc_physrisk_scenarios.scenario ( 
@@ -121,7 +147,8 @@ CREATE TABLE osc_physrisk_hazards.hazard (
 	CONSTRAINT pk_hazard PRIMARY KEY ( id ),
 	CONSTRAINT fk_hazard_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
 	CONSTRAINT fk_hazard_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_hazard_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
+	CONSTRAINT fk_hazard_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_hazard_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
 
 CREATE TABLE osc_physrisk_hazards.hazard_indicator ( 
@@ -153,7 +180,8 @@ CREATE TABLE osc_physrisk_hazards.hazard_indicator (
 	CONSTRAINT fk_hazard_indicator_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_hazards.hazard(id),
 	CONSTRAINT fk_hazard_indicator_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
 	CONSTRAINT fk_hazard_indicator_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_hazard_indicator_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
+	CONSTRAINT fk_hazard_indicator_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_hazard_indicator_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
 
  -- SCHEMA osc_physrisk_exposure_models
@@ -184,7 +212,8 @@ CREATE TABLE osc_physrisk_hazards.hazard_indicator (
 	CONSTRAINT pk_exposure_function PRIMARY KEY ( id ),
 	CONSTRAINT fk_exposure_function_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
 	CONSTRAINT fk_exposure_function_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_exposure_function_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
+	CONSTRAINT fk_exposure_function_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_exposure_function_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
 
 -- SCHEMA osc_physrisk_vulnerability_models
@@ -215,7 +244,8 @@ CREATE TABLE osc_physrisk_vulnerability_models.vulnerability_function (
 	CONSTRAINT pk_vulnerability_function PRIMARY KEY ( id ),
 	CONSTRAINT fk_vulnerability_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
 	CONSTRAINT fk_vulnerability_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_vulnerability_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
+	CONSTRAINT fk_vulnerability_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_vulnerability_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
 
 CREATE TABLE osc_physrisk_vulnerability_models.damage_function ( 
@@ -245,7 +275,8 @@ CREATE TABLE osc_physrisk_vulnerability_models.damage_function (
 	CONSTRAINT pk_damage_function PRIMARY KEY ( id ),
 	CONSTRAINT fk_damage_function_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
 	CONSTRAINT fk_damage_function_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_damage_function_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
+	CONSTRAINT fk_damage_function_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_damage_function_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
 
 -- SCHEMA osc_physrisk_financial_models;
@@ -276,7 +307,8 @@ CREATE TABLE osc_physrisk_financial_models.financial_model (
 	CONSTRAINT pk_financial_model PRIMARY KEY ( id ),
 	CONSTRAINT fk_financial_model_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
 	CONSTRAINT fk_financial_model_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_financial_model_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
+	CONSTRAINT fk_financial_model_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_financial_model_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
 
 -- SCHEMA osc_physrisk_assets
@@ -309,7 +341,8 @@ CREATE TABLE osc_physrisk_assets.fact_portfolio (
 	CONSTRAINT pk_fact_portfolio PRIMARY KEY (id ),
 	CONSTRAINT fk_fact_portfolio_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
 	CONSTRAINT fk_fact_portfolio_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_fact_portfolio_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
+	CONSTRAINT fk_fact_portfolio_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_fact_portfolio_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
 
 CREATE TABLE osc_physrisk_assets.fact_asset ( 
@@ -354,7 +387,8 @@ CREATE TABLE osc_physrisk_assets.fact_asset (
     CONSTRAINT ck_fact_asset_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
 	CONSTRAINT fk_fact_asset_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
 	CONSTRAINT fk_fact_asset_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_fact_asset_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)
+	CONSTRAINT fk_fact_asset_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_fact_asset_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
 
 CREATE INDEX "ix_osc_physrisk_assets_fact_asset_portfolio_id" ON osc_physrisk_assets.fact_asset USING btree (portfolio_id);
@@ -430,7 +464,8 @@ CREATE TABLE osc_physrisk_analysis_results.fact_portfolio_impact (
 	CONSTRAINT fk_fact_portfolio_analysis_hazard_id FOREIGN KEY ( analysis_hazard_id ) REFERENCES osc_physrisk_hazards.hazard(id)   ,
 	CONSTRAINT fk_fact_portfolio_analysis_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
 	CONSTRAINT fk_fact_portfolio_analysis_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_fact_portfolio_analysis_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)  
+	CONSTRAINT fk_fact_portfolio_analysis_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)  ,
+	CONSTRAINT fk_fact_portfolio_analysis_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
 
 CREATE TABLE osc_physrisk_analysis_results.fact_asset_impact ( 
@@ -494,7 +529,8 @@ CREATE TABLE osc_physrisk_analysis_results.fact_asset_impact (
 	CONSTRAINT fk_fact_asset_analysis_hazard_id FOREIGN KEY ( analysis_hazard_id ) REFERENCES osc_physrisk_hazards.hazard(id)    ,
 	CONSTRAINT fk_fact_asset_analysis_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
 	CONSTRAINT fk_fact_asset_analysis_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_fact_asset_analysis_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)   
+	CONSTRAINT fk_fact_asset_analysis_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)   ,
+	CONSTRAINT fk_fact_asset_analysis_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
 
 -- SCHEMA osc_physrisk_index_hazards
@@ -543,7 +579,8 @@ CREATE TABLE osc_physrisk_index_hazards.index_hazard_flood (
 	CONSTRAINT ck_index_hazard_flood_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
 	CONSTRAINT fk_index_hazard_flood_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
 	CONSTRAINT fk_index_hazard_flood_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_index_hazard_flood_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id) 
+	CONSTRAINT fk_index_hazard_flood_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id) ,
+	CONSTRAINT fk_index_hazard_flood_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
 
 -- SETUP PERMISSIONS
@@ -558,6 +595,10 @@ INSERT INTO osc_physrisk.osc_physrisk_backend.users
 VALUES 
 	(1,'2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'osc',1,'example@email','Open-Source','Climate','y')
 ;
+INSERT INTO osc_physrisk.osc_physrisk_backend.tenants
+	(id, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, tenancy_name, "name", is_active)
+VALUES 
+	(1,'2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL,'Default','Default','y');
 
 INSERT INTO osc_physrisk.osc_physrisk_scenarios.scenario
 	(id, description_full, description_short, name_fullyqualified, "name", tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, seq_num, translated_from_id, is_active, is_published, publisher_id, published_date)
@@ -1113,20 +1154,20 @@ SELECT * FROM osc_physrisk.osc_physrisk_scenarios.scenario WHERE culture='fr';
 SELECT * FROM osc_physrisk.osc_physrisk_scenarios.scenario WHERE culture='es';
 
 SELECT a."name" as "English Name",  b.culture as "Translated Culture",  b."name" as "Translated Name", b.description_full as "Translated Description", b.tags as "Translated Tags" FROM osc_physrisk.osc_physrisk_scenarios.scenario a 
-INNER JOIN osc_physrisk.osc_physrisk_scenarios.scenario b ON a.scenario_id = b.translated_from_id
+INNER JOIN osc_physrisk.osc_physrisk_scenarios.scenario b ON a.id = b.translated_from_id
 WHERE b.culture='es'  ;
 
 -- INSERT ASSET PORTFOLIO EXAMPLE
 -- INCLUDING EXAMPLE ASSET WITH OED AND NAICS TAGS
 INSERT INTO osc_physrisk.osc_physrisk_assets.fact_portfolio
-	(portfolio_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, value_total, value_currency_alphabetic_code)
+	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, value_total, value_currency_alphabetic_code)
 VALUES 
-	('07c629be-42c6-4dbe-bd56-83e64253368d', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', NULL, 1,'y',1,'2024-07-25T00:00:01Z', 12345678.90, 'USD');
+	('07c629be-42c6-4dbe-bd56-83e64253368d', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z', 12345678.90, 'USD');
 
 INSERT INTO osc_physrisk.osc_physrisk_assets.fact_asset
-	(asset_id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, portfolio_id, geo_location_name, geo_location_coordinates, geo_gers_id, geo_h3_index, geo_h3_resolution, asset_type, asset_class, owner_bloomberg_id, owner_lei_id, value_total, value_currency_alphabetic_code)
+	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, portfolio_id, geo_location_name, geo_location_coordinates, geo_gers_id, geo_h3_index, geo_h3_resolution, asset_type, asset_class, owner_bloomberg_id, owner_lei_id, value_total, value_currency_alphabetic_code)
 VALUES 
-	('281d68cc-ffd3-4740-acd6-1ea23bce902f', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'naics=>22111,oed:occupancy:oed_code=>1300,oed:occupancy:air_code=>361','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', NULL, 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '08b2a134d458bfff0200c38196ab869e', '1234', 12, 'Power Generating Utility', 'Industrial', 'BBG000BLNQ16', '', 12345678.90, 'USD')
+	('281d68cc-ffd3-4740-acd6-1ea23bce902f', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'naics=>22111,oed:occupancy:oed_code=>1300,oed:occupancy:air_code=>361','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '08b2a134d458bfff0200c38196ab869e', '1234', 12, 'Power Generating Utility', 'Industrial', 'BBG000BLNQ16', '', 12345678.90, 'USD')
 ;
 -- QUERY BY TAGS EXAMPLE: FIND ASSETS WITH A CERTAIN NAICS OR OED OCCUPANCY VALUE (MULTIPLE TAXONOMIES)
 SELECT a."name",  a.description_full, a.tags FROM osc_physrisk.osc_physrisk_assets.fact_asset a
@@ -1138,54 +1179,13 @@ WHERE a.tags -> 'key1'='value1_en' OR a.tags -> 'key2'='value4_en'  ;
 
 -- SHOW IMPACT ANALYSIS EXAMPLE (CURRENTLY EMPTY - tODO MISSING TEST DATA)
 SELECT
-	portfolio_analysis_id,
-	"name",
-	name_fullyqualified,
-	description_full,
-	description_short,
-	tags,
-	portfolio_id,
-	id,
-	scenario_year,
-	id,
-	id,
-	value_at_risk,
-	annual_exceedence_probability,
-	average_annual_loss,
-	value_currency_alphabetic_code
+	*
 FROM
 	osc_physrisk.osc_physrisk_analysis_results.fact_portfolio_impact
 ;
 
 SELECT
-	asset_analysis_id,
-	"name",
-	name_fullyqualified,
-	description_full,
-	description_short,
-	tags,
-	culture,
-	asset_id,
-	geo_location_name,
-	geo_location_coordinates,
-	geo_gers_id,
-	geo_h3_index,
-	geo_h3_resolution,
-	id,
-	scenario_year,
-	id,
-	hazard_intensity,
-	id,
-	value_at_risk,
-	value_currency_alphabetic_code,
-	return_periods,
-	"parameter",
-	impact_mean,
-	impact_distr_bin_edges,
-	impact_distr_p,
-	impact_exc_exceed_p,
-	impact_exc_values,
-	probability
+	*
 FROM
 	osc_physrisk.osc_physrisk_analysis_results.fact_asset_impact
 ;
@@ -1193,22 +1193,22 @@ FROM
 -- VIEW RIVERINE INUNDATION HAZARD INDICATORS
 SELECT	*
 FROM
-	osc_physrisk.osc_physrisk_hazards.hazard haz INNER JOIN osc_physrisk.osc_physrisk_hazards.hazard_indicator hi ON hi.hazard_id = haz.hazard_id
+	osc_physrisk.osc_physrisk_hazards.hazard haz INNER JOIN osc_physrisk.osc_physrisk_hazards.hazard_indicator hi ON hi.hazard_id = haz.id
 WHERE haz."name" = 'Riverine Inundation' -- more likely written as WHERE haz.hazard_id = '63ed7943-c4c4-43ea-abd2-86bb1997a094'
 ;
 
 -- VIEW COASTAL INUNDATION HAZARD INDICATORS
 SELECT	*
 FROM
-	 osc_physrisk.osc_physrisk_hazards.hazard haz INNER JOIN osc_physrisk.osc_physrisk_hazards.hazard_indicator hi ON hi.hazard_id = haz.hazard_id
-WHERE haz.hazard_id = '28a095cd-4cde-40a1-90d9-cbb0ca673c06'
+	 osc_physrisk.osc_physrisk_hazards.hazard haz INNER JOIN osc_physrisk.osc_physrisk_hazards.hazard_indicator hi ON hi.hazard_id = haz.id
+WHERE haz.id = '28a095cd-4cde-40a1-90d9-cbb0ca673c06'
 ;
 
 -- VIEW CHRONIC HEAT HAZARD INDICATORS
 SELECT	*
 FROM
-	 osc_physrisk.osc_physrisk_hazards.hazard haz INNER JOIN osc_physrisk.osc_physrisk_hazards.hazard_indicator hi ON hi.hazard_id = haz.hazard_id
-WHERE haz.hazard_id = 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b'
+	 osc_physrisk.osc_physrisk_hazards.hazard haz INNER JOIN osc_physrisk.osc_physrisk_hazards.hazard_indicator hi ON hi.hazard_id = haz.id
+WHERE haz.id = 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b'
 ;
 
 -- SAMPLE CHECKSUM UPDATE
