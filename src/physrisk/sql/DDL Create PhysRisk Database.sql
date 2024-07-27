@@ -3,7 +3,7 @@
 -- to align with phys-risk/geo-indexer/other related initiatives
 -- speed up application development, help internationalize and display the results of analyses, and more.
 
--- Last Updated: 2024-07-26. Added some backend functionality such as user table and indexes for performance.
+-- Last Updated: 2024-07-27. Added some backend functionality such as user table and indexes for performance. Simplify table names and consolidate schemas.
 -- The backend schema User and Tenant tables are derived from ASP.NET Boilerplate tables (https://aspnetboilerplate.com/). That code is available under the MIT license, here: https://github.com/aspnetboilerplate/aspnetboilerplate
 
 -- SETUP EXTENSIONS
@@ -453,7 +453,7 @@ CREATE TABLE osc_physrisk_assets.asset (
 	CONSTRAINT fk_asset_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id),
 	CONSTRAINT fk_asset_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
-COMMENT ON TABLE osc_physrisk_assets.fact_assest IS 'A physical financial asset (infrastructure, utilities, property, buildings) that is contained within a financial portfolio. The lowest unit of assessment for physical risk & resilience (currently).';
+COMMENT ON TABLE osc_physrisk_assets.asset IS 'A physical financial asset (infrastructure, utilities, property, buildings) that is contained within a financial portfolio. The lowest unit of assessment for physical risk & resilience (currently).';
 
 CREATE INDEX "ix_osc_physrisk_assets_asset_portfolio_id" ON osc_physrisk_assets.asset USING btree (portfolio_id);
 
