@@ -71,7 +71,7 @@ CREATE TABLE osc_physrisk_backend.tenants (
 	deleter_user_id      bigint    ,
 	deletion_time       timestamptz    ,
 	tenancy_name varchar(64) NOT NULL,
-	name varchar(128) NOT NULL,
+	name varchar(256) NOT NULL,
 	is_active       boolean  NOT NULL  ,
 	PRIMARY KEY (id),
 	CONSTRAINT fk_tenants_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
@@ -90,10 +90,11 @@ COMMENT ON TABLE osc_physrisk_backend.tenants IS 'Stores tenant information to s
 -- SCHEMA osc_physrisk_scenarios
 CREATE TABLE osc_physrisk_scenarios.scenario ( 
 	id bigint  NOT NULL,
-	name        varchar(256)  NOT NULL  ,
-	name_fullyqualified varchar(256)    ,
+	name        varchar(256)  NOT NULL,
+	name_fullyqualified varchar(256),
+	name_abbreviation varchar(8),
 	description_full   text NOT NULL,
-	description_short  varchar(256)  NOT NULL  ,
+	description_short  varchar(256)  NOT NULL,
     tags hstore,
 	creation_time       timestamptz  NOT NULL  ,
 	creator_user_id      bigint    ,
@@ -122,10 +123,11 @@ CREATE TABLE osc_physrisk_scenarios.scenario (
 -- SCHEMA osc_physrisk_hazards
 CREATE TABLE osc_physrisk_hazards.hazard ( 
 	id	UUID  DEFAULT gen_random_uuid ()  NOT NULL,
-	name        varchar(256)  NOT NULL  ,
-	name_fullyqualified varchar(256)    ,
+	name        varchar(256)  NOT NULL,
+	name_fullyqualified varchar(256),
+	name_abbreviation varchar(8),
 	description_full   text NOT NULL,
-	description_short  varchar(256)  NOT NULL  ,
+	description_short  varchar(256)  NOT NULL,
     tags hstore,
 	creation_time     timestamptz  NOT NULL  ,
 	creator_user_id      bigint    ,
@@ -158,10 +160,11 @@ COMMENT ON TABLE osc_physrisk_hazards.hazard IS 'Contains a list of the physical
 
 CREATE TABLE osc_physrisk_hazards.hazard_indicator ( 
 	id	UUID  DEFAULT gen_random_uuid () NOT NULL,
-	name        varchar(256)  NOT NULL  ,
-	name_fullyqualified varchar(256)    ,
+	name	varchar(256)  NOT NULL,
+	name_fullyqualified varchar(256),
+	name_abbreviation varchar(8),
 	description_full   text NOT NULL,
-	description_short  varchar(256)  NOT NULL  ,
+	description_short  varchar(256)  NOT NULL,
     tags hstore,
 	creation_time     timestamptz  NOT NULL  ,
 	creator_user_id      bigint    ,
@@ -191,11 +194,12 @@ CREATE TABLE osc_physrisk_hazards.hazard_indicator (
 COMMENT ON TABLE osc_physrisk_hazards.hazard_indicator IS 'Contains a list of the physical hazard indicators that are supported by OS-Climate. An indicator must always relate to one particular hazard.';
 
 CREATE TABLE osc_physrisk_hazards.precalculated_flood_indicators ( 
-	id                UUID  DEFAULT gen_random_uuid () NOT NULL,
-	name        varchar(256)  NOT NULL  ,
-	name_fullyqualified varchar(256)    ,
+	id	UUID  DEFAULT gen_random_uuid () NOT NULL,
+	name varchar(256)  NOT NULL,
+	name_fullyqualified varchar(256),
+	name_abbreviation varchar(8),
 	description_full   text NOT NULL,
-	description_short  varchar(256)  NOT NULL  ,
+	description_short  varchar(256)  NOT NULL,
     tags hstore,
 	creation_time       timestamptz  NOT NULL  ,
 	creator_user_id      bigint    ,
@@ -244,10 +248,11 @@ CREATE TABLE osc_physrisk_hazards.precalculated_flood_indicators (
  -- SCHEMA osc_physrisk_models
  CREATE TABLE osc_physrisk_models.exposure_function ( 
 	id	UUID  DEFAULT gen_random_uuid () NOT NULL,
-	name        varchar(256)  NOT NULL  ,
-	name_fullyqualified varchar(256)    ,
+	name	varchar(256)  NOT NULL,
+	name_fullyqualified varchar(256),
+	name_abbreviation varchar(8),
 	description_full   text NOT NULL,
-	description_short  varchar(256)  NOT NULL  ,
+	description_short  varchar(256)  NOT NULL,
     tags hstore,
 	creation_time     timestamptz  NOT NULL  ,
 	creator_user_id      bigint    ,
@@ -278,10 +283,11 @@ CREATE TABLE osc_physrisk_hazards.precalculated_flood_indicators (
 -- SCHEMA osc_physrisk_models
 CREATE TABLE osc_physrisk_models.vulnerability_function ( 
 	id	UUID  DEFAULT gen_random_uuid () NOT NULL,
-	name        varchar(256)  NOT NULL  ,
-	name_fullyqualified varchar(256)    ,
+	name        varchar(256)  NOT NULL,
+	name_fullyqualified varchar(256),
+	name_abbreviation varchar(8),
 	description_full   text NOT NULL,
-	description_short  varchar(256)  NOT NULL  ,
+	description_short  varchar(256)  NOT NULL,
     tags hstore,
 	creation_time     timestamptz  NOT NULL  ,
 	creator_user_id      bigint    ,
@@ -310,10 +316,11 @@ COMMENT ON TABLE osc_physrisk_models.vulnerability_function IS 'The model used t
 
 CREATE TABLE osc_physrisk_models.damage_function ( 
 	id	UUID  DEFAULT gen_random_uuid () NOT NULL,
-	name        varchar(256)  NOT NULL  ,
-	name_fullyqualified varchar(256)    ,
+	name        varchar(256)  NOT NULL,
+	name_fullyqualified varchar(256),
+	name_abbreviation varchar(8),
 	description_full   text NOT NULL,
-	description_short  varchar(256)  NOT NULL  ,
+	description_short  varchar(256)  NOT NULL,
     tags hstore,
 	creation_time     timestamptz  NOT NULL  ,
 	creator_user_id      bigint    ,
@@ -343,10 +350,11 @@ COMMENT ON TABLE osc_physrisk_models.damage_function IS 'The model used to deter
 -- SCHEMA osc_physrisk_models;
 CREATE TABLE osc_physrisk_models.financial_model ( 
 	id	UUID  DEFAULT gen_random_uuid () NOT NULL,
-	name        varchar(256)  NOT NULL  ,
-	name_fullyqualified varchar(256)    ,
+	name varchar(256)  NOT NULL,
+	name_fullyqualified varchar(256),
+	name_abbreviation varchar(8),
 	description_full   text NOT NULL,
-	description_short  varchar(256)  NOT NULL  ,
+	description_short  varchar(256)  NOT NULL,
     tags hstore,
 	creation_time     timestamptz  NOT NULL  ,
 	creator_user_id      bigint    ,
@@ -375,11 +383,12 @@ COMMENT ON TABLE osc_physrisk_models.financial_model IS 'Is this the same as dam
 
 -- SCHEMA osc_physrisk_assets
 CREATE TABLE osc_physrisk_assets.portfolio ( 
-	id                UUID  DEFAULT gen_random_uuid () NOT NULL,
-	name        varchar(256)  NOT NULL  ,
-	name_fullyqualified varchar(256)    ,
+	id UUID  DEFAULT gen_random_uuid () NOT NULL,
+	name        varchar(256)  NOT NULL,
+	name_fullyqualified varchar(256),
+	name_abbreviation varchar(8),
 	description_full   text NOT NULL,
-	description_short  varchar(256)  NOT NULL  ,
+	description_short  varchar(256)  NOT NULL,
     tags hstore,
 	creation_time       timestamptz  NOT NULL  ,
 	creator_user_id      bigint    ,
@@ -409,11 +418,12 @@ CREATE TABLE osc_physrisk_assets.portfolio (
 COMMENT ON TABLE osc_physrisk_assets.portfolio IS 'A financial portfolio that contains 1 or more physical financial assets (infrastructure, utilities, property, buildings).';
 
 CREATE TABLE osc_physrisk_assets.asset ( 
-	id                UUID  DEFAULT gen_random_uuid () NOT NULL,
-	name        varchar(256)  NOT NULL  ,
-	name_fullyqualified varchar(256)    ,
+	id UUID  DEFAULT gen_random_uuid () NOT NULL,
+	name varchar(256)  NOT NULL,
+	name_fullyqualified varchar(256),
+	name_abbreviation varchar(8),
 	description_full   text NOT NULL,
-	description_short  varchar(256)  NOT NULL  ,
+	description_short  varchar(256)  NOT NULL,
     tags hstore,
 	creation_time       timestamptz  NOT NULL  ,
 	creator_user_id      bigint    ,
@@ -460,10 +470,11 @@ CREATE INDEX "ix_osc_physrisk_assets_asset_portfolio_id" ON osc_physrisk_assets.
 -- SCHEMA osc_physrisk_analysis_results
 CREATE TABLE osc_physrisk_analysis_results.impact_type ( 
 	id bigint NOT NULL,
-	name        varchar(256)  NOT NULL  ,
-	name_fullyqualified varchar(256)    ,
+	name varchar(256)  NOT NULL,
+	name_fullyqualified varchar(256),
+	name_abbreviation varchar(8),
 	description_full   text NOT NULL,
-	description_short  varchar(256)  NOT NULL  ,
+	description_short  varchar(256)  NOT NULL,
     tags hstore,
 	creation_time       timestamptz  NOT NULL  ,
 	creator_user_id      bigint    ,
@@ -491,10 +502,11 @@ COMMENT ON TABLE osc_physrisk_analysis_results.impact_type IS 'A lookup table to
 
 CREATE TABLE osc_physrisk_analysis_results.portfolio_impact ( 
 	id UUID  DEFAULT gen_random_uuid () NOT NULL,
-	name        varchar(256)  NOT NULL  ,
-	name_fullyqualified varchar(256)    ,
+	name varchar(256)  NOT NULL,
+	name_fullyqualified varchar(256),
+	name_abbreviation varchar(8),
 	description_full   text NOT NULL,
-	description_short  varchar(256)  NOT NULL  ,
+	description_short  varchar(256)  NOT NULL,
     tags hstore,
 	creation_time       timestamptz  NOT NULL  ,
 	creator_user_id      bigint    ,
@@ -537,10 +549,11 @@ COMMENT ON TABLE osc_physrisk_analysis_results.portfolio_impact IS 'The result o
 
 CREATE TABLE osc_physrisk_analysis_results.asset_impact ( 
 	id UUID  DEFAULT gen_random_uuid () NOT NULL,
-	name        varchar(256)  NOT NULL  ,
-	name_fullyqualified varchar(256)    ,
+	name varchar(256)  NOT NULL,
+	name_fullyqualified varchar(256),
+	name_abbreviation varchar(8),
 	description_full   text NOT NULL,
-	description_short  varchar(256)  NOT NULL  ,
+	description_short  varchar(256)  NOT NULL,
     tags hstore,
 	creation_time       timestamptz  NOT NULL  ,
 	creator_user_id      bigint    ,
