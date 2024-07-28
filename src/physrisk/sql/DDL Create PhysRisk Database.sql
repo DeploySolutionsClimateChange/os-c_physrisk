@@ -535,6 +535,7 @@ CREATE TABLE osc_physrisk_analysis_results.asset_impact (
 	analysis_hazard_id	UUID NOT NULL,
     analysis_hazard_intensity decimal,
 	impact_type_id integer NOT NULL,
+	impact_data_raw jsonb NOT NULL,
     value_total decimal,
     value_at_risk decimal,
     value_currency_alphabetic_code char(3),
@@ -549,7 +550,6 @@ CREATE TABLE osc_physrisk_analysis_results.asset_impact (
     vulnerability_impact_exc_exceed_p    decimal[],
     vulnerability_impact_exc_values    decimal[],
 	vulnerability_return_periods jsonb, 
-	-- should there be an impact data raw?
     CONSTRAINT pk_asset_analysis PRIMARY KEY ( id ),
     CONSTRAINT ck_asset_analysis_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
 	CONSTRAINT fk_asset_analysis_asset_id FOREIGN KEY ( asset_id ) REFERENCES osc_physrisk_assets.asset(id),
