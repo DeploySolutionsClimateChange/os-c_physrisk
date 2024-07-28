@@ -193,58 +193,6 @@ CREATE TABLE osc_physrisk_hazards.hazard_indicator (
  );
 COMMENT ON TABLE osc_physrisk_hazards.hazard_indicator IS 'Contains a list of the physical hazard indicators that are supported by OS-Climate. An indicator must always relate to one particular hazard.';
 
-CREATE TABLE osc_physrisk_hazards.precalculated_flood_indicators ( 
-	id	UUID  DEFAULT gen_random_uuid () NOT NULL,
-	name varchar(256)  NOT NULL,
-	name_fullyqualified varchar(256),
-	name_abbreviation varchar(8),
-	description_full   text NOT NULL,
-	description_short  varchar(256)  NOT NULL,
-    tags hstore,
-	creation_time       timestamptz  NOT NULL  ,
-	creator_user_id      bigint    ,
-	last_modification_time timestamptz    ,
-	last_modifier_user_id bigint    ,
-	is_deleted          boolean  NOT NULL  ,
-	deleter_user_id     bigint    ,
-	deletion_time      timestamptz    ,
-	culture        varchar(5)  NOT NULL  ,
-	checksum        varchar(40)    ,
-	external_id         varchar(36)    ,
-	seq_num         integer  NOT NULL  ,
-	translated_from_id   UUID  ,
-	is_active       boolean  NOT NULL  ,
-	tenant_id           integer  NOT NULL  ,
-	is_published        boolean  NOT NULL  ,
-	publisher_id        bigint    ,
-	published_date      timestamptz    ,
-    hazard_id UUID NOT NULL,
-	geo_location_name      	varchar(256),
-    geo_location_address      	text ,
-    geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
-	geo_gers_id			UUID,
-	geo_h3_index H3INDEX NOT NULL,
-    geo_h3_resolution INT2 NOT NULL,
-	analysis_is_historic_record boolean NOT NULL,
-	analysis_historic_occurred_on timestamptz,
-	result_is_impacted boolean NOT NULL,
-	analysis_scenario_id integer NOT NULL,
-    analysis_scenario_year smallint,
-	analysis_data_source text NOT NULL,
-	result_flood_depth_min decimal NOT NULL,
-	result_flood_depth_max decimal,
-	result_flood_depth_mean decimal,
-	CONSTRAINT pk_precalculated_flood_indicators_id PRIMARY KEY ( id ),
-	CONSTRAINT fk_precalculated_flood_indicators_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_hazards.hazard(id),	
-	CONSTRAINT fk_precalculated_flood_indicators_analysis_scenario_id FOREIGN KEY ( analysis_scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(id),
-	CONSTRAINT ck_precalculated_flood_indicators_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
-	CONSTRAINT fk_precalculated_flood_indicators_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_precalculated_flood_indicators_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
-	CONSTRAINT fk_precalculated_flood_indicators_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id) ,
-	CONSTRAINT fk_precalculated_flood_indicators_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
- );
- COMMENT ON TABLE osc_physrisk_hazards.precalculated_flood_indicators IS 'To help with indexing and searching, locations may have precalculated hazard indicator information. This can be historic (it actually happend) or projected (it is likely to happen).';
-
  -- SCHEMA osc_physrisk_models
  CREATE TABLE osc_physrisk_models.exposure_function ( 
 	id	UUID  DEFAULT gen_random_uuid () NOT NULL,
@@ -446,7 +394,7 @@ CREATE TABLE osc_physrisk_assets.asset (
 	geo_location_name      	varchar(256),
     geo_location_address      	text,
     geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
-	geo_gers_id			UUID,
+	geo_gers_id			UUID NOT NULL,
 	geo_h3_index H3INDEX NOT NULL,
     geo_h3_resolution INT2 NOT NULL,
 	asset_type	varchar(256),
@@ -576,7 +524,7 @@ CREATE TABLE osc_physrisk_analysis_results.asset_impact (
 	geo_location_name      	varchar(256),
 	geo_location_address      	text,
     geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
-	geo_gers_id			UUID,
+	geo_gers_id			UUID NOT NULL,
 	geo_h3_index H3INDEX NOT NULL,
     geo_h3_resolution INT2 NOT NULL,
 	analysis_scenario_id integer NOT NULL,
@@ -613,6 +561,56 @@ CREATE TABLE osc_physrisk_analysis_results.asset_impact (
 	CONSTRAINT fk_asset_analysis_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
 COMMENT ON TABLE osc_physrisk_analysis_results.asset_impact IS 'The result of a physical risk & resilience analysis for a particular asset. The result is determined by the chosen scenario, year, and hazard. If multiple scenarios/years/hazards were chosen, there will be multiple other rows containing the combined set of results.';
+
+CREATE TABLE osc_physrisk_analysis_results.geolocated_precalculated_impact ( 
+	id	UUID  DEFAULT gen_random_uuid () NOT NULL,
+	name varchar(256)  NOT NULL,
+	name_fullyqualified varchar(256),
+	name_abbreviation varchar(8),
+	description_full   text NOT NULL,
+	description_short  varchar(256)  NOT NULL,
+    tags hstore,
+	creation_time       timestamptz  NOT NULL  ,
+	creator_user_id      bigint    ,
+	last_modification_time timestamptz    ,
+	last_modifier_user_id bigint    ,
+	is_deleted          boolean  NOT NULL  ,
+	deleter_user_id     bigint    ,
+	deletion_time      timestamptz    ,
+	culture        varchar(5)  NOT NULL  ,
+	checksum        varchar(40)    ,
+	external_id         varchar(36)    ,
+	seq_num         integer  NOT NULL  ,
+	translated_from_id   UUID  ,
+	is_active       boolean  NOT NULL  ,
+	tenant_id           integer  NOT NULL  ,
+	is_published        boolean  NOT NULL  ,
+	publisher_id        bigint    ,
+	published_date      timestamptz    ,
+    hazard_id UUID NOT NULL,
+	geo_location_name      	varchar(256),
+    geo_location_address      	text ,
+    geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
+	geo_gers_id			UUID NOT NULL,
+	geo_h3_index H3INDEX NOT NULL,
+    geo_h3_resolution INT2 NOT NULL,
+	analysis_is_historic_record boolean NOT NULL,
+	analysis_historic_occurred_on timestamptz,
+	result_is_impacted boolean NOT NULL,
+	analysis_scenario_id integer NOT NULL,
+    analysis_scenario_year smallint,
+	analysis_data_source text NOT NULL,
+	result_data jsonb NOT NULL, -- we recommend that this json includes schema references so a consuming application can use json schema for parsing.
+	CONSTRAINT pk_geolocated_precalculated_impact_id PRIMARY KEY ( id ),
+	CONSTRAINT fk_geolocated_precalculated_impact_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_hazards.hazard(id),	
+	CONSTRAINT fk_geolocated_precalculated_impact_analysis_scenario_id FOREIGN KEY ( analysis_scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(id),
+	CONSTRAINT ck_geolocated_precalculated_impact_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
+	CONSTRAINT fk_geolocated_precalculated_impact_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_geolocated_precalculated_impact_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_geolocated_precalculated_impact_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id) ,
+	CONSTRAINT fk_geolocated_precalculated_impact_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
+ );
+ COMMENT ON TABLE osc_physrisk_analysis_results.geolocated_precalculated_impact IS 'To help with indexing and searching, geographic locations may have precalculated information for hazard impacts. This can be historic (it actually happend) or projected (it is likely to happen). Note that this information is not aware of or concerned by whether or which physical assets may be present inside its borders.';
 
 
 -- SETUP PERMISSIONS
