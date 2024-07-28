@@ -3,7 +3,7 @@
 -- to align with phys-risk/geo-indexer/other related initiatives
 -- speed up application development, help internationalize and display the results of analyses, and more.
 
--- Last Updated: 2024-07-27. Added some backend functionality such as user table and indexes for performance. Simplify table names and consolidate schemas.
+-- Last Updated: 2024-07-28. Added some backend functionality such as user table and indexes for performance. Simplify table names and consolidate schemas.
 -- The backend schema User and Tenant tables are derived from ASP.NET Boilerplate tables (https://aspnetboilerplate.com/). That code is available under the MIT license, here: https://github.com/aspnetboilerplate/aspnetboilerplate
 
 -- SETUP EXTENSIONS
@@ -539,16 +539,17 @@ CREATE TABLE osc_physrisk_analysis_results.asset_impact (
     value_at_risk decimal,
     value_currency_alphabetic_code char(3),
     parameter    decimal,
-    exposure_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
+    exposure_data_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
 	exposure_probability decimal,
 	exposure_is_exposed bool,
-	vulnerability_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
+	vulnerability_data_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
     vulnerability_impact_mean    decimal,
     vulnerability_impact_distr_bin_edges    decimal[],
     vulnerability_impact_distr_p    decimal[],
     vulnerability_impact_exc_exceed_p    decimal[],
     vulnerability_impact_exc_values    decimal[],
-	vulnerability_return_periods jsonb,
+	vulnerability_return_periods jsonb, 
+	-- should there be an impact data raw?
     CONSTRAINT pk_asset_analysis PRIMARY KEY ( id ),
     CONSTRAINT ck_asset_analysis_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
 	CONSTRAINT fk_asset_analysis_asset_id FOREIGN KEY ( asset_id ) REFERENCES osc_physrisk_assets.asset(id),
@@ -588,19 +589,20 @@ CREATE TABLE osc_physrisk_analysis_results.geolocated_precalculated_impact (
 	publisher_id        bigint    ,
 	published_date      timestamptz    ,
     hazard_id UUID NOT NULL,
+	analysis_scenario_id integer NOT NULL,
+    analysis_scenario_year smallint,
+	analysis_data_source text NOT NULL,
 	geo_location_name      	varchar(256),
     geo_location_address      	text ,
     geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
 	geo_gers_id			UUID NOT NULL,
 	geo_h3_index H3INDEX NOT NULL,
     geo_h3_resolution INT2 NOT NULL,
-	analysis_is_historic_record boolean NOT NULL,
-	analysis_historic_occurred_on timestamptz,
-	result_is_impacted boolean NOT NULL,
-	analysis_scenario_id integer NOT NULL,
-    analysis_scenario_year smallint,
-	analysis_data_source text NOT NULL,
-	result_data jsonb NOT NULL, -- we recommend that this json includes schema references so a consuming application can use json schema for parsing.
+	is_impacted boolean NOT NULL,
+	is_historic_impact boolean NOT NULL,
+	historic_impact_started timestamptz,
+	historic_impact_ended timestamptz,
+	impact_data_raw jsonb NOT NULL, -- we recommend that this json includes schema references so a consuming application can use json schema for parsing.
 	CONSTRAINT pk_geolocated_precalculated_impact_id PRIMARY KEY ( id ),
 	CONSTRAINT fk_geolocated_precalculated_impact_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_hazards.hazard(id),	
 	CONSTRAINT fk_geolocated_precalculated_impact_analysis_scenario_id FOREIGN KEY ( analysis_scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(id),
