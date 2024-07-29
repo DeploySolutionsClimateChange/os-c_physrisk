@@ -3,7 +3,7 @@
 -- to align with phys-risk/geo-indexer/other related initiatives
 -- speed up application development, help internationalize and display the results of analyses, and more.
 
--- Last Updated: 2024-07-28. Added some backend functionality such as user table and indexes for performance. Simplify table names and consolidate schemas.
+-- Last Updated: 2024-07-29. Added some backend functionality such as user table and indexes for performance. Simplify table names and consolidate schemas.
 -- The backend schema User and Tenant tables are derived from ASP.NET Boilerplate tables (https://aspnetboilerplate.com/). That code is available under the MIT license, here: https://github.com/aspnetboilerplate/aspnetboilerplate
 
 -- SETUP EXTENSIONS
@@ -21,7 +21,6 @@ CREATE SCHEMA IF NOT EXISTS osc_physrisk_assets;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_analysis_results;
 
 -- SETUP TABLES
--- SCHEMA osc_physrisk_backend
 -- SCHEMA osc_physrisk_backend
 CREATE TABLE osc_physrisk_backend.users (
 	id bigint NOT NULL,
