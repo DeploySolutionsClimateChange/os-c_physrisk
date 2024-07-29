@@ -535,14 +535,14 @@ CREATE TABLE osc_physrisk_analysis_results.asset_impact (
     value_at_risk decimal,
     value_currency_alphabetic_code char(3),
     --parameter    decimal,
-    exposure_function_ids text,
+    exposure_function_ids text, -- simple way of including a delimited list of model ids. A bridge tble would be a normalized way to do this, but would require a lookup table. TBD.
 	exposure_data_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
 	exposure_probability decimal,
 	exposure_is_exposed bool,
-	vulnerability_function_ids text,
+	vulnerability_function_ids text, -- simple way of including a delimited list of model ids. A bridge tble would be a normalized way to do this, but would require a lookup table. TBD.
 	vulnerability_data_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
-    --financial_model_ids text,
-	impact_type_id integer NOT NULL,
+    financial_model_ids text, -- simple way of including a delimited list of model ids. A bridge tble would be a normalized way to do this, but would require a lookup table. TBD.
+	impact_type_id integer NOT NULL, -- this design assumes one row per impact type. If there are multiple potential impact types, there would be multiple rows.
 	impact_data_raw jsonb NOT NULL,
     impact_mean    decimal,
     impact_distr_bin_edges    decimal[],
