@@ -612,14 +612,36 @@ CREATE TABLE osc_physrisk_analysis_results.geolocated_precalculated_impact (
 	CONSTRAINT fk_geolocated_precalculated_impact_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id) ,
 	CONSTRAINT fk_geolocated_precalculated_impact_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
  );
- COMMENT ON TABLE osc_physrisk_analysis_results.geolocated_precalculated_impact IS 'To help with indexing and searching, geographic locations may have precalculated information for hazard impacts. This can be historic (it actually happend) or projected (it is likely to happen). Note that this information is not aware of or concerned by whether or which physical assets may be present inside its borders.';
+ COMMENT ON TABLE osc_physrisk_analysis_results.geolocated_precalculated_impact IS 'To help with indexing and searching, geographic locations may have precalculated information for hazard impacts. This can be historic (it actually happened) or projected (it is likely to happen). Note that this information is not aware of or concerned by whether or which physical assets may be present inside its borders.';
 
 
--- SETUP PERMISSIONS
---GRANT USAGE ON SCHEMA "osc.physrisk.data_example.comp_domain" TO physrisk_service;
---GRANT SELECT ON ALL TABLES IN SCHEMA "osc.physrisk.data_example.comp_domain" TO physrisk_service;
---GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA "osc.physrisk.data_example.comp_domain" TO physrisk_service;
---GRANT ALL ON ALL TABLES IN SCHEMA "osc.physrisk.data_example.comp_domain" TO physrisk_service;
+-- SETUP PERMISSIONS FOR A READER SQL SERVICE ACCOUNT (CREATE THAT USING A DATABASE TOOL)
+--GRANT USAGE ON SCHEMA "osc_physrisk_backend" TO physrisk_reader_service;
+--GRANT SELECT ON ALL TABLES IN SCHEMA "osc_physrisk_backend" TO physrisk_reader_service;
+--GRANT USAGE ON SCHEMA "osc_physrisk_scenarios" TO physrisk_reader_service;
+--GRANT SELECT ON ALL TABLES IN SCHEMA "osc_physrisk_scenarios" TO physrisk_reader_service;
+--GRANT USAGE ON SCHEMA "osc_physrisk_hazards" TO physrisk_reader_service;
+--GRANT SELECT ON ALL TABLES IN SCHEMA "osc_physrisk_hazards" TO physrisk_reader_service;
+--GRANT USAGE ON SCHEMA "osc_physrisk_models" TO physrisk_reader_service;
+--GRANT SELECT ON ALL TABLES IN SCHEMA "osc_physrisk_models" TO physrisk_reader_service;
+--GRANT USAGE ON SCHEMA "osc_physrisk_assets" TO physrisk_reader_service;
+--GRANT SELECT ON ALL TABLES IN SCHEMA "osc_physrisk_assets" TO physrisk_reader_service;
+--GRANT USAGE ON SCHEMA "osc_physrisk_analysis_results" TO physrisk_reader_service;
+--GRANT SELECT ON ALL TABLES IN SCHEMA "osc_physrisk_analysis_results" TO physrisk_reader_service;
+
+-- SETUP PERMISSIONS FOR A READER/WRITER SQL SERVICE ACCOUNT (CREATE THAT USING A DATABASE TOOL)
+--GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA "osc_physrisk_backend" TO physrisk_readerwriter_service;
+--GRANT ALL ON ALL TABLES IN SCHEMA "osc_physrisk_backend" TO physrisk_readerwriter_service;
+--GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA "osc_physrisk_scenarios" TO physrisk_readerwriter_service;
+--GRANT ALL ON ALL TABLES IN SCHEMA "osc_physrisk_scenarios" TO physrisk_readerwriter_service;
+--GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA "osc_physrisk_hazards" TO physrisk_readerwriter_service;
+--GRANT ALL ON ALL TABLES IN SCHEMA "osc_physrisk_hazards" TO physrisk_readerwriter_service;
+--GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA "osc_physrisk_models" TO physrisk_readerwriter_service;
+--GRANT ALL ON ALL TABLES IN SCHEMA "osc_physrisk_models" TO physrisk_readerwriter_service;
+--GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA "osc_physrisk_assets" TO physrisk_readerwriter_service;
+--GRANT ALL ON ALL TABLES IN SCHEMA "osc_physrisk_assets" TO physrisk_readerwriter_service;
+--GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA "osc_physrisk_analysis_results" TO physrisk_readerwriter_service;
+--GRANT ALL ON ALL TABLES IN SCHEMA "osc_physrisk_analysis_results" TO physrisk_readerwriter_service;
 
 -- DATA IN ENGLISH STARTS
 INSERT INTO osc_physrisk.osc_physrisk_backend.users
@@ -1201,7 +1223,7 @@ INSERT INTO osc_physrisk.osc_physrisk_assets.asset
 VALUES 
 	('281d68cc-ffd3-4740-acd6-1ea23bce902f', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'naics=>22111,oed:occupancy:oed_code=>1300,oed:occupancy:air_code=>361','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '08b2a134d458bfff0200c38196ab869e', '1234', 12, 'Power Generating Utility', 'Industrial', 'BBG000BLNQ16', '', 12345678.90, 'USD')
 ;
--- QUERY BY TAGS EXAMPLE: FIND ASSETS WITH A CERTAIN NAICS OR OED OCCUPANCY VALUE (MULTIPLE TAXONOMIES)
+-- QUERY BY TAGS EXAMPLE: FIND ASSETS WITH A CERTAIN NAICS OR OED OCCUPANCY VALUE (SHOWS HOW TO SUPPORT MULTIPLE STANDARDS)
 SELECT a."name",  a.description_full, a.tags FROM osc_physrisk.osc_physrisk_assets.asset a
 WHERE a.tags -> 'naics'='22111' OR a.tags -> 'oed:occupancy:oed_code'='1300' OR a.tags -> 'oed:occupancy:air_code'='361' ;
 
@@ -1209,7 +1231,7 @@ WHERE a.tags -> 'naics'='22111' OR a.tags -> 'oed:occupancy:oed_code'='1300' OR 
 SELECT a."name",  a.description_full, a.tags FROM osc_physrisk.osc_physrisk_scenarios.scenario a
 WHERE a.tags -> 'key1'='value1_en' OR a.tags -> 'key2'='value4_en'  ;
 
--- SHOW IMPACT ANALYSIS EXAMPLE (CURRENTLY EMPTY - tODO MISSING TEST DATA)
+-- SHOW IMPACT ANALYSIS EXAMPLE (CURRENTLY EMPTY - TODO MISSING TEST DATA)
 SELECT
 	*
 FROM
@@ -1226,7 +1248,7 @@ FROM
 SELECT	*
 FROM
 	osc_physrisk.osc_physrisk_hazards.hazard haz INNER JOIN osc_physrisk.osc_physrisk_hazards.hazard_indicator hi ON hi.hazard_id = haz.id
-WHERE haz."name" = 'Riverine Inundation' -- more likely written as WHERE haz.hazard_id = '63ed7943-c4c4-43ea-abd2-86bb1997a094'
+WHERE haz."name" = 'Riverine Inundation' -- more likely written as WHERE haz.id = '63ed7943-c4c4-43ea-abd2-86bb1997a094'
 ;
 
 -- VIEW COASTAL INUNDATION HAZARD INDICATORS
