@@ -328,7 +328,42 @@ CREATE TABLE osc_physrisk_models.financial_model (
  );
 COMMENT ON TABLE osc_physrisk_models.financial_model IS 'Is this the same as damage_function, above?';
 
+
+
 -- SCHEMA osc_physrisk_assets
+
+CREATE TABLE osc_physrisk_assets.asset_class ( 
+	id UUID  DEFAULT gen_random_uuid () NOT NULL,
+	name varchar(256)  NOT NULL,
+	name_fullyqualified varchar(256),
+	name_abbreviation varchar(8),
+	description_full   text NOT NULL,
+	description_short  varchar(256)  NOT NULL,
+    tags hstore,
+	creation_time       timestamptz  NOT NULL  ,
+	creator_user_id      bigint    ,
+	last_modification_time timestamptz    ,
+	last_modifier_user_id bigint    ,
+	is_deleted          boolean  NOT NULL  ,
+	deleter_user_id     bigint    ,
+	deletion_time      timestamptz    ,
+	culture        varchar(5)  NOT NULL  ,
+	checksum        varchar(40)    ,
+	external_id         varchar(36)    ,
+	seq_num         integer  NOT NULL  ,
+	translated_from_id   UUID  ,
+	is_active       boolean  NOT NULL  ,
+	is_published        boolean  NOT NULL  ,
+	publisher_id        bigint    ,
+	published_date      timestamptz    ,
+    CONSTRAINT pk_asset_class PRIMARY KEY ( id ),
+	CONSTRAINT fk_asset_class_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_asset_class_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_asset_class_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id)	
+ );
+COMMENT ON TABLE osc_physrisk_assets.asset_class IS 'A physical financial asset (infrastructure, utilities, property, buildings) category, that may impact the modeling (ex real estate vs power generating utilities).';
+
+
 CREATE TABLE osc_physrisk_assets.portfolio ( 
 	id UUID  DEFAULT gen_random_uuid () NOT NULL,
 	name        varchar(256)  NOT NULL,
@@ -397,7 +432,7 @@ CREATE TABLE osc_physrisk_assets.asset (
 	geo_h3_index H3INDEX NOT NULL,
     geo_h3_resolution INT2 NOT NULL,
 	asset_type	varchar(256),
-	asset_class varchar(256),
+	asset_class_id UUID,
 	owner_bloomberg_id	varchar(12) DEFAULT NULL,
 	owner_lei_id varchar(20) DEFAULT NULL,
 	value_cashflows numeric ARRAY,-- Sequence of the associated cash flows (for cash flow generating assets only).
@@ -406,6 +441,7 @@ CREATE TABLE osc_physrisk_assets.asset (
 	value_currency_alphabetic_code char(3),
 	CONSTRAINT pk_asset PRIMARY KEY ( id ),
 	CONSTRAINT fk_asset_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.portfolio(id),
+    CONSTRAINT fk_asset_asset_class_id FOREIGN KEY ( asset_class_id ) REFERENCES osc_physrisk_assets.asset_class(id),
     CONSTRAINT ck_asset_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
 	CONSTRAINT fk_asset_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
 	CONSTRAINT fk_asset_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
@@ -1231,20 +1267,30 @@ VALUES
 
 -- INSERT ASSET PORTFOLIO EXAMPLE
 -- INCLUDING EXAMPLE ASSET WITH OED AND NAICS TAGS
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_class
+	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, is_published, publisher_id, published_date)
+VALUES 
+	('536e8cee-682f-4cd6-b23e-b32e885cc094', 'Real Estate', 'Real Estate', 'Real Estate', 'Real Estate', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_class
+	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, is_published, publisher_id, published_date)
+VALUES 
+	('f2baa602-44fe-49be-a5c9-d8b8208d9499', 'Power Generating Utility', 'Power Generating Utility', 'Power Generating Utility', 'Power Generating Utility', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+
+
 INSERT INTO osc_physrisk.osc_physrisk_assets.portfolio
 	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, value_total, value_currency_alphabetic_code)
 VALUES 
 	('07c629be-42c6-4dbe-bd56-83e64253368d', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z', 12345678.90, 'USD');
 
 INSERT INTO osc_physrisk.osc_physrisk_assets.asset_realestate
-	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, portfolio_id, geo_location_name, geo_location_coordinates, geo_gers_id, geo_h3_index, geo_h3_resolution, asset_type, asset_class, owner_bloomberg_id, owner_lei_id, value_total, value_currency_alphabetic_code, value_ltv)
+	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, portfolio_id, geo_location_name, geo_location_coordinates, geo_gers_id, geo_h3_index, geo_h3_resolution, asset_class_id, asset_type, owner_bloomberg_id, owner_lei_id, value_total, value_currency_alphabetic_code, value_ltv)
 VALUES 
-	('281d68cc-ffd3-4740-acd6-1ea23bce902f', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'naics=>531111,oed:occupancy:oed_code=>1050,oed:occupancy:air_code=>301','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '4e1f5a6d-c2d1-48f5-8ef5-35ed06c344dc', '1234', 12, 'Real Estate', 'Commercial', 'BBG000BLNQ16', '', 12345678.90, 'USD','{LTV value ratio}')
+	('281d68cc-ffd3-4740-acd6-1ea23bce902f', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'naics=>531111,oed:occupancy:oed_code=>1050,oed:occupancy:air_code=>301','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '4e1f5a6d-c2d1-48f5-8ef5-35ed06c344dc', '1234', 12, '536e8cee-682f-4cd6-b23e-b32e885cc094', 'Commercial', 'BBG000BLNQ16', '', 12345678.90, 'USD','{LTV value ratio}')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_assets.asset_powergeneratingutility
-	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, portfolio_id, geo_location_name, geo_location_coordinates, geo_gers_id, geo_h3_index, geo_h3_resolution, asset_type, asset_class, owner_bloomberg_id, owner_lei_id, value_total, value_currency_alphabetic_code, production, capacity, availability_rate)
+	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, portfolio_id, geo_location_name, geo_location_coordinates, geo_gers_id, geo_h3_index, geo_h3_resolution, asset_class_id,asset_type,  owner_bloomberg_id, owner_lei_id, value_total, value_currency_alphabetic_code, production, capacity, availability_rate)
 VALUES 
-	('78cb5382-5e4f-4762-b2e8-7cb33954f788', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'naics=>22111,oed:occupancy:oed_code=>1300,oed:occupancy:air_code=>361','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '08b2a134d458bfff0200c38196ab869e', '1234', 12, 'Power Generating Utility', 'Industrial', 'BBG000BLNQ16', '', 12345678.90, 'USD', 12345.0,100.00,95.00)
+	('78cb5382-5e4f-4762-b2e8-7cb33954f788', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'naics=>22111,oed:occupancy:oed_code=>1300,oed:occupancy:air_code=>361','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '08b2a134d458bfff0200c38196ab869e', '1234', 12, 'f2baa602-44fe-49be-a5c9-d8b8208d9499', 'Industrial', 'BBG000BLNQ16', '', 12345678.90, 'USD', 12345.0,100.00,95.00)
 ;
 
 
@@ -1258,10 +1304,12 @@ SELECT a."name" as "English Name",  b.culture as "Translated Culture",  b."name"
 INNER JOIN osc_physrisk.osc_physrisk_scenarios.scenario b ON a.id = b.translated_from_id
 WHERE b.culture='es'  ;
 
-
 -- QUERY BY TAGS EXAMPLE: FIND ASSETS WITH A CERTAIN NAICS OR OED OCCUPANCY VALUE (SHOWS HOW TO SUPPORT MULTIPLE STANDARDS)
-SELECT a."name",  a.description_full, a.tags FROM osc_physrisk.osc_physrisk_assets.asset a
+SELECT a."name",  a.description_full, a.tags, b.name as asset_class FROM osc_physrisk.osc_physrisk_assets.asset a INNER JOIN osc_physrisk.osc_physrisk_assets.asset_class b ON a.asset_class_id = b.id
 WHERE a.tags -> 'naics'='22111' OR a.tags -> 'oed:occupancy:oed_code'='1300' OR a.tags -> 'oed:occupancy:air_code'='361' ;
+
+SELECT a."name",  a.description_full, a.tags, b.name as asset_class FROM osc_physrisk.osc_physrisk_assets.asset a INNER JOIN osc_physrisk.osc_physrisk_assets.asset_class b ON a.asset_class_id = b.id
+WHERE a.tags -> 'naics' LIKE '53%'  ;
 
 -- QUERY BY TAGS EXAMPLE: FIND SCENARIOS WITH CERTAIN TAGS
 SELECT a."name",  a.description_full, a.tags FROM osc_physrisk.osc_physrisk_scenarios.scenario a
@@ -1297,10 +1345,12 @@ WHERE haz.id = 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b'
 --	SET checksum = md5(concat('Unknown/Not Selected', 'Unknown/Not Selected', 'Unknown/Not Selected', 'Unknown/Not Selected')) WHERE scenario_id = -1
 --;
 
-
 -- SELECT DIFFERENT ASSET TYPES
 SELECT * from osc_physrisk_assets.asset; -- NOTICE THESE ARE THE GENERIC ASSET COLUMNS AND ALL ASSETS ARE RETURNED
 SELECT name, value_ltv from osc_physrisk_assets.asset_realestate; -- NOTICE THE COLUMNS INCLUDE RE-SPECIFIC FIELDS AND ONLY RE ASSETS ARE RETURNED
 SELECT name, production, capacity, availability_rate from osc_physrisk_assets.asset_powergeneratingutility; -- NOTICE THE COLUMNS INCLUDE UTILITY-SPECIFIC FIELDS AND ONLY UTILITY ASSETS ARE RETURNED
 
-
+-- WE CAN ALSO DO A JOIN BY ASSET CLASS TO FILTER THE RESULTS
+SELECT * from osc_physrisk_assets.asset a INNER JOIN osc_physrisk.osc_physrisk_assets.asset_class b ON a.asset_class_id = b.id
+WHERE b."name" LIKE '%Utility%'
+; -- NOTICE ONLY UTILITY ROW IS RETURNED
