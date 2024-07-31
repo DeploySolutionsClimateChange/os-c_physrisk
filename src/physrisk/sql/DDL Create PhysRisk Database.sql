@@ -354,7 +354,7 @@ CREATE TABLE osc_physrisk_assets.portfolio (
 	is_published        boolean  NOT NULL  ,
 	publisher_id        bigint    ,
 	published_date      timestamptz    ,
-    value_total decimal,
+    value_total numeric,
     value_currency_alphabetic_code char(3),
 	CONSTRAINT pk_portfolio PRIMARY KEY (id ),
 	CONSTRAINT fk_portfolio_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
@@ -400,8 +400,10 @@ CREATE TABLE osc_physrisk_assets.asset (
 	asset_class varchar(256),
 	owner_bloomberg_id	varchar(12) DEFAULT NULL,
 	owner_lei_id varchar(20) DEFAULT NULL,
-    value_total decimal,
-    value_currency_alphabetic_code char(3),
+	value_cashflows numeric ARRAY,-- Sequence of the associated cash flows (for cash flow generating assets only).
+    value_total numeric,
+    value_dynamics jsonb, -- Asset Value Dynamics over time, example real estate appreciation
+	value_currency_alphabetic_code char(3),
 	CONSTRAINT pk_asset PRIMARY KEY ( id ),
 	CONSTRAINT fk_asset_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.portfolio(id),
     CONSTRAINT ck_asset_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
@@ -413,6 +415,35 @@ CREATE TABLE osc_physrisk_assets.asset (
 COMMENT ON TABLE osc_physrisk_assets.asset IS 'A physical financial asset (infrastructure, utilities, property, buildings) that is contained within a financial portfolio. The lowest unit of assessment for physical risk & resilience (currently).';
 
 CREATE INDEX "ix_osc_physrisk_assets_asset_portfolio_id" ON osc_physrisk_assets.asset USING btree (portfolio_id);
+
+CREATE TABLE osc_physrisk_assets.asset_realestate ( 
+	value_ltv text ARRAY, -- Sequence of Loan-to-Value results by date, representing the ratio of the first mortgage line as a percentage of the total appraised value of real property.
+	value_dynamics jsonb, -- Asset Value Dynamics over time, example real estate appreciation
+	CONSTRAINT pk_asset_realestate PRIMARY KEY ( id ),
+	CONSTRAINT fk_asset_realestate_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.portfolio(id),
+    CONSTRAINT ck_asset_realestate_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
+	CONSTRAINT fk_asset_realestate_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_asset_realestate_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_asset_realestate_deleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_asset_realestate_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
+ ) INHERITS (osc_physrisk_assets.asset);
+COMMENT ON TABLE osc_physrisk_assets.asset_realestate IS 'A physical financial asset (infrastructure, utilities, property, buildings) that is contained within a financial portfolio. The lowest unit of assessment for physical risk & resilience (currently).';
+
+CREATE TABLE osc_physrisk_assets.asset_powergeneratingutility ( 
+	production numeric, -- Real annual production of a power plant in Wh.
+	capacity numeric, -- Capacity of the power plant in W.
+	availability_rate numeric, -- Availability factor of production.
+	value_dynamics jsonb, -- Asset Value Dynamics over time, example real estate appreciation
+	CONSTRAINT pk_asset_powergeneratingutility PRIMARY KEY ( id ),
+	CONSTRAINT fk_asset_powergeneratingutility_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.portfolio(id),
+    CONSTRAINT ck_asset_powergeneratingutility_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
+	CONSTRAINT fk_asset_powergeneratingutility_creator_user_id FOREIGN KEY ( creator_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_asset_powergeneratingutility_last_modifier_user_id FOREIGN KEY ( last_modifier_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_asset_powergeneratingutilitydeleter_user_id FOREIGN KEY ( deleter_user_id ) REFERENCES osc_physrisk_backend.users(id),
+	CONSTRAINT fk_asset_powergeneratingutility_tenant_id FOREIGN KEY ( tenant_id ) REFERENCES osc_physrisk_backend.tenants(id)
+ ) INHERITS (osc_physrisk_assets.asset);
+COMMENT ON TABLE osc_physrisk_assets.asset_powergeneratingutility IS 'A physical financial asset (infrastructure, utilities, property, buildings) that is contained within a financial portfolio. The lowest unit of assessment for physical risk & resilience (currently).';
+
 
 -- SCHEMA osc_physrisk_analysis_results
 CREATE TABLE osc_physrisk_analysis_results.impact_type ( 
@@ -477,10 +508,10 @@ CREATE TABLE osc_physrisk_analysis_results.portfolio_impact (
     analysis_scenario_year smallint,
 	analysis_hazard_id	UUID NOT NULL,
     impact_type_id integer NOT NULL,
-	annual_exceedence_probability decimal,
-	average_annual_loss decimal,
-    value_total decimal,
-    value_at_risk decimal,
+	annual_exceedence_probability numeric,
+	average_annual_loss numeric,
+    value_total numeric,
+    value_at_risk numeric,
     value_currency_alphabetic_code char(3),
 	CONSTRAINT pk_portfolio_analysis PRIMARY KEY ( id ),
 	CONSTRAINT fk_portfolio_analysis_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.portfolio(id),
@@ -529,25 +560,25 @@ CREATE TABLE osc_physrisk_analysis_results.asset_impact (
 	scenario_id integer NOT NULL,
     scenario_year smallint,
 	hazard_id	UUID NOT NULL,
-    --hazard_intensity decimal,
-	value_total decimal,
-    value_at_risk decimal,
+    --hazard_intensity numeric,
+	value_total numeric,
+    value_at_risk numeric,
     value_currency_alphabetic_code char(3),
-    --parameter    decimal,
+    --parameter    numeric,
     exposure_function_ids text, -- simple way of including a delimited list of model ids. A bridge tble would be a normalized way to do this, but would require a lookup table. TBD.
 	exposure_data_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
-	exposure_probability decimal,
+	exposure_probability numeric,
 	exposure_is_exposed bool,
 	vulnerability_function_ids text, -- simple way of including a delimited list of model ids. A bridge tble would be a normalized way to do this, but would require a lookup table. TBD.
 	vulnerability_data_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
     financial_model_ids text, -- simple way of including a delimited list of model ids. A bridge tble would be a normalized way to do this, but would require a lookup table. TBD.
 	impact_type_id integer NOT NULL, -- this design assumes one row per impact type. If there are multiple potential impact types, there would be multiple rows.
 	impact_data_raw jsonb NOT NULL,
-    impact_mean    decimal,
-    impact_distr_bin_edges    decimal[],
-    impact_distr_p    decimal[],
-    impact_exc_exceed_p    decimal[],
-    impact_exc_values    decimal[],
+    impact_mean    numeric,
+    impact_distr_bin_edges    numeric[],
+    impact_distr_p    numeric[],
+    impact_exc_exceed_p    numeric[],
+    impact_exc_values    numeric[],
 	impact_return_periods jsonb, 
     CONSTRAINT pk_asset_analysis PRIMARY KEY ( id ),
     CONSTRAINT ck_asset_analysis_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
@@ -1195,9 +1226,26 @@ VALUES
 	(31, 'RCP8.5 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Intergubernamental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP8.5', 'RCP8.5', 'RCP8.5','key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'checksum',1,9, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 
-
-
 -- DATA IN SPANISH ENDS
+
+
+-- INSERT ASSET PORTFOLIO EXAMPLE
+-- INCLUDING EXAMPLE ASSET WITH OED AND NAICS TAGS
+INSERT INTO osc_physrisk.osc_physrisk_assets.portfolio
+	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, value_total, value_currency_alphabetic_code)
+VALUES 
+	('07c629be-42c6-4dbe-bd56-83e64253368d', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z', 12345678.90, 'USD');
+
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_realestate
+	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, portfolio_id, geo_location_name, geo_location_coordinates, geo_gers_id, geo_h3_index, geo_h3_resolution, asset_type, asset_class, owner_bloomberg_id, owner_lei_id, value_total, value_currency_alphabetic_code, value_ltv)
+VALUES 
+	('281d68cc-ffd3-4740-acd6-1ea23bce902f', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'naics=>531111,oed:occupancy:oed_code=>1050,oed:occupancy:air_code=>301','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '4e1f5a6d-c2d1-48f5-8ef5-35ed06c344dc', '1234', 12, 'Real Estate', 'Commercial', 'BBG000BLNQ16', '', 12345678.90, 'USD','{LTV value ratio}')
+;
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_powergeneratingutility
+	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, portfolio_id, geo_location_name, geo_location_coordinates, geo_gers_id, geo_h3_index, geo_h3_resolution, asset_type, asset_class, owner_bloomberg_id, owner_lei_id, value_total, value_currency_alphabetic_code, production, capacity, availability_rate)
+VALUES 
+	('78cb5382-5e4f-4762-b2e8-7cb33954f788', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'naics=>22111,oed:occupancy:oed_code=>1300,oed:occupancy:air_code=>361','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '08b2a134d458bfff0200c38196ab869e', '1234', 12, 'Power Generating Utility', 'Industrial', 'BBG000BLNQ16', '', 12345678.90, 'USD', 12345.0,100.00,95.00)
+;
 
 
 -- EXAMPLE QUERIES
@@ -1210,18 +1258,7 @@ SELECT a."name" as "English Name",  b.culture as "Translated Culture",  b."name"
 INNER JOIN osc_physrisk.osc_physrisk_scenarios.scenario b ON a.id = b.translated_from_id
 WHERE b.culture='es'  ;
 
--- INSERT ASSET PORTFOLIO EXAMPLE
--- INCLUDING EXAMPLE ASSET WITH OED AND NAICS TAGS
-INSERT INTO osc_physrisk.osc_physrisk_assets.portfolio
-	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, value_total, value_currency_alphabetic_code)
-VALUES 
-	('07c629be-42c6-4dbe-bd56-83e64253368d', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z', 12345678.90, 'USD');
 
-INSERT INTO osc_physrisk.osc_physrisk_assets.asset
-	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, portfolio_id, geo_location_name, geo_location_coordinates, geo_gers_id, geo_h3_index, geo_h3_resolution, asset_type, asset_class, owner_bloomberg_id, owner_lei_id, value_total, value_currency_alphabetic_code)
-VALUES 
-	('281d68cc-ffd3-4740-acd6-1ea23bce902f', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'naics=>22111,oed:occupancy:oed_code=>1300,oed:occupancy:air_code=>361','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '08b2a134d458bfff0200c38196ab869e', '1234', 12, 'Power Generating Utility', 'Industrial', 'BBG000BLNQ16', '', 12345678.90, 'USD')
-;
 -- QUERY BY TAGS EXAMPLE: FIND ASSETS WITH A CERTAIN NAICS OR OED OCCUPANCY VALUE (SHOWS HOW TO SUPPORT MULTIPLE STANDARDS)
 SELECT a."name",  a.description_full, a.tags FROM osc_physrisk.osc_physrisk_assets.asset a
 WHERE a.tags -> 'naics'='22111' OR a.tags -> 'oed:occupancy:oed_code'='1300' OR a.tags -> 'oed:occupancy:air_code'='361' ;
@@ -1231,17 +1268,8 @@ SELECT a."name",  a.description_full, a.tags FROM osc_physrisk.osc_physrisk_scen
 WHERE a.tags -> 'key1'='value1_en' OR a.tags -> 'key2'='value4_en'  ;
 
 -- SHOW IMPACT ANALYSIS EXAMPLE (CURRENTLY EMPTY - TODO MISSING TEST DATA)
-SELECT
-	*
-FROM
-	osc_physrisk.osc_physrisk_analysis_results.portfolio_impact
-;
-
-SELECT
-	*
-FROM
-	osc_physrisk.osc_physrisk_analysis_results.asset_impact
-;
+SELECT	* FROM	osc_physrisk.osc_physrisk_analysis_results.portfolio_impact;
+SELECT * FROM osc_physrisk.osc_physrisk_analysis_results.asset_impact;
 
 -- VIEW RIVERINE INUNDATION HAZARD INDICATORS
 SELECT	*
@@ -1270,7 +1298,9 @@ WHERE haz.id = 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b'
 --;
 
 
-
-
+-- SELECT DIFFERENT ASSET TYPES
+SELECT * from osc_physrisk_assets.asset; -- NOTICE THESE ARE THE GENERIC ASSET COLUMNS AND ALL ASSETS ARE RETURNED
+SELECT name, value_ltv from osc_physrisk_assets.asset_realestate; -- NOTICE THE COLUMNS INCLUDE RE-SPECIFIC FIELDS AND ONLY RE ASSETS ARE RETURNED
+SELECT name, production, capacity, availability_rate from osc_physrisk_assets.asset_powergeneratingutility; -- NOTICE THE COLUMNS INCLUDE UTILITY-SPECIFIC FIELDS AND ONLY UTILITY ASSETS ARE RETURNED
 
 
