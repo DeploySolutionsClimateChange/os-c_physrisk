@@ -3,7 +3,7 @@
 -- to align with phys-risk/geo-indexer/other related initiatives
 -- speed up application development, help internationalize and display the results of analyses, and more.
 
--- Last Updated: 2024-07-31. Added asset table inheritance examples, and some backend functionality such as user table and indexes for performance. Simplify table names and consolidate schemas.
+-- Last Updated: 2024-08-01. Added Precalculated damage curve example. Added asset table inheritance examples, and some backend functionality such as user table and indexes for performance. Simplify table names and consolidate schemas.
 -- The backend schema User and Tenant tables are derived from ASP.NET Boilerplate tables (https://aspnetboilerplate.com/). That code is available under the MIT license, here: https://github.com/aspnetboilerplate/aspnetboilerplate
 
 -- SETUP EXTENSIONS
@@ -428,7 +428,7 @@ CREATE TABLE osc_physrisk_assets.asset (
 	geo_location_name      	varchar(256),
     geo_location_address      	text,
     geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
-	geo_gers_id			UUID NOT NULL,
+	geo_overture_features			jsonb[], -- This asset can be described in 0 or more Overture Map schemas to cover its land use, infrastructure, building extents, etc
 	geo_h3_index H3INDEX NOT NULL,
     geo_h3_resolution INT2 NOT NULL,
 	asset_type	varchar(256),
@@ -590,13 +590,13 @@ CREATE TABLE osc_physrisk_analysis_results.asset_impact (
 	geo_location_name      	varchar(256),
 	geo_location_address      	text,
     geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
-	geo_gers_id			UUID NOT NULL,
+	geo_overture_features			jsonb[], -- This asset can be described in 0 or more Overture Map schemas to cover its land use, infrastructure, building extents, etc	
 	geo_h3_index H3INDEX NOT NULL,
     geo_h3_resolution INT2 NOT NULL,
 	scenario_id integer NOT NULL,
     scenario_year smallint,
 	hazard_id	UUID NOT NULL,
-    --hazard_intensity numeric,
+    hazard_intensity numeric[],
 	value_total numeric,
     value_at_risk numeric,
     value_currency_alphabetic_code char(3),
@@ -610,7 +610,8 @@ CREATE TABLE osc_physrisk_analysis_results.asset_impact (
     financial_model_ids text, -- simple way of including a delimited list of model ids. A bridge tble would be a normalized way to do this, but would require a lookup table. TBD.
 	impact_type_id integer NOT NULL, -- this design assumes one row per impact type. If there are multiple potential impact types, there would be multiple rows.
 	impact_data_raw jsonb NOT NULL,
-    impact_mean    numeric,
+    impact_mean    numeric[],
+	impact_std    numeric[],
     impact_distr_bin_edges    numeric[],
     impact_distr_p    numeric[],
     impact_exc_exceed_p    numeric[],
@@ -655,20 +656,23 @@ CREATE TABLE osc_physrisk_analysis_results.geolocated_precalculated_impact (
 	publisher_id        bigint    ,
 	published_date      timestamptz    ,
     hazard_id UUID NOT NULL,
+    hazard_intensity numeric[],
 	analysis_scenario_id integer NOT NULL,
     analysis_scenario_year smallint,
 	analysis_data_source text NOT NULL,
 	geo_location_name      	varchar(256),
     geo_location_address      	text ,
     geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
-	geo_gers_id			UUID NOT NULL,
+	geo_overture_features			jsonb[], -- This location can be described in 0 or more Overture Map schemas to cover its land use, infrastructure, building extents, etc
 	geo_h3_index H3INDEX NOT NULL,
     geo_h3_resolution INT2 NOT NULL,
 	is_impacted boolean NOT NULL,
 	is_historic_impact boolean NOT NULL,
 	historic_impact_started timestamptz,
 	historic_impact_ended timestamptz,
-	impact_data_raw jsonb NOT NULL, -- we recommend that this json includes schema references so a consuming application can use json schema for parsing.
+	impact_data_raw jsonb NOT NULL, -- we recommend that this json includes schema references so a consuming application can use json schema for parsing.	
+    impact_mean    numeric[],
+	impact_std    numeric[],
 	CONSTRAINT pk_geolocated_precalculated_impact_id PRIMARY KEY ( id ),
 	CONSTRAINT fk_geolocated_precalculated_impact_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_hazards.hazard(id),	
 	CONSTRAINT fk_geolocated_precalculated_impact_analysis_scenario_id FOREIGN KEY ( analysis_scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(id),
@@ -1283,16 +1287,420 @@ VALUES
 	('07c629be-42c6-4dbe-bd56-83e64253368d', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z', 12345678.90, 'USD');
 
 INSERT INTO osc_physrisk.osc_physrisk_assets.asset_realestate
-	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, portfolio_id, geo_location_name, geo_location_coordinates, geo_gers_id, geo_h3_index, geo_h3_resolution, asset_class_id, asset_type, owner_bloomberg_id, owner_lei_id, value_total, value_currency_alphabetic_code, value_ltv)
+	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, portfolio_id, geo_location_name, geo_location_coordinates, geo_overture_features, geo_h3_index, geo_h3_resolution, asset_class_id, asset_type, owner_bloomberg_id, owner_lei_id, value_total, value_currency_alphabetic_code, value_ltv)
 VALUES 
-	('281d68cc-ffd3-4740-acd6-1ea23bce902f', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'naics=>531111,oed:occupancy:oed_code=>1050,oed:occupancy:air_code=>301','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '4e1f5a6d-c2d1-48f5-8ef5-35ed06c344dc', '1234', 12, '536e8cee-682f-4cd6-b23e-b32e885cc094', 'Commercial', 'BBG000BLNQ16', '', 12345678.90, 'USD','{LTV value ratio}')
+	('281d68cc-ffd3-4740-acd6-1ea23bce902f', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'naics=>531111,oed:occupancy:oed_code=>1050,oed:occupancy:air_code=>301','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, '536e8cee-682f-4cd6-b23e-b32e885cc094', 'Commercial', 'BBG000BLNQ16', '', 12345678.90, 'USD','{LTV value ratio}')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_assets.asset_powergeneratingutility
-	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, portfolio_id, geo_location_name, geo_location_coordinates, geo_gers_id, geo_h3_index, geo_h3_resolution, asset_class_id,asset_type,  owner_bloomberg_id, owner_lei_id, value_total, value_currency_alphabetic_code, production, capacity, availability_rate)
+	(id, "name", name_fullyqualified, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, portfolio_id, geo_location_name, geo_location_coordinates, geo_overture_features, geo_h3_index, geo_h3_resolution, asset_class_id,asset_type,  owner_bloomberg_id, owner_lei_id, value_total, value_currency_alphabetic_code, production, capacity, availability_rate)
 VALUES 
-	('78cb5382-5e4f-4762-b2e8-7cb33954f788', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'naics=>22111,oed:occupancy:oed_code=>1300,oed:occupancy:air_code=>361','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '08b2a134d458bfff0200c38196ab869e', '1234', 12, 'f2baa602-44fe-49be-a5c9-d8b8208d9499', 'Industrial', 'BBG000BLNQ16', '', 12345678.90, 'USD', 12345.0,100.00,95.00)
+	('78cb5382-5e4f-4762-b2e8-7cb33954f788', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'naics=>22111,oed:occupancy:oed_code=>1300,oed:occupancy:air_code=>361','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, 'f2baa602-44fe-49be-a5c9-d8b8208d9499', 'Industrial', 'BBG000BLNQ16', '', 12345678.90, 'USD', 12345.0,100.00,95.00)
 ;
 
+-- INSERT PRECALCULATED IMPACT EXAMPLE
+INSERT INTO osc_physrisk.osc_physrisk_analysis_results.geolocated_precalculated_impact
+	(id, "name", name_fullyqualified, name_abbreviation, description_full, description_short, tags, creation_time, creator_user_id, last_modification_time, last_modifier_user_id, is_deleted, deleter_user_id, deletion_time, culture, checksum, external_id, seq_num, translated_from_id, is_active, tenant_id, is_published, publisher_id, published_date, hazard_id, analysis_scenario_id, analysis_scenario_year, analysis_data_source, geo_location_name, geo_location_address, geo_location_coordinates, geo_overture_features, geo_h3_index, geo_h3_resolution, is_impacted, is_historic_impact, historic_impact_started, historic_impact_ended, impact_data_raw)
+VALUES 
+	('3bbb4a0e-f719-4e78-864b-3962e7f9e3a4', 'Example stored precalculated impact damage curve for Utility', 'Example stored precalculated impact damage curve for Utility', NULL, 'Example stored precalculated impact damage curve for Utility','Example stored precalculated impact damage curve for Utility', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'checksum',NULL,1,NULL,'y', 1,'y',1,'2024-07-15T00:00:01Z','63ed7943-c4c4-43ea-abd2-86bb1997a094', 3, 2040, 'WRI Data', '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, 'y', 'n',NULL ,NULL , '{
+    "items": [
+        {
+            "asset_type": "Steam/OnceThrough",
+            "event_type": "Inundation",
+            "impact_mean": [
+                0.0,
+                1.0,
+                2.0,
+                7.0,
+                14.0,
+                30.0,
+                60.0,
+                180.0,
+                365.0
+            ],
+            "impact_std": [],
+            "impact_type": "Disruption",
+            "impact_units": "Days",
+            "intensity": [
+                0.0,
+                0.1,
+                0.2,
+                0.3,
+                0.4,
+                0.5,
+                0.6,
+                0.7,
+                1.0
+            ],
+            "intensity_units": "Metres",
+            "location": "Global"
+        },
+        {
+            "asset_type": "Steam/Dry",
+            "event_type": "Inundation",
+            "impact_mean": [
+                0.0,
+                1.0,
+                2.0,
+                7.0,
+                14.0,
+                30.0,
+                60.0,
+                180.0,
+                365.0
+            ],
+            "impact_std": [],
+            "impact_type": "Disruption",
+            "impact_units": "Days",
+            "intensity": [
+                0.0,
+                0.1,
+                0.2,
+                0.3,
+                0.4,
+                0.5,
+                0.6,
+                0.7,
+                1.0
+            ],
+            "intensity_units": "Metres",
+            "location": "Global"
+        },
+        {
+            "asset_type": "Gas",
+            "event_type": "Inundation",
+            "impact_mean": [
+                0.0,
+                1.0,
+                2.0,
+                7.0,
+                14.0,
+                30.0,
+                60.0,
+                180.0,
+                365.0
+            ],
+            "impact_std": [],
+            "impact_type": "Disruption",
+            "impact_units": "Days",
+            "intensity": [
+                0.0,
+                0.1,
+                0.2,
+                0.3,
+                0.4,
+                0.5,
+                0.6,
+                0.7,
+                1.0
+            ],
+            "intensity_units": "Metres",
+            "location": "Global"
+        },
+        {
+            "asset_type": "Steam/Recirculating",
+            "event_type": "Inundation",
+            "impact_mean": [
+                0.0,
+                1.0,
+                2.0,
+                7.0,
+                14.0,
+                30.0,
+                60.0,
+                180.0,
+                365.0
+            ],
+            "impact_std": [],
+            "impact_type": "Disruption",
+            "impact_units": "Days",
+            "intensity": [
+                0.0,
+                0.1,
+                0.2,
+                0.3,
+                0.4,
+                0.5,
+                0.6,
+                0.7,
+                1.0
+            ],
+            "intensity_units": "Metres",
+            "location": "Global"
+        },
+        {
+            "asset_type": "Steam/Dry",
+            "event_type": "AirTemperature",
+            "impact_mean": [
+                0.0,
+                0.02,
+                0.04,
+                0.08,
+                0.11,
+                0.15,
+                1.0
+            ],
+            "impact_std": [],
+            "impact_type": "Disruption",
+            "impact_units": "Days",
+            "intensity": [
+                0.0,
+                6.0,
+                12.0,
+                18.0,
+                24.0,
+                30.0,
+                198.0
+            ],
+            "intensity_units": "DegreesCelsius",
+            "location": "Global"
+        },
+        {
+            "asset_type": "Gas",
+            "event_type": "AirTemperature",
+            "impact_mean": [
+                0.0,
+                0.1,
+                0.25,
+                0.5,
+                0.8,
+                1.0
+            ],
+            "impact_std": [],
+            "impact_type": "Disruption",
+            "impact_units": "Days",
+            "intensity": [
+                0.0,
+                10.0,
+                20.0,
+                30.0,
+                40.0,
+                50.0
+            ],
+            "intensity_units": "DegreesCelsius",
+            "location": "Global"
+        },
+        {
+            "asset_type": "Steam/OnceThrough",
+            "event_type": "Drought",
+            "impact_mean": [
+                0.0,
+                0.0,
+                0.1,
+                0.2,
+                1.0
+            ],
+            "impact_std": [],
+            "impact_type": "Disruption",
+            "impact_units": "Days",
+            "intensity": [
+                0.0,
+                -2.0,
+                -2.5,
+                -3.0,
+                -3.6
+            ],
+            "intensity_units": "Unitless",
+            "location": "Global"
+        },
+        {
+            "asset_type": "Steam/Recirculating",
+            "event_type": "Drought",
+            "impact_mean": [
+                0.0,
+                0.0,
+                0.1,
+                0.2,
+                1.0
+            ],
+            "impact_std": [],
+            "impact_type": "Disruption",
+            "impact_units": "Days",
+            "intensity": [
+                0.0,
+                -2.0,
+                -2.5,
+                -3.0,
+                -3.6
+            ],
+            "intensity_units": "Unitless",
+            "location": "Global"
+        },
+        {
+            "asset_type": "Steam/OnceThrough",
+            "event_type": "WaterTemperature",
+            "impact_mean": [
+                0.0,
+                0.003,
+                0.009,
+                0.017,
+                0.027,
+                0.041,
+                0.061,
+                0.089,
+                0.118,
+                0.157,
+                0.205,
+                0.257,
+                0.327,
+                0.411,
+                0.508,
+                0.629,
+                0.775,
+                1.0
+            ],
+            "impact_std": [],
+            "impact_type": "Disruption",
+            "impact_units": "Days",
+            "intensity": [
+                0.0,
+                1.0,
+                2.0,
+                3.0,
+                4.0,
+                5.0,
+                6.0,
+                7.0,
+                8.0,
+                9.0,
+                10.0,
+                11.0,
+                12.0,
+                13.0,
+                14.0,
+                15.0,
+                16.0,
+                17.0
+            ],
+            "intensity_units": "DegreesCelsius",
+            "location": "Global"
+        },
+        {
+            "asset_type": "Steam/Recirculating",
+            "event_type": "WaterTemperature",
+            "impact_mean": [
+                0.0,
+                0.003,
+                0.009,
+                0.017,
+                0.027,
+                0.041,
+                0.061,
+                0.089,
+                0.118,
+                0.157,
+                0.205,
+                0.257,
+                0.327,
+                0.411,
+                0.508,
+                0.629,
+                0.775,
+                1.0
+            ],
+            "impact_std": [],
+            "impact_type": "Disruption",
+            "impact_units": "Days",
+            "intensity": [
+                0.0,
+                1.0,
+                2.0,
+                3.0,
+                4.0,
+                5.0,
+                6.0,
+                7.0,
+                8.0,
+                9.0,
+                10.0,
+                11.0,
+                12.0,
+                13.0,
+                14.0,
+                15.0,
+                16.0,
+                17.0
+            ],
+            "intensity_units": "DegreesCelsius",
+            "location": "Global"
+        },
+        {
+            "asset_type": "Steam/OnceThrough",
+            "event_type": "WaterStress",
+            "impact_mean": [
+                0.0,
+                0.02,
+                0.1,
+                0.2,
+                0.5,
+                1.0
+            ],
+            "impact_std": [],
+            "impact_type": "Disruption",
+            "impact_units": "Days",
+            "intensity": [
+                0.0,
+                0.1,
+                0.25,
+                0.5,
+                0.75,
+                1.0
+            ],
+            "intensity_units": "Unitless",
+            "location": "Global"
+        },
+        {
+            "asset_type": "Steam/Recirculating",
+            "event_type": "WaterStress",
+            "impact_mean": [
+                0.0,
+                0.02,
+                0.1,
+                0.2,
+                0.5,
+                1.0
+            ],
+            "impact_std": [],
+            "impact_type": "Disruption",
+            "impact_units": "Days",
+            "intensity": [
+                0.0,
+                0.1,
+                0.25,
+                0.5,
+                0.75,
+                1.0
+            ],
+            "intensity_units": "Unitless",
+            "location": "Global"
+        },
+        {
+            "asset_type": "Steam/OnceThrough",
+            "event_type": "RegulatoryDischargeWaterLimit",
+            "impact_mean": [
+                0.0,
+                0.1,
+                0.2,
+                0.4,
+                0.5,
+                1.0
+            ],
+            "impact_std": [],
+            "impact_type": "Disruption",
+            "impact_units": "Days",
+            "intensity": [
+                27.0,
+                28.0,
+                29.0,
+                30.0,
+                31.0,
+                32.0
+            ],
+            "intensity_units": "DegreesCelsius",
+            "location": "Global"
+        }
+    ]
+}
+');
 
 -- EXAMPLE QUERIES
 -- VIEW SCENARIOS IN DIFFERENT LANGUAGES
@@ -1354,3 +1762,11 @@ SELECT name, production, capacity, availability_rate from osc_physrisk_assets.as
 SELECT * from osc_physrisk_assets.asset a INNER JOIN osc_physrisk.osc_physrisk_assets.asset_class b ON a.asset_class_id = b.id
 WHERE b."name" LIKE '%Utility%'
 ; -- NOTICE ONLY UTILITY ROW IS RETURNED
+
+-- QUERY PRECALCULATED DAMAGE CURVES AT A CERTAIN LOCATION
+SELECT
+	geo_h3_index, geo_h3_resolution, ST_X(geo_location_coordinates::geometry) as Long, ST_Y(geo_location_coordinates::geometry) as Lat, geo_overture_features, is_impacted, is_historic_impact, impact_data_raw
+FROM
+	osc_physrisk.osc_physrisk_analysis_results.geolocated_precalculated_impact
+WHERE geo_h3_index = '1234'
+	;
