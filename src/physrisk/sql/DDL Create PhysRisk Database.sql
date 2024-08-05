@@ -466,8 +466,6 @@ CREATE TABLE osc_physrisk_assets.asset (
 	geo_overture_features			jsonb[], -- This asset can be described in 0 or more Overture Map schemas to cover its land use, infrastructure, building extents, etc
 	geo_h3_index H3INDEX NOT NULL,
     geo_h3_resolution INT2 NOT NULL,
-	asset_type	varchar(256),
-	osc_asset_class_id UUID,
 	osc_asset_type_id UUID,
 	owner_bloomberg_osc_id	varchar(12) DEFAULT NULL,
 	owner_lei_osc_id varchar(20) DEFAULT NULL,
@@ -482,7 +480,6 @@ CREATE TABLE osc_physrisk_assets.asset (
 	CONSTRAINT fk_asset_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_asset_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_asset_osc_tenant_id FOREIGN KEY ( osc_tenant_id ) REFERENCES osc_physrisk_backend.tenant(osc_id),
-    CONSTRAINT fk_asset_osc_asset_class_id FOREIGN KEY ( osc_asset_class_id ) REFERENCES osc_physrisk_assets.asset_class(osc_id),
     CONSTRAINT fk_asset_osc_asset_type_id FOREIGN KEY ( osc_asset_type_id ) REFERENCES osc_physrisk_assets.asset_type(osc_id)
  );
 COMMENT ON TABLE osc_physrisk_assets.asset IS 'A physical financial asset (infrastructure, utilities, property, buildings) that is contained within a financial portfolio. The lowest unit of assessment for physical risk & resilience (currently).';
@@ -499,7 +496,6 @@ CREATE TABLE osc_physrisk_assets.asset_realestate (
 	CONSTRAINT fk_asset_realestate_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_asset_realestate_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_asset_realestate_osc_tenant_id FOREIGN KEY ( osc_tenant_id ) REFERENCES osc_physrisk_backend.tenant(osc_id),	
-    CONSTRAINT fk_asset_realestate_osc_asset_class_id FOREIGN KEY ( osc_asset_class_id ) REFERENCES osc_physrisk_assets.asset_class(osc_id),
     CONSTRAINT fk_asset_realestate_osc_asset_type_id FOREIGN KEY ( osc_asset_type_id ) REFERENCES osc_physrisk_assets.asset_type(osc_id)
  ) INHERITS (osc_physrisk_assets.asset);
 COMMENT ON TABLE osc_physrisk_assets.asset_realestate IS 'A physical financial asset (infrastructure, utilities, property, buildings) that is contained within a financial portfolio. The lowest unit of assessment for physical risk & resilience (currently).';
@@ -516,7 +512,6 @@ CREATE TABLE osc_physrisk_assets.asset_powergeneratingutility (
 	CONSTRAINT fk_asset_powergeneratingutility_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_asset_powergeneratingutilityosc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_asset_powergeneratingutility_osc_tenant_id FOREIGN KEY ( osc_tenant_id ) REFERENCES osc_physrisk_backend.tenant(osc_id),	
-    CONSTRAINT fk_asset_powergeneratingutility_osc_asset_class_id FOREIGN KEY ( osc_asset_class_id ) REFERENCES osc_physrisk_assets.asset_class(osc_id),
     CONSTRAINT fk_asset_powergeneratingutility_osc_asset_type_id FOREIGN KEY ( osc_asset_type_id ) REFERENCES osc_physrisk_assets.asset_type(osc_id)
  ) INHERITS (osc_physrisk_assets.asset);
 COMMENT ON TABLE osc_physrisk_assets.asset_powergeneratingutility IS 'A physical financial asset (infrastructure, utilities, property, buildings) that is contained within a financial portfolio. The lowest unit of assessment for physical risk & resilience (currently).';
@@ -1330,7 +1325,14 @@ INSERT INTO osc_physrisk.osc_physrisk_assets.asset_class
 VALUES 
 	('f2baa602-44fe-49be-a5c9-d8b8208d9499', 'Power Generating Utility', 'Power Generating Utility', 'Power Generating Utility', 'Power Generating Utility', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 
-
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('85246f30-e622-4af9-af86-16b23e8671a7', 'Commercial Real Estate', 'Commercial Real Estate', 'Commercial Real Estate', 'Commercial Real Estate', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','536e8cee-682f-4cd6-b23e-b32e885cc094');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('3a568df0-cf71-4598-9bc7-2fb5997fb30d', 'Power Generating Utility', 'Power Generating Utility', 'Power Generating Utility', 'Power Generating Utility', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
 
 INSERT INTO osc_physrisk.osc_physrisk_assets.portfolio
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_tenant_id, osc_is_published, osc_publisher_id, osc_datetime_published, value_total, value_currency_alphabetic_code)
@@ -1338,14 +1340,14 @@ VALUES
 	('07c629be-42c6-4dbe-bd56-83e64253368d', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z', 12345678.90, 'USD');
 
 INSERT INTO osc_physrisk.osc_physrisk_assets.asset_realestate
-	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active,osc_tenant_id, osc_is_published, osc_publisher_id, osc_datetime_published, osc_portfolio_id, geo_location_name, geo_location_coordinates, geo_overture_features, geo_h3_index, geo_h3_resolution, osc_asset_class_id, asset_type, owner_bloomberg_osc_id, owner_lei_osc_id, value_total, value_currency_alphabetic_code, value_ltv)
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active,osc_tenant_id, osc_is_published, osc_publisher_id, osc_datetime_published, osc_portfolio_id, geo_location_name, geo_location_coordinates, geo_overture_features, geo_h3_index, geo_h3_resolution, osc_asset_type_id, owner_bloomberg_osc_id, owner_lei_osc_id, value_total, value_currency_alphabetic_code, value_ltv)
 VALUES 
-	('281d68cc-ffd3-4740-acd6-1ea23bce902f', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'naics=>531111,oed:occupancy:oed_code=>1050,oed:occupancy:air_code=>301','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, '536e8cee-682f-4cd6-b23e-b32e885cc094', 'Commercial', 'BBG000BLNQ16', '', 12345678.90, 'USD','{LTV value ratio}')
+	('281d68cc-ffd3-4740-acd6-1ea23bce902f', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'naics=>531111,oed:occupancy:oed_code=>1050,oed:occupancy:air_code=>301','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, '85246f30-e622-4af9-af86-16b23e8671a7', 'BBG000BLNQ16', '', 12345678.90, 'USD','{LTV value ratio}')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_assets.asset_powergeneratingutility
-	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_tenant_id, osc_is_published, osc_publisher_id, osc_datetime_published, osc_portfolio_id, geo_location_name, geo_location_coordinates, geo_overture_features, geo_h3_index, geo_h3_resolution, osc_asset_class_id,asset_type,  owner_bloomberg_osc_id, owner_lei_osc_id, value_total, value_currency_alphabetic_code, production, capacity, availability_rate)
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_tenant_id, osc_is_published, osc_publisher_id, osc_datetime_published, osc_portfolio_id, geo_location_name, geo_location_coordinates, geo_overture_features, geo_h3_index, geo_h3_resolution,osc_asset_type_id,  owner_bloomberg_osc_id, owner_lei_osc_id, value_total, value_currency_alphabetic_code, production, capacity, availability_rate)
 VALUES 
-	('78cb5382-5e4f-4762-b2e8-7cb33954f788', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'naics=>22111,oed:occupancy:oed_code=>1300,oed:occupancy:air_code=>361','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, 'f2baa602-44fe-49be-a5c9-d8b8208d9499', 'Industrial', 'BBG000BLNQ16', '', 12345678.90, 'USD', 12345.0,100.00,95.00)
+	('78cb5382-5e4f-4762-b2e8-7cb33954f788', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'naics=>22111,oed:occupancy:oed_code=>1300,oed:occupancy:air_code=>361','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, '3a568df0-cf71-4598-9bc7-2fb5997fb30d', 'BBG000BLNQ16', '', 12345678.90, 'USD', 12345.0,100.00,95.00)
 ;
 
 
