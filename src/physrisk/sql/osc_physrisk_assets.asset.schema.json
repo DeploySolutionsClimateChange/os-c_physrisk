@@ -1,0 +1,236 @@
+{
+  "fields": [
+    {
+      "name": "osc_id",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Id",
+      "description": "The Id number of the item (a GUID)."
+    },
+    {
+      "name": "osc_name",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Name",
+      "description": "The name of the item."
+    },
+    {
+      "name": "osc_name_display",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Display Name",
+      "description": "The display name of the item, if different from its regular name."
+    },
+    {
+      "name": "osc_abbreviation",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Abbreviation",
+      "description": "The abbreviated name of the item, if different from its regular name."
+    },
+    {
+      "name": "osc_description_short",
+      "type": "string",
+      "format": "default",
+      "title": "Description Short",
+      "description": "Short description of the item (max 256 chars)."
+    },
+    {
+      "name": "osc_description_full",
+      "type": "string",
+      "format": "default",
+      "title": "Description Full",
+      "description": "Full description of the item."
+    },
+    {
+      "name": "osc_tags",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Tags",
+      "description": "The key value pairs of this item."
+    },
+    {
+      "name": "osc_datetime_created",
+      "type": "datetime",
+      "format": "default",
+      "title": "OSC DateTime Created",
+      "description": "Date and time item was created (ideally in ISO format YY-MM-DDDD UTC time)."
+    },
+    {
+      "name": "osc_datetime_lastmodified",
+      "type": "datetime",
+      "format": "default",
+      "title": "OSC DateTime Last Modified",
+      "description": "Date and time item was last modified (ideally in ISO format YY-MM-DDDD UTC time)."
+    },
+    {
+      "name": "osc_lastmodifier_user_id",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Last Modifier User ID",
+      "description": "References the user Id that last modified the item (or the creator, if unmodified)."
+    },
+    {
+      "name": "osc_is_active",
+      "type": "boolean",
+      "format": "default",
+      "title": "OSC Is Active",
+      "description": "Describes whether the item is considered 'active' in the system of record."
+    },
+    {
+      "name": "osc_is_deleted",
+      "type": "boolean",
+      "format": "default",
+      "title": "OSC Is Deleted",
+      "description": "Describes whether the item was deleted in the system of record (to support soft deletes)."
+    },
+    {
+      "name": "osc_datetime_deleted",
+      "type": "datetime",
+      "format": "default",
+      "title": "OSC DateTime Deleted",
+      "description": "If the item was deleted in the system of record, this records the date and time of that event (ideally in ISO format YY-MM-DDDD UTC time). Otherwise, NULL."
+    },
+    {
+      "name": "osc_deleter_user_id",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Deleter User ID",
+      "description": "If the item was deleted in the system of record, this references the user Id that deleted the item. Otherwise NULL."
+    },
+    {
+      "name": "osc_tenant_id",
+      "type": "integer",
+      "format": "default",
+      "title": "OSC Tenant ID",
+      "description": "Id number for tenant (to support multitenancy). Default is 1."
+    },
+    {
+      "name": "osc_culture",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Culture",
+      "description": "Culture used for multilingualism/internationalization, max 5 characters. See https://datatracker.ietf.org/doc/html/rfc4646 and https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-globalization-cultureinfo). Default is 'en', neutral English culture."
+    },
+    {
+      "name": "osc_checksum",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Checksum",
+      "description": "A checksum of the item's value, as set by the system of record which determines what are the key values for hashing. It could alternatively reference a Git commit hash."
+    },
+    {
+      "name": "osc_version",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Version",
+      "description": "A version number of the item, as determined perhaps by the system of record or the destination storage system. The exact format is flexible. It could reference a Git commit hash if versioning is managed by a Git source control system."
+    },
+    {
+      "name": "osc_seq_num",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Sequence Number",
+      "description": "A positive number assigned to the item to help determine its relative position in search or list displays. Exact implementation details are left to the system developer."
+    },
+    {
+      "name": "osc_translated_from_id",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Translated From ID",
+      "description": "If this item was translated from another (i.e. its culture is different from the data/system default), list that ID. Otherwise, leave NULL."
+    },
+    {
+      "name": "osc_is_published",
+      "type": "boolean",
+      "format": "default",
+      "title": "OSC Is Published",
+      "description": "Describes whether the item was published in the system of record. Exactly what this means is left to the data/system integrator. Leave NULL if publishing information is not relevant or implemented."
+    },
+    {
+      "name": "osc_datetime_published",
+      "type": "datetime",
+      "format": "default",
+      "title": "OSC DateTime Published",
+      "description": "If the item was published in the system of record, this records the date and time of that event (ideally in ISO format YY-MM-DDDD UTC time). Otherwise, NULL."
+    },
+    {
+      "name": "osc_publisher_user_id",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Publisher User ID",
+      "description": "If the item was Published in the system of record, this references the user Id that published the item. Otherwise NULL."
+    },
+    {
+      "name": "osc_geo_coordinates_longitude",
+      "type": "geopoint",
+      "format": "default",
+      "title": "OSC Geo Longitude",
+      "description": "The Longitude coordinate of the item (such as -76.0948245)"
+    },
+    {
+      "name": "osc_geo_coordinates_latitude",
+      "type": "geopoint",
+      "format": "default",
+      "title": "OSC Geo Latitude",
+      "description": "The Latitude coordinate of the item (such as 36.229972) if known, otherise NULL."
+    },
+    {
+      "name": "osc_geo_altitude",
+      "type": "integer",
+      "format": "default",
+      "title": "OSC Geo Altitude",
+      "description": "The altitude of an item (in meters above the WGS84 ellipsoid), otherwise NULL."
+    },
+    {
+      "name": "osc_geo_altitude_confidence",
+      "type": "integer",
+      "format": "default",
+      "title": "OSC Geo Altitude Confidence",
+      "description": "The accuracy of the altitude value at a 95% confidence level, expressed in metres (positive numbers only), otherwise NULL."
+    },
+    {
+      "name": "osc_geo_overture_features",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Overture Features",
+      "description": "The Overture Foundation json features present at this location (an array of json items, if known), otherwise NULL."
+    },
+    {
+      "name": "osc_geo_h3_index",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Geo H3 Index",
+      "description": "The Uber H3 geocoded id of this item's geographic location at the specified H3 resolution, otherwise NULL."
+    },
+    {
+      "name": "osc_geo_h3_resolution",
+      "type": "integer",
+      "format": "default",
+      "title": "OSC Geo H3 Resolution",
+      "description": "The Uber H3 geocoded resolution of this item's geographic location (1 to 16), otherwise NULL."
+    },
+    {
+      "name": "osc_asset_type_id",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Asset Type ID",
+      "description": "the Asset Type of this item."
+    },
+    {
+      "name": "osc_owner_bloomberg_id",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Owner Bloomberg ID",
+      "description": "the owning entity's Bloomberg ID of this item if known, otherwise NULL."
+    },
+    {
+      "name": "osc_owner_lei_id",
+      "type": "string",
+      "format": "default",
+      "title": "OSC Owner LEI ID",
+      "description": "the owning entity's LEI ID of this item if known, otherwise NULL."
+    }
+
+  ]
+}
