@@ -1346,15 +1346,108 @@ VALUES
 	('beafc1fa-f6c8-4c72-9717-a243eea1a2ef', 'Cultural','Cultural Heritage Sites', 'Cultural Heritage Sites', 'Historical buildings, monuments, and sites of cultural significance.', 'Historical buildings, monuments, and sites of cultural significance.', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 
 
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('fa3d647a-4ab8-494a-b68e-6abf48404462', 'Single-family Homes', 'Single-family Homes', 'Single-family Homes', 'Single-family Homes', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','db4a14a2-a27b-4bb0-8249-a07fb78438f4');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('d1317024-2a21-4c89-8e7c-8609798dcc09', 'Multi-family apartments', 'Multi-family apartments', 'Multi-family apartments', 'Multi-family apartments', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','db4a14a2-a27b-4bb0-8249-a07fb78438f4');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('6ba2fda4-c6a7-4142-9e63-19948fe385f3', 'High-rise residential buildings', 'High-rise residential buildings', 'High-rise residential buildings', 'High-rise residential buildings', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','db4a14a2-a27b-4bb0-8249-a07fb78438f4');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('85246f30-e622-4af9-af86-16b23e8671a7', 'Retail Stores', 'Retail Stores', 'Retail Stores', 'Retail Stores', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','536e8cee-682f-4cd6-b23e-b32e885cc094');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('e9d9c1d6-915b-4450-ae2e-9fb2ad624478', 'Office buildings', 'Office buildings', 'Office buildings', 'Office buildings', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','536e8cee-682f-4cd6-b23e-b32e885cc094');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('f403566e-04eb-47aa-8327-ce6a43220867', 'Hotels and hospitality facilities', 'Hotels and hospitality facilities', 'Hotels and hospitality facilities', 'Hotels and hospitality facilities', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','536e8cee-682f-4cd6-b23e-b32e885cc094');
 
 INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('85246f30-e622-4af9-af86-16b23e8671a7', 'Commercial Real Estate', 'Commercial Real Estate', 'Commercial Real Estate', 'Commercial Real Estate', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','536e8cee-682f-4cd6-b23e-b32e885cc094');
+	('ce606ca8-8f4c-429b-bdea-da87ed28087e', 'Highways', 'Highways', 'Highways', 'Highways', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
 INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('3a568df0-cf71-4598-9bc7-2fb5997fb30d', 'Power Generating Utility', 'Power Generating Utility', 'Power Generating Utility', 'Power Generating Utility', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
+	('20265e12-495b-46ee-af68-246216f0dacb', 'Bridges', 'Bridges', 'Bridges', 'Bridges', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('64d4ffe2-e8b2-480d-9234-da51e53661d1', 'Railroads', 'Railroads', 'Railroads', 'Railroads', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('3a568df0-cf71-4598-9bc7-2fb5997fb30d', 'Power transmission lines', 'Power transmission lines', 'Power transmission lines', 'Power transmission lines', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('c7431f81-f1a7-42ca-90bd-6f43defe7931', 'Water treatment plants', 'Water treatment plants', 'Water treatment plants', 'Water treatment plants', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
+
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('34ec5bde-96dc-4f50-86f4-71bef7f2271a', 'Irrigated cropland', 'Irrigated cropland', 'Irrigated cropland', 'Irrigated cropland', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','a9da716f-6667-4efe-bac7-f91c1cdcc2f1');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('9115c6ec-776f-45c2-a74b-010f7a21355c', 'Non-irrigated cropland', 'Non-irrigated cropland', 'Non-irrigated cropland', 'Non-irrigated cropland', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','a9da716f-6667-4efe-bac7-f91c1cdcc2f1');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('076c1110-a9e8-435c-994e-499bed18bc11', 'Livestock farms', 'Livestock farms', 'Livestock farms', 'Livestock farms', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','a9da716f-6667-4efe-bac7-f91c1cdcc2f1');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('8135bb62-54e7-4eb4-ad76-5b2b8e08c02e', 'Greenhouses', 'Greenhouses', 'Greenhouses', 'Greenhouses', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','a9da716f-6667-4efe-bac7-f91c1cdcc2f1');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('8bd9e90c-cfa9-404e-ad02-c3e53fad0210', 'Manufacturing plants', 'Manufacturing plants', 'Manufacturing plants', 'Manufacturing plants', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','1ad910c8-fba0-4f45-845e-5a1901b9ffbe');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('b5c703ea-336e-4a97-8883-971f1a275b69', 'Storage warehouses', 'Storage warehouses', 'Storage warehouses', 'Storage warehouses', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','1ad910c8-fba0-4f45-845e-5a1901b9ffbe');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('94face63-24ef-46ef-ac13-7565c7d81789', 'Chemical processing facilities', 'Chemical processing facilities', 'Chemical processing facilities', 'Chemical processing facilities', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','1ad910c8-fba0-4f45-845e-5a1901b9ffbe');
+
+
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('7eb31e49-883b-4c0d-9464-404fc49b8eaa', 'Forest ecosystems', 'Forest ecosystems', 'Forest ecosystems', 'Forest ecosystems', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','2b5557e6-05ee-49d6-b6a6-b7ef54948af7');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('ae7851b9-123f-4ab6-8d26-594c88e2a6f5', 'River basins', 'River basins', 'River basins', 'River basins', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','2b5557e6-05ee-49d6-b6a6-b7ef54948af7');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('ef7cbcbc-adec-462f-84e6-d49de80fb882', 'Coastal wetlands', 'Coastal wetlands', 'Coastal wetlands', 'Coastal wetlands', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','2b5557e6-05ee-49d6-b6a6-b7ef54948af7');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('27628236-0486-4816-9487-dd9d9ccc9c5d', 'Historic buildings', 'Historic buildings', 'Historic buildings', 'Historic buildings', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','beafc1fa-f6c8-4c72-9717-a243eea1a2ef');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('82a14f2d-4db9-4df4-b62b-11b4aa157ebf', 'Archaeological Sites', 'Archaeological Sites', 'Archaeological Sites', 'Archaeological Sites', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','beafc1fa-f6c8-4c72-9717-a243eea1a2ef');
+INSERT INTO osc_physrisk.osc_physrisk_assets.asset_type
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
+VALUES 
+	('bdea3237-f764-4907-98cd-e0d131e099c5', 'Museums', 'Museums', 'Museums', 'Museums', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','beafc1fa-f6c8-4c72-9717-a243eea1a2ef');
+
+
 
 INSERT INTO osc_physrisk.osc_physrisk_assets.portfolio
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_tenant_id, osc_is_published, osc_publisher_id, osc_datetime_published, value_total, value_currency_alphabetic_code)
@@ -1830,6 +1923,10 @@ WHERE haz.osc_id = 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b'
 --;
 
 -- SELECT DIFFERENT ASSET TYPES
+SELECT b.osc_name as "Asset Class", a.osc_name as "Asset Type", a.osc_description_full as "Asset Type Description" FROM osc_physrisk_assets.asset_type a INNER JOIN osc_physrisk_assets.asset_class b ON a.osc_asset_class_id = b.osc_id
+ORDER BY b.osc_name ASC
+;
+
 SELECT * from osc_physrisk_assets.asset; -- NOTICE THESE ARE THE GENERIC ASSET COLUMNS AND ALL ASSETS ARE RETURNED
 SELECT osc_name, value_ltv from osc_physrisk_assets.asset_realestate; -- NOTICE THE COLUMNS INCLUDE RE-SPECIFIC FIELDS AND ONLY RE ASSETS ARE RETURNED
 SELECT osc_name, production, capacity, availability_rate from osc_physrisk_assets.asset_powergeneratingutility; -- NOTICE THE COLUMNS INCLUDE UTILITY-SPECIFIC FIELDS AND ONLY UTILITY ASSETS ARE RETURNED
