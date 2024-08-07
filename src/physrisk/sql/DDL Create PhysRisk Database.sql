@@ -1319,11 +1319,11 @@ VALUES
 INSERT INTO osc_physrisk.osc_physrisk_assets.asset_class
 	(osc_id, osc_abbreviation, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('db4a14a2-a27b-4bb0-8249-a07fb78438f4', 'Residential','Residential Buildings', 'Residential Buildings', 'Homes, apartments, and other residential structures.', 'Homes, apartments, and other residential structures.', 'naics=>,oed:occupancy:oed_code=>1050,oed:occupancy:air_code=>301','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('db4a14a2-a27b-4bb0-8249-a07fb78438f4', 'Residential','Residential Buildings', 'Residential Buildings', 'Homes, apartments, and other residential structures.', 'Homes, apartments, and other residential structures.', 'naics=>53,oed:occupancy:oed_code=>1050,oed:occupancy:air_code=>301','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 INSERT INTO osc_physrisk.osc_physrisk_assets.asset_class
 	(osc_id, osc_abbreviation, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('536e8cee-682f-4cd6-b23e-b32e885cc094', 'Commercial', 'Commercial Buildings', 'Commercial Buildings', 'Offices, retail spaces, and other commercial properties.', 'Offices, retail spaces, and other commercial properties.', 'naics=>,oed:occupancy:oed_code=>1100,oed:occupancy:air_code=>311','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('536e8cee-682f-4cd6-b23e-b32e885cc094', 'Commercial', 'Commercial Buildings', 'Commercial Buildings', 'Offices, retail spaces, and other commercial properties.', 'Offices, retail spaces, and other commercial properties.', 'naics=>44,naics=>45,naics=>49,oed:occupancy:oed_code=>1100,oed:occupancy:air_code=>311','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 INSERT INTO osc_physrisk.osc_physrisk_assets.asset_class
 	(osc_id, osc_abbreviation, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
@@ -1882,10 +1882,10 @@ INNER JOIN osc_physrisk.osc_physrisk_scenarios.scenario b ON a.osc_id = b.osc_tr
 WHERE b.osc_culture='es'  ;
 
 -- QUERY BY osc_tags EXAMPLE: FIND ASSETS WITH A CERTAIN NAICS OR OED OCCUPANCY VALUE (SHOWS HOW TO SUPPORT MULTIPLE STANDARDS)
-SELECT a.osc_name,  a.osc_description_full, a.osc_tags, b.osc_name as asset_class FROM osc_physrisk.osc_physrisk_assets.asset a INNER JOIN osc_physrisk.osc_physrisk_assets.asset_class b ON a.osc_asset_class_id = b.osc_id
+SELECT a.osc_name,  a.osc_description_full, a.osc_tags, b.osc_name as asset_class FROM osc_physrisk.osc_physrisk_assets.asset a INNER JOIN osc_physrisk.osc_physrisk_assets.asset_class b ON a.osc_id = b.osc_id
 WHERE a.osc_tags -> 'naics'='22111' OR a.osc_tags -> 'oed:occupancy:oed_code'='1300' OR a.osc_tags -> 'oed:occupancy:air_code'='361' ;
 
-SELECT a.osc_name,  a.osc_description_full, a.osc_tags, b.osc_name as asset_class FROM osc_physrisk.osc_physrisk_assets.asset a INNER JOIN osc_physrisk.osc_physrisk_assets.asset_class b ON a.osc_asset_class_id = b.osc_id
+SELECT a.osc_name,  a.osc_description_full, a.osc_tags, b.osc_name as asset_class FROM osc_physrisk.osc_physrisk_assets.asset a INNER JOIN osc_physrisk.osc_physrisk_assets.asset_class b ON a.osc_id = b.osc_id
 WHERE a.osc_tags -> 'naics' LIKE '53%'  ;
 
 -- QUERY BY osc_tags EXAMPLE: FIND SCENARIOS WITH CERTAIN osc_tags
