@@ -1323,7 +1323,7 @@ VALUES
 INSERT INTO osc_physrisk.osc_physrisk_assets.asset_class
 	(osc_id, osc_abbreviation, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('536e8cee-682f-4cd6-b23e-b32e885cc094', 'Commercial', 'Commercial Buildings', 'Commercial Buildings', 'Offices, retail spaces, and other commercial properties.', 'Offices, retail spaces, and other commercial properties.', 'naics=>44,naics=>45,naics=>49,oed:occupancy:oed_code=>1100,oed:occupancy:air_code=>311','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('536e8cee-682f-4cd6-b23e-b32e885cc094', 'Commercial', 'Commercial Buildings', 'Commercial Buildings', 'Offices, retail spaces, and other commercial properties.', 'Offices, retail spaces, and other commercial properties.', 'naics=>44|45|49,oed:occupancy:oed_code=>1100,oed:occupancy:air_code=>311','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 INSERT INTO osc_physrisk.osc_physrisk_assets.asset_class
 	(osc_id, osc_abbreviation, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
@@ -1923,7 +1923,9 @@ WHERE haz.osc_id = 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b'
 --;
 
 -- SELECT DIFFERENT ASSET TYPES
-SELECT b.osc_name as "Asset Class", a.osc_name as "Asset Type", a.osc_description_full as "Asset Type Description" FROM osc_physrisk_assets.asset_type a INNER JOIN osc_physrisk_assets.asset_class b ON a.osc_asset_class_id = b.osc_id
+SELECT b.osc_name as "Asset Class", a.osc_name as "Asset Type", a.osc_description_full as "Asset Type Description", b.osc_tags as "Asset Class Tags", a.osc_tags as "Asset Type Tags" FROM osc_physrisk_assets.asset_type a INNER JOIN osc_physrisk_assets.asset_class b ON a.osc_asset_class_id = b.osc_id
+--WHERE b.osc_tags -> 'naics' LIKE '%12%'
+--WHERE b.osc_tags -> 'oed:occupancy:oed_code' LIKE '%1%'
 ORDER BY b.osc_name ASC
 ;
 
