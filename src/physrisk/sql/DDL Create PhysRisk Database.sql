@@ -3,7 +3,7 @@
 -- to align with phys-risk/geo-indexer/other related initiatives
 -- speed up application development, help internationalize and display the results of analyses, and more.
 
--- Last Updated: 2024-08-07. Add tags to Asset Class rows. Add Asset Type table. Add osc_ prefix to most columns. Added Precalculated damage curve example. Added asset table inheritance examples, and some backend functionality such as user table and indexes for performance. Simplify table osc_names and consolosc_idate schemas.
+-- Last Updated: 2024-08-12. Updates to schema structure from Arfima feedback. Add tags to Asset Class rows. Add Asset Type table. Add osc_ prefix to most columns. Added Precalculated damage curve example. Added asset table inheritance examples, and some backend functionality such as user table and indexes for performance. Simplify table osc_names and consolosc_idate schemas.
 -- The backend schema User and Tenant tables are derived from ASP.NET Boilerplate tables (https://aspnetboilerplate.com/). That code is available under the MIT license, here: https://github.com/aspnetboilerplate/aspnetboilerplate
 
 -- SETUP EXTENSIONS
@@ -17,6 +17,7 @@ CREATE SCHEMA IF NOT EXISTS osc_physrisk_backend;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_scenarios;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_hazards;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_models;
+CREATE SCHEMA IF NOT EXISTS osc_physrisk_financial;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_assets;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_analysis_results;
 
@@ -260,41 +261,8 @@ CREATE TABLE osc_physrisk_models.vulnerability_function (
  );
 COMMENT ON TABLE osc_physrisk_models.vulnerability_function IS 'The model used to determine the degree by which a particular asset is vulnerable to a particular hazard indicator. If an asset is vulnerable to a peril, it must necessarily be exposed to it (see exposure_function).';
 
-CREATE TABLE osc_physrisk_models.damage_function ( 
-	osc_id	UUID  DEFAULT gen_random_UUID () NOT NULL,
-	osc_name VARCHAR(256) NOT NULL,
-	osc_name_display VARCHAR(256),
-	osc_abbreviation VARCHAR(12),
-	osc_description_full  TEXT NOT NULL,
-	osc_description_short  VARCHAR(256) NOT NULL,
-    osc_tags hstore DEFAULT NULL,
-	osc_datetime_created TIMESTAMPTZ NOT NULL,
-	osc_creator_user_id BIGINT NOT NULL,
-	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
-	osc_last_modifier_user_id BIGINT NOT NULL,
-	osc_is_deleted BOOLEAN NOT NULL DEFAULT 'n',
-	osc_deleter_user_id BIGINT DEFAULT NULL,
-	osc_datetime_deleted TIMESTAMPTZ DEFAULT NULL,
-	osc_tenant_id BIGINT NOT NULL DEFAULT 1,
-	osc_culture VARCHAR(5) NOT NULL DEFAULT 'en',
-	osc_checksum VARCHAR(40) DEFAULT NULL,
-	osc_seq_num SMALLINT  NOT NULL Default 1,
-	osc_translated_from_id UUID DEFAULT NULL,
-	osc_is_active BOOLEAN NOT NULL DEFAULT 'y',
-	osc_is_published BOOLEAN DEFAULT 'n',
-	osc_publisher_id BIGINT DEFAULT NULL,
-	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
-	osc_version TEXT DEFAULT '1.0',
-	CONSTRAINT pk_damage_function PRIMARY KEY ( osc_id ),
-	CONSTRAINT fk_damage_function_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
-	CONSTRAINT fk_damage_function_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
-	CONSTRAINT fk_damage_function_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
-	CONSTRAINT fk_damage_function_osc_tenant_id FOREIGN KEY ( osc_tenant_id ) REFERENCES osc_physrisk_backend.tenant(osc_id)
- );
-COMMENT ON TABLE osc_physrisk_models.damage_function IS 'The model used to determine how to convert the vulnerability of an asset into a particular level of  damage and/or disruption. If an asset has damage or disruption from a peril, it must necessarily exposed to and vulnerable to it (see exposure_function and vulnerability_function).';
-
 -- SCHEMA osc_physrisk_models;
-CREATE TABLE osc_physrisk_models.financial_model ( 
+CREATE TABLE osc_physrisk_financial.financial_model ( 
 	osc_id	UUID  DEFAULT gen_random_UUID () NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
@@ -325,7 +293,7 @@ CREATE TABLE osc_physrisk_models.financial_model (
 	CONSTRAINT fk_financial_model_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_financial_model_osc_tenant_id FOREIGN KEY ( osc_tenant_id ) REFERENCES osc_physrisk_backend.tenant(osc_id)
  );
-COMMENT ON TABLE osc_physrisk_models.financial_model IS 'Is this the same as damage_function, above?';
+COMMENT ON TABLE osc_physrisk_financial.financial_model IS 'Is this the same as damage_function, above?';
 
 
 
@@ -469,8 +437,7 @@ CREATE TABLE osc_physrisk_assets.asset (
 	osc_asset_type_id UUID,
 	osc_owner_bloomberg_id	varchar(12) DEFAULT NULL,
 	osc_owner_lei_id varchar(20) DEFAULT NULL,
-	value_cashflows numeric ARRAY,-- Sequence of the associated cash flows (for cash flow generating assets only).
-    value_total numeric,
+	value_total numeric,
     value_dynamics jsonb, -- Asset Value Dynamics over time, example real estate appreciation
 	value_currency_alphabetic_code char(3),
 	CONSTRAINT pk_asset PRIMARY KEY ( osc_id ),
@@ -487,6 +454,8 @@ COMMENT ON TABLE osc_physrisk_assets.asset IS 'A physical financial asset (infra
 CREATE INDEX "ix_osc_physrisk_assets_asset_osc_portfolio_id" ON osc_physrisk_assets.asset USING btree (osc_portfolio_id);
 
 CREATE TABLE osc_physrisk_assets.asset_realestate ( 
+	value_cashflows numeric ARRAY,-- Sequence of the associated cash flows (for cash flow generating assets only).
+    value_loan text ARRAY, -- Sequence of Loans by date, representing the mortgage lines
 	value_ltv text ARRAY, -- Sequence of Loan-to-Value results by date, representing the ratio of the first mortgage line as a percentage of the total appraised value of real property.
 	value_dynamics jsonb, -- Asset Value Dynamics over time, example real estate appreciation
 	CONSTRAINT pk_asset_realestate PRIMARY KEY ( osc_id ),
@@ -501,9 +470,9 @@ CREATE TABLE osc_physrisk_assets.asset_realestate (
 COMMENT ON TABLE osc_physrisk_assets.asset_realestate IS 'A physical financial asset (infrastructure, utilities, property, buildings) that is contained within a financial portfolio. The lowest unit of assessment for physical risk & resilience (currently).';
 
 CREATE TABLE osc_physrisk_assets.asset_powergeneratingutility ( 
-	production numeric, -- Real annual production of a power plant in Wh.
-	capacity numeric, -- Capacity of the power plant in W.
-	availability_rate numeric, -- Availability factor of production.
+	production numeric NOT NULL, -- Real annual production of a power plant in Wh.
+	capacity numeric NOT NULL, -- Capacity of the power plant in W.
+	availability_rate numeric NOT NULL, -- Availability factor of production.
 	value_dynamics jsonb, -- Asset Value Dynamics over time, example real estate appreciation
 	CONSTRAINT pk_asset_powergeneratingutility PRIMARY KEY ( osc_id ),
 	CONSTRAINT fk_asset_powergeneratingutility_osc_portfolio_id FOREIGN KEY ( osc_portfolio_id ) REFERENCES osc_physrisk_assets.portfolio(osc_id),
@@ -515,6 +484,40 @@ CREATE TABLE osc_physrisk_assets.asset_powergeneratingutility (
     CONSTRAINT fk_asset_powergeneratingutility_osc_asset_type_id FOREIGN KEY ( osc_asset_type_id ) REFERENCES osc_physrisk_assets.asset_type(osc_id)
  ) INHERITS (osc_physrisk_assets.asset);
 COMMENT ON TABLE osc_physrisk_assets.asset_powergeneratingutility IS 'A physical financial asset (infrastructure, utilities, property, buildings) that is contained within a financial portfolio. The lowest unit of assessment for physical risk & resilience (currently).';
+
+-- SCHEMA osc_physrisk_analysis_results
+CREATE TABLE osc_physrisk_financial.financial_impact_type ( 
+	osc_id INTEGER NOT NULL,
+	osc_name VARCHAR(256) NOT NULL,
+	osc_name_display VARCHAR(256),
+	osc_abbreviation VARCHAR(12),
+	osc_description_full  TEXT NOT NULL,
+	osc_description_short  VARCHAR(256) NOT NULL,
+    osc_tags hstore DEFAULT NULL,
+	osc_datetime_created TIMESTAMPTZ NOT NULL,
+	osc_creator_user_id BIGINT NOT NULL,
+	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
+	osc_last_modifier_user_id BIGINT NOT NULL,
+	osc_is_deleted BOOLEAN NOT NULL DEFAULT 'n',
+	osc_deleter_user_id BIGINT DEFAULT NULL,
+	osc_datetime_deleted TIMESTAMPTZ DEFAULT NULL,
+	osc_culture VARCHAR(5) NOT NULL DEFAULT 'en',
+	osc_checksum VARCHAR(40) DEFAULT NULL,
+	osc_seq_num SMALLINT  NOT NULL Default 1,
+	osc_translated_from_id INTEGER DEFAULT NULL,
+	osc_is_active BOOLEAN NOT NULL DEFAULT 'y',
+	osc_is_published BOOLEAN DEFAULT 'n',
+	osc_publisher_id BIGINT DEFAULT NULL,
+	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
+	osc_version TEXT DEFAULT '1.0',
+    accounting_category varchar(256),
+	CONSTRAINT pk_financial_impact_type PRIMARY KEY ( osc_id ),
+	CONSTRAINT fk_financial_impact_type_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
+	CONSTRAINT fk_financial_impact_type_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
+	CONSTRAINT fk_financial_impact_type_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id)
+ ); 
+COMMENT ON TABLE osc_physrisk_financial.financial_impact_type IS 'A lookup table to classify and constrain types of damage/disruption that could occur to an asset due to its vulnerability to a hazard.';
+
 
 -- SCHEMA osc_physrisk_analysis_results
 CREATE TABLE osc_physrisk_analysis_results.impact_type ( 
@@ -547,10 +550,10 @@ CREATE TABLE osc_physrisk_analysis_results.impact_type (
 	CONSTRAINT fk_impact_type_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_impact_type_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id)
  ); 
-COMMENT ON TABLE osc_physrisk_analysis_results.impact_type IS 'A lookup table to classify and constrain types of damage/disruption that could occur to an asset due to its vulnerability to a hazard.';
+COMMENT ON TABLE osc_physrisk_financial.financial_impact_type IS 'A lookup table to classify and constrain types of damage/disruption that could occur to an asset due to its vulnerability to a hazard.';
 
 
-CREATE TABLE osc_physrisk_analysis_results.portfolio_impact ( 
+CREATE TABLE osc_physrisk_financial.portfolio_impact ( 
 	osc_id UUID  DEFAULT gen_random_UUID () NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
@@ -579,7 +582,6 @@ CREATE TABLE osc_physrisk_analysis_results.portfolio_impact (
 	osc_scenario_id integer NOT NULL,
     osc_scenario_year smallint,
 	analysis_osc_hazard_id	UUID NOT NULL,
-    osc_impact_type_id integer NOT NULL,
 	annual_exceedence_probability numeric,
 	average_annual_loss numeric,
     value_total numeric,
@@ -588,14 +590,13 @@ CREATE TABLE osc_physrisk_analysis_results.portfolio_impact (
 	CONSTRAINT pk_portfolio_analysis PRIMARY KEY ( osc_id ),
 	CONSTRAINT fk_portfolio_analysis_osc_id FOREIGN KEY ( osc_portfolio_id ) REFERENCES osc_physrisk_assets.portfolio(osc_id),
 	CONSTRAINT fk_portfolio_osc_scenario_id FOREIGN KEY ( osc_scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(osc_id),
-	CONSTRAINT fk_portfolio_analysis_osc_impact_type_id FOREIGN KEY ( osc_impact_type_id ) REFERENCES osc_physrisk_analysis_results.impact_type(osc_id),
 	CONSTRAINT fk_portfolio_analysis_osc_hazard_id FOREIGN KEY ( analysis_osc_hazard_id ) REFERENCES osc_physrisk_hazards.hazard(osc_id)   ,
 	CONSTRAINT fk_portfolio_analysis_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_portfolio_analysis_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_portfolio_analysis_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id)  ,
 	CONSTRAINT fk_portfolio_analysis_osc_tenant_id FOREIGN KEY ( osc_tenant_id ) REFERENCES osc_physrisk_backend.tenant(osc_id)
  );
-COMMENT ON TABLE osc_physrisk_analysis_results.portfolio_impact IS 'The result of a physical risk & resilience analysis. The result is determined by the chosen scenario, year, and hazard, aggregating the results for all of the assets in a given portfolio. If multiple scenarios/years/hazards were chosen, there will be multiple other rows containing the combined set of results.';
+COMMENT ON TABLE osc_physrisk_financial.portfolio_impact IS 'The result of a physical risk & resilience analysis. The result is determined by the chosen scenario, year, and hazard, aggregating the results for all of the assets in a given portfolio. If multiple scenarios/years/hazards were chosen, there will be multiple other rows containing the combined set of results.';
 
 CREATE TABLE osc_physrisk_analysis_results.asset_impact ( 
 	osc_id UUID  DEFAULT gen_random_UUID () NOT NULL,
@@ -623,7 +624,7 @@ CREATE TABLE osc_physrisk_analysis_results.asset_impact (
 	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
 	osc_version TEXT DEFAULT '1.0',
 	osc_asset_id            UUID  NOT NULL  ,
-	osc_hazard_id UUID NOT NULL,
+	osc_hazard_indicator_id UUID NOT NULL,
     osc_hazard_intensity numeric[],
 	osc_scenario_id integer NOT NULL,
     osc_scenario_year smallint,
@@ -639,8 +640,9 @@ CREATE TABLE osc_physrisk_analysis_results.asset_impact (
 	is_impacted boolean NOT NULL,
 	is_historic_impact boolean NOT NULL,
 	historic_impact_started timestamptz,
-	historic_impact_ended timestamptz,
-	osc_impact_type_id integer NOT NULL, -- this design assumes one row per impact type. If there are multiple potential impact types, there would be multiple rows.
+	historic_impact_ended timestamptz,	
+    osc_impact_type_id integer NOT NULL,
+	osc_financial_impact_type_id integer NOT NULL, -- this design assumes one row per impact type. If there are multiple potential impact types, there would be multiple rows.
 	impact_data_raw jsonb NOT NULL, -- we recommend that this json includes schema references so a consuming application can use json schema for parsing.	
     impact_mean    numeric[],
 	impact_std    numeric[],
@@ -648,7 +650,7 @@ CREATE TABLE osc_physrisk_analysis_results.asset_impact (
     impact_distr_p    numeric[],
     impact_exc_exceed_p    numeric[],
     impact_exc_values    numeric[],
-	impact_return_periods jsonb, 
+	impact_return_periods jsonb, 	
 	value_total numeric,
     value_at_risk numeric,
     value_currency_alphabetic_code char(3),
@@ -664,8 +666,9 @@ CREATE TABLE osc_physrisk_analysis_results.asset_impact (
     CONSTRAINT ck_asset_analysis_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
 	CONSTRAINT fk_asset_analysis_osc_asset_id FOREIGN KEY ( osc_asset_id ) REFERENCES osc_physrisk_assets.asset(osc_id),
 	CONSTRAINT fk_asset_osc_scenario_id FOREIGN KEY ( osc_scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(osc_id),
-	CONSTRAINT fk_asset_analysis_osc_impact_type_id FOREIGN KEY ( osc_impact_type_id ) REFERENCES osc_physrisk_analysis_results.impact_type(osc_id),
-	CONSTRAINT fk_asset_analysis_osc_hazard_id FOREIGN KEY ( osc_hazard_id ) REFERENCES osc_physrisk_hazards.hazard(osc_id)    ,
+	CONSTRAINT fk_portfolio_analysis_osc_impact_type_id FOREIGN KEY ( osc_impact_type_id ) REFERENCES osc_physrisk_analysis_results.impact_type(osc_id),
+	CONSTRAINT fk_portfolio_analysis_osc_financial_impact_type_id FOREIGN KEY ( osc_financial_impact_type_id ) REFERENCES osc_physrisk_financial.financial_impact_type(osc_id),
+	CONSTRAINT fk_asset_analysis_osc_hazard_indicator_id FOREIGN KEY ( osc_hazard_indicator_id ) REFERENCES osc_physrisk_hazards.hazard_indicator(osc_id)    ,
 	CONSTRAINT fk_asset_analysis_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_asset_analysis_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_asset_analysis_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id)   ,
@@ -825,28 +828,28 @@ VALUES
 	(9, 'RCP8.5 - Rising radiative forcing pathway leading to 8.5 W/m2 in 2100. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP8.5', 'RCP8.5', 'RCP8.5','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,9, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 
-INSERT INTO osc_physrisk.osc_physrisk_analysis_results.impact_type
+INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
 	(-1, 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z')
 ;
-INSERT INTO osc_physrisk.osc_physrisk_analysis_results.impact_type
+INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, accounting_category)
 VALUES 
 	(1, 'Asset repairs and construction', 'Asset repairs and construction', 'Asset repairs and construction','Asset repairs and construction', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','Capex' );
-INSERT INTO osc_physrisk.osc_physrisk_analysis_results.impact_type
+INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, accounting_category)
 VALUES 
 	(2, 'Revenue loss due to asset restoration', 'Revenue loss due to asset restoration', 'Revenue loss due to asset restoration','Revenue loss due to asset restoration', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','Revenue' );
-INSERT INTO osc_physrisk.osc_physrisk_analysis_results.impact_type
+INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, accounting_category)
 VALUES 
 	(3, 'Revenue loss due to productivity impact', 'Revenue loss due to productivity impact', 'Revenue loss due to productivity impact','Revenue loss due to productivity impact', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','Revenue' );
-INSERT INTO osc_physrisk.osc_physrisk_analysis_results.impact_type
+INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, accounting_category)
 VALUES 
 	(4, 'Recurring cost increase (chronic)', 'Recurring cost increase (chronic)', 'Recurring cost increase (chronic)','Recurring cost increase (chronic)', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','OpEx' );
-INSERT INTO osc_physrisk.osc_physrisk_analysis_results.impact_type
+INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, accounting_category)
 VALUES 
 	(5, 'Recurring cost increase (acute)', 'Recurring cost increase (acute)', 'Recurring cost increase (acute)','Recurring cost increase (acute)', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','OpEx' );
@@ -1487,7 +1490,7 @@ VALUES
                 365.0
             ],
             "impact_std": [],
-            "impact_type": "Disruption",
+            "financial_impact_type": "Disruption",
             "impact_units": "Days",
             "intensity": [
                 0.0,
@@ -1518,7 +1521,7 @@ VALUES
                 365.0
             ],
             "impact_std": [],
-            "impact_type": "Disruption",
+            "financial_impact_type": "Disruption",
             "impact_units": "Days",
             "intensity": [
                 0.0,
@@ -1549,7 +1552,7 @@ VALUES
                 365.0
             ],
             "impact_std": [],
-            "impact_type": "Disruption",
+            "financial_impact_type": "Disruption",
             "impact_units": "Days",
             "intensity": [
                 0.0,
@@ -1580,7 +1583,7 @@ VALUES
                 365.0
             ],
             "impact_std": [],
-            "impact_type": "Disruption",
+            "financial_impact_type": "Disruption",
             "impact_units": "Days",
             "intensity": [
                 0.0,
@@ -1609,7 +1612,7 @@ VALUES
                 1.0
             ],
             "impact_std": [],
-            "impact_type": "Disruption",
+            "financial_impact_type": "Disruption",
             "impact_units": "Days",
             "intensity": [
                 0.0,
@@ -1635,7 +1638,7 @@ VALUES
                 1.0
             ],
             "impact_std": [],
-            "impact_type": "Disruption",
+            "financial_impact_type": "Disruption",
             "impact_units": "Days",
             "intensity": [
                 0.0,
@@ -1659,7 +1662,7 @@ VALUES
                 1.0
             ],
             "impact_std": [],
-            "impact_type": "Disruption",
+            "financial_impact_type": "Disruption",
             "impact_units": "Days",
             "intensity": [
                 0.0,
@@ -1682,7 +1685,7 @@ VALUES
                 1.0
             ],
             "impact_std": [],
-            "impact_type": "Disruption",
+            "financial_impact_type": "Disruption",
             "impact_units": "Days",
             "intensity": [
                 0.0,
@@ -1718,7 +1721,7 @@ VALUES
                 1.0
             ],
             "impact_std": [],
-            "impact_type": "Disruption",
+            "financial_impact_type": "Disruption",
             "impact_units": "Days",
             "intensity": [
                 0.0,
@@ -1767,7 +1770,7 @@ VALUES
                 1.0
             ],
             "impact_std": [],
-            "impact_type": "Disruption",
+            "financial_impact_type": "Disruption",
             "impact_units": "Days",
             "intensity": [
                 0.0,
@@ -1804,7 +1807,7 @@ VALUES
                 1.0
             ],
             "impact_std": [],
-            "impact_type": "Disruption",
+            "financial_impact_type": "Disruption",
             "impact_units": "Days",
             "intensity": [
                 0.0,
@@ -1829,7 +1832,7 @@ VALUES
                 1.0
             ],
             "impact_std": [],
-            "impact_type": "Disruption",
+            "financial_impact_type": "Disruption",
             "impact_units": "Days",
             "intensity": [
                 0.0,
@@ -1854,7 +1857,7 @@ VALUES
                 1.0
             ],
             "impact_std": [],
-            "impact_type": "Disruption",
+            "financial_impact_type": "Disruption",
             "impact_units": "Days",
             "intensity": [
                 27.0,
@@ -1893,7 +1896,7 @@ SELECT a.osc_name,  a.osc_description_full, a.osc_tags FROM osc_physrisk.osc_phy
 WHERE a.osc_tags -> 'key1'='value1_en' OR a.osc_tags -> 'key2'='value4_en'  ;
 
 -- SHOW IMPACT ANALYSIS EXAMPLE (CURRENTLY EMPTY - TODO MISSING TEST DATA)
-SELECT	* FROM	osc_physrisk.osc_physrisk_analysis_results.portfolio_impact;
+SELECT	* FROM	osc_physrisk.osc_physrisk_financial.portfolio_impact;
 SELECT * FROM osc_physrisk.osc_physrisk_analysis_results.asset_impact;
 
 -- VIEW RIVERINE INUNDATION HAZARD INDICATORS
@@ -1934,7 +1937,7 @@ SELECT osc_name, value_ltv from osc_physrisk_assets.asset_realestate; -- NOTICE 
 SELECT osc_name, production, capacity, availability_rate from osc_physrisk_assets.asset_powergeneratingutility; -- NOTICE THE COLUMNS INCLUDE UTILITY-SPECIFIC FIELDS AND ONLY UTILITY ASSETS ARE RETURNED
 
 -- WE CAN ALSO DO A JOIN BY ASSET CLASS TO FILTER THE RESULTS
-SELECT * from osc_physrisk_assets.asset a INNER JOIN osc_physrisk.osc_physrisk_assets.asset_class b ON a.osc_asset_class_id = b.osc_id
+SELECT * from osc_physrisk_assets.asset a INNER JOIN osc_physrisk.osc_physrisk_assets.asset_class b ON a.osc_id = b.osc_id
 WHERE b.osc_name LIKE '%Utility%'
 ; -- NOTICE ONLY UTILITY ROW IS RETURNED
 
