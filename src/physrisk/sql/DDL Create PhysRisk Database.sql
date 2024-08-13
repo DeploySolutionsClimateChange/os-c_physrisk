@@ -87,7 +87,6 @@ CREATE INDEX "ix_osc_physrisk_backend_tenants_osc_tenancy_name" ON osc_physrisk_
 
 COMMENT ON TABLE osc_physrisk_backend.tenant IS 'Stores tenant information to support multi-tenancy data (where appropriate). A default tenant is always provosc_ided.';
 
-
 -- SCHEMA osc_physrisk_core_scenarios
 CREATE TABLE osc_physrisk_core_scenarios.scenario ( 
 	osc_id BIGINT NOT NULL,
@@ -874,59 +873,64 @@ INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 VALUES 
 	(5, 'Recurring cost increase (acute)', 'Recurring cost increase (acute)', 'Recurring cost increase (acute)','Recurring cost increase (acute)', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','OpEx' );
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
-	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('8159d927-e596-444d-8f1a-494494339fad', 'Unknown hazard/Not selected', 'Unknown hazard/Not selected', 'Unknown hazard/Not selected', 'Unknown hazard/Not selected', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('8159d927-e596-444d-8f1a-494494339fad', 'climate-hazard-type-unknown', 'Unknown hazard/Not selected', 'Unknown hazard/Not selected', 'Unknown hazard/Not selected', 'Unknown hazard/Not selected', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
-	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('63ed7943-c4c4-43ea-abd2-86bb1997a094', 'Riverine Inundation', 'Riverine Inundation', 'Riverine Inundation', 'Riverine Inundation', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y', 'y',1,'2024-07-15T00:00:01Z')
+	('63ed7943-c4c4-43ea-abd2-86bb1997a094', 'climate-hazard-type-inundation-riverine', 'Riverine Inundation', 'Riverine Inundation', 'Riverine Inundation', 'Riverine Inundation', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y', 'y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
-	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('28a095cd-4cde-40a1-90d9-cbb0ca673c06', 'Coastal Inundation', 'Coastal Inundation', 'Coastal Inundation', 'Coastal Inundation', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('28a095cd-4cde-40a1-90d9-cbb0ca673c06', 'climate-hazard-type-inundation-coastal', 'Coastal Inundation', 'Coastal Inundation', 'Coastal Inundation', 'Coastal Inundation', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
-	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug,osc_name,  osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('d08db675-ee1e-48fe-b9e1-b0da27de8f2b', 'Chronic Heat', 'Chronic Heat', 'Chronic Heat', 'Chronic Heat', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('338ea109-828e-4aaf-b212-12d8eaf70a7e', 'climate-hazard-type-inundation-combined','Combined Inundation', 'Combined Inundation', 'Combined Inundation', 'Combined Inundation', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
-	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('64fee0d3-b78b-49bf-911a-029695585d6a', 'Fire', 'Fire', 'Fire', 'Fire', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('d08db675-ee1e-48fe-b9e1-b0da27de8f2b', 'climate-hazard-type-chronic-heat', 'Chronic Heat', 'Chronic Heat', 'Chronic Heat', 'Chronic Heat', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
-	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('35ace20f-86dc-4735-9536-129b51b6d25d', 'Drought', 'Drought', 'Drought', 'Drought', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('64fee0d3-b78b-49bf-911a-029695585d6a', 'climate-hazard-type-fire','Fire', 'Fire', 'Fire', 'Fire', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
-	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('2faed491-2c5d-499e-9568-fad6e3b3c0ec', 'Precipitation', 'Precipitation', 'Precipitation', 'Precipitation', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('35ace20f-86dc-4735-9536-129b51b6d25d', 'climate-hazard-type-drought','Drought', 'Drought', 'Drought', 'Drought', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
-	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug,osc_name,  osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('e4e4e199-367e-4568-824d-3f916e355567', 'Hail', 'Hail', 'Hail', 'Hail', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('2faed491-2c5d-499e-9568-fad6e3b3c0ec', 'climate-hazard-type-precipitation','Precipitation', 'Precipitation', 'Precipitation', 'Precipitation', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
-	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('0184b858-404d-4282-8f0d-2b4c42f7acd7', 'Wind', 'Wind', 'Wind', 'Wind', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('29514258-18cb-4f2b-8798-203e0d513803', 'climate-hazard-type-water-risk','Water Risk', 'Water Risk', 'Water Risk', 'Water Risk', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
-	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('338ea109-828e-4aaf-b212-12d8eaf70a7e', 'Combined Inundation', 'Combined Inundation', 'Combined Inundation', 'Combined Inundation', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('e4e4e199-367e-4568-824d-3f916e355567', 'climate-hazard-type-hail','Hail', 'Hail', 'Hail', 'Hail', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
-	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('29514258-18cb-4f2b-8798-203e0d513803', 'Water Risk', 'Water Risk', 'Water Risk', 'Water Risk', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('0184b858-404d-4282-8f0d-2b4c42f7acd7', 'climate-hazard-type-wind','Wind', 'Wind', 'Wind', 'Wind', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
+	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('4441cf3b-1460-4131-aff6-b51bf01cd084', 'climate-hazard-type-subsidence','subsidence', 'subsidence', 'subsidence', 'subsidence', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
