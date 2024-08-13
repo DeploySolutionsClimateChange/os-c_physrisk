@@ -1,10 +1,11 @@
 -- PHYRISK EXAMPLE DATABASE STRUCTURE
 -- Intended to help standardize glossary/metadata as well as field osc_names and constraints
--- to align with phys-risk/geo-indexer/other related initiatives
+-- to align with phys-risk/geo-indexer/other related initiatives and 
 -- speed up application development, help internationalize and display the results of analyses, and more.
-
--- Last Updated: 2024-08-12. Updates to schema structure from Arfima feedback. Add tags to Asset Class rows. Add Asset Type table. Add osc_ prefix to most columns. Added Precalculated damage curve example. Added asset table inheritance examples, and some backend functionality such as user table and indexes for performance. Simplify table osc_names and consolosc_idate schemas.
 -- The backend schema User and Tenant tables are derived from ASP.NET Boilerplate tables (https://aspnetboilerplate.com/). That code is available under the MIT license, here: https://github.com/aspnetboilerplate/aspnetboilerplate
+
+-- Last Updated: 2024-08-13. 
+-- Updates to schema structure from Arfima feedback. Add tags to Asset Class rows. Add Asset Type table. Add osc_ prefix to most columns. Added Precalculated damage curve example. Added asset table inheritance examples, and some backend functionality such as user table and indexes for performance. Simplify table osc_names and consolosc_idate schemas.
 
 -- SETUP EXTENSIONS
 CREATE EXTENSION postgis; -- used for geolocation
@@ -92,6 +93,7 @@ CREATE TABLE osc_physrisk_core_scenarios.scenario (
 	osc_id BIGINT NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
+	osc_slug VARCHAR(256),
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
@@ -125,6 +127,7 @@ CREATE TABLE osc_physrisk_core_scenarios.hazard (
 	osc_id	UUID  DEFAULT gen_random_UUID ()  NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
+	osc_slug VARCHAR(256),
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
@@ -160,6 +163,7 @@ CREATE TABLE osc_physrisk_core_scenarios.hazard_indicator (
 	osc_id	UUID  DEFAULT gen_random_UUID () NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
+	osc_slug VARCHAR(256),
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
@@ -193,6 +197,7 @@ COMMENT ON TABLE osc_physrisk_core_scenarios.hazard_indicator IS 'Contains a lis
 	osc_id	UUID  DEFAULT gen_random_UUID () NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
+	osc_slug VARCHAR(256),
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
@@ -227,6 +232,7 @@ CREATE TABLE osc_physrisk_core_scenarios.vulnerability_function (
 	osc_id	UUID  DEFAULT gen_random_UUID () NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
+	osc_slug VARCHAR(256),
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
@@ -261,6 +267,7 @@ CREATE TABLE osc_physrisk_financial.financial_function (
 	osc_id	UUID  DEFAULT gen_random_UUID () NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
+	osc_slug VARCHAR(256),
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
@@ -296,6 +303,7 @@ CREATE TABLE osc_physrisk_core_assets.asset_class (
 	osc_id UUID  DEFAULT gen_random_UUID () NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
+	osc_slug VARCHAR(256),
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
@@ -328,6 +336,7 @@ CREATE TABLE osc_physrisk_core_assets.asset_type (
 	osc_id UUID  DEFAULT gen_random_UUID () NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
+	osc_slug VARCHAR(256),
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
@@ -362,6 +371,7 @@ CREATE TABLE osc_physrisk_core_assets.portfolio (
 	osc_id UUID  DEFAULT gen_random_UUID () NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
+	osc_slug VARCHAR(256),
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
@@ -397,6 +407,7 @@ CREATE TABLE osc_physrisk_core_assets.generic_asset (
 	osc_id UUID  DEFAULT gen_random_UUID () NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
+	osc_slug VARCHAR(256),
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
@@ -483,6 +494,7 @@ CREATE TABLE osc_physrisk_financial.financial_impact_type (
 	osc_id INTEGER NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
+	osc_slug VARCHAR(256),
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
@@ -517,6 +529,7 @@ CREATE TABLE osc_physrisk_core_impacts.impact_type (
 	osc_id INTEGER NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
+	osc_slug VARCHAR(256),
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
@@ -550,6 +563,7 @@ CREATE TABLE osc_physrisk_financial.portfolio_impact (
 	osc_id UUID  DEFAULT gen_random_UUID () NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
+	osc_slug VARCHAR(256),
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
@@ -595,6 +609,7 @@ CREATE TABLE osc_physrisk_core_impacts.asset_impact (
 	osc_id UUID  DEFAULT gen_random_UUID () NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
+	osc_slug VARCHAR(256),
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
@@ -674,6 +689,7 @@ CREATE TABLE osc_physrisk_core_impacts.geolocated_precalculated_impact (
 	osc_id	UUID  DEFAULT gen_random_UUID () NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
+	osc_slug VARCHAR(256),
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
@@ -1324,33 +1340,33 @@ VALUES
 -- INSERT ASSET PORTFOLIO EXAMPLE
 -- INCLUDING EXAMPLE ASSET WITH OED AND NAICS osc_tags
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_class
-	(osc_id, osc_abbreviation, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_abbreviation, osc_name, osc_slug, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('db4a14a2-a27b-4bb0-8249-a07fb78438f4', 'Residential','Residential Buildings', 'Residential Buildings', 'Homes, apartments, and other residential structures.', 'Homes, apartments, and other residential structures.', 'naics=>53,oed:occupancy:oed_code=>1050,oed:occupancy:air_code=>301','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('db4a14a2-a27b-4bb0-8249-a07fb78438f4', 'Residential','Residential Buildings','asset-class-residential', 'Residential Buildings', 'Homes, apartments, and other residential structures.', 'Homes, apartments, and other residential structures.', 'naics=>53,oed:occupancy:oed_code=>1050,oed:occupancy:air_code=>301','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_class
-	(osc_id, osc_abbreviation, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_abbreviation, osc_name, osc_slug, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('536e8cee-682f-4cd6-b23e-b32e885cc094', 'Commercial', 'Commercial Buildings', 'Commercial Buildings', 'Offices, retail spaces, and other commercial properties.', 'Offices, retail spaces, and other commercial properties.', 'naics=>44|45|49,oed:occupancy:oed_code=>1100,oed:occupancy:air_code=>311','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('536e8cee-682f-4cd6-b23e-b32e885cc094', 'Commercial', 'Commercial Buildings','asset-class-commercial', 'Commercial Buildings', 'Offices, retail spaces, and other commercial properties.', 'Offices, retail spaces, and other commercial properties.', 'naics=>44|45|49,oed:occupancy:oed_code=>1100,oed:occupancy:air_code=>311','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_class
-	(osc_id, osc_abbreviation, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_abbreviation, osc_name, osc_slug, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('f2baa602-44fe-49be-a5c9-d8b8208d9499', 'Infra','Infrastructure', 'Infrastructure', 'Roads, bridges, railways, airports, ports, and utilities (water, electricity, telecommunications).', 'Roads, bridges, railways, airports, ports, and utilities (water, electricity, telecommunications).', 'naics=>,oed:occupancy:oed_code=>1256,oed:occupancy:oed_code=>1305','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('f2baa602-44fe-49be-a5c9-d8b8208d9499', 'Infra','Infrastructure','asset-class-infrastructure', 'Infrastructure', 'Roads, bridges, railways, airports, ports, and utilities (water, electricity, telecommunications).', 'Roads, bridges, railways, airports, ports, and utilities (water, electricity, telecommunications).', 'oed:occupancy:oed_code=>1256,oed:occupancy:oed_code=>1305','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_class
-	(osc_id, osc_abbreviation, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_abbreviation, osc_name, osc_slug, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('a9da716f-6667-4efe-bac7-f91c1cdcc2f1', 'Agri','Agricultural Assets', 'Agricultural Assets', 'Cropland, livestock, agricultural facilities, and equipment.', 'Cropland, livestock, agricultural facilities, and equipment.', 'naics=>,oed:occupancy:oed_code=>2700,oed:occupancy:air_code=>484','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('a9da716f-6667-4efe-bac7-f91c1cdcc2f1', 'Agri','Agricultural Assets','asset-class-agricultural', 'Agricultural Assets', 'Cropland, livestock, agricultural facilities, and equipment.', 'Cropland, livestock, agricultural facilities, and equipment.', 'oed:occupancy:oed_code=>2700,oed:occupancy:air_code=>484','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_class
-	(osc_id, osc_abbreviation, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_abbreviation, osc_name, osc_slug, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('1ad910c8-fba0-4f45-845e-5a1901b9ffbe', 'Industrial','Industrial Facilities', 'Industrial Facilities', 'Factories, warehouses, and other industrial properties.', 'Factories, warehouses, and other industrial properties.', 'naics=>,oed:occupancy:oed_code=>1150,oed:occupancy:air_code=>321','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('1ad910c8-fba0-4f45-845e-5a1901b9ffbe', 'Industrial','Industrial Facilities', 'asset-class-industrial','Industrial Facilities', 'Factories, warehouses, and other industrial properties.', 'Factories, warehouses, and other industrial properties.', 'oed:occupancy:oed_code=>1150,oed:occupancy:air_code=>321','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_class
-	(osc_id, osc_abbreviation, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_abbreviation, osc_name, osc_slug, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('2b5557e6-05ee-49d6-b6a6-b7ef54948af7', 'Natural','Natural Assets', 'Natural Assets', 'Forests, wetlands, rivers, and other natural environments.', 'Forests, wetlands, rivers, and other natural environments.', 'naics=>,oed:occupancy:oed_code=>1000,oed:occupancy:air_code=>300','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('2b5557e6-05ee-49d6-b6a6-b7ef54948af7', 'Natural','Natural Assets', 'asset-class-natural','Natural Assets', 'Forests, wetlands, rivers, and other natural environments.', 'Forests, wetlands, rivers, and other natural environments.', 'oed:occupancy:oed_code=>1000,oed:occupancy:air_code=>300','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_class
-	(osc_id, osc_abbreviation, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_abbreviation, osc_name, osc_slug, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('beafc1fa-f6c8-4c72-9717-a243eea1a2ef', 'Cultural','Cultural Heritage Sites', 'Cultural Heritage Sites', 'Historical buildings, monuments, and sites of cultural significance.', 'Historical buildings, monuments, and sites of cultural significance.', 'naics=>,oed:occupancy:oed_code=>1000,oed:occupancy:air_code=>300','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('beafc1fa-f6c8-4c72-9717-a243eea1a2ef', 'Cultural','Cultural Heritage Sites', 'asset-class-cultural','Cultural Heritage Sites', 'Historical buildings, monuments, and sites of cultural significance.', 'Historical buildings, monuments, and sites of cultural significance.', 'oed:occupancy:oed_code=>1000,oed:occupancy:air_code=>300','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 
 
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
