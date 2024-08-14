@@ -4,14 +4,13 @@
 -- speed up application development, help internationalize and display the results of analyses, and more.
 -- The backend schema User and Tenant tables are derived from ASP.NET Boilerplate tables (https://aspnetboilerplate.com/). That code is available under the MIT license, here: https://github.com/aspnetboilerplate/aspnetboilerplate
 
--- Last Updated: 2024-08-13. 
--- Updates to schema structure from Arfima feedback. Add tags to Asset Class rows. Add Asset Type table. Add osc_ prefix to most columns. Added Precalculated damage curve example. Added asset table inheritance examples, and some backend functionality such as user table and indexes for performance. Simplify table osc_names and consolosc_idate schemas.
+-- Last Updated: 2024-08-15. 
+-- Change tags to be a jsonb field. Updates to osc_slug. Update schema structure from Arfima feedback. Add tags to Asset Class rows. Add Asset Type table. Add osc_ prefix to most columns. Added Precalculated damage curve example. Added asset table inheritance examples, and some backend functionality such as user table and indexes for performance. Simplify table osc_names and consolosc_idate schemas.
 
 -- SETUP EXTENSIONS
 CREATE EXTENSION postgis; -- used for geolocation
 CREATE EXTENSION h3; -- used for Uber H3 geolocation
 CREATE EXTENSION pgcrypto; -- used for random UUID generation
-CREATE EXTENSION hstore; -- used for metadata
 
 -- SETUP SCHEMAS
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_backend;
@@ -96,7 +95,7 @@ CREATE TABLE osc_physrisk_core_scenarios.scenario (
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
-    osc_tags hstore DEFAULT NULL,
+    osc_tags jsonb DEFAULT NULL,
 	osc_datetime_created TIMESTAMPTZ NOT NULL,
 	osc_creator_user_id BIGINT NOT NULL,
 	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
@@ -130,7 +129,7 @@ CREATE TABLE osc_physrisk_core_scenarios.hazard (
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
-    osc_tags hstore DEFAULT NULL,
+    osc_tags jsonb DEFAULT NULL,
 	osc_datetime_created TIMESTAMPTZ NOT NULL,
 	osc_creator_user_id BIGINT NOT NULL,
 	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
@@ -166,7 +165,7 @@ CREATE TABLE osc_physrisk_core_scenarios.hazard_indicator (
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
-    osc_tags hstore DEFAULT NULL,
+    osc_tags jsonb DEFAULT NULL,
 	osc_datetime_created TIMESTAMPTZ NOT NULL,
 	osc_creator_user_id BIGINT NOT NULL,
 	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
@@ -200,7 +199,7 @@ COMMENT ON TABLE osc_physrisk_core_scenarios.hazard_indicator IS 'Contains a lis
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
-    osc_tags hstore DEFAULT NULL,
+    osc_tags jsonb DEFAULT NULL,
 	osc_datetime_created TIMESTAMPTZ NOT NULL,
 	osc_creator_user_id BIGINT NOT NULL,
 	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
@@ -235,7 +234,7 @@ CREATE TABLE osc_physrisk_core_scenarios.vulnerability_function (
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
-    osc_tags hstore DEFAULT NULL,
+    osc_tags jsonb DEFAULT NULL,
 	osc_datetime_created TIMESTAMPTZ NOT NULL,
 	osc_creator_user_id BIGINT NOT NULL,
 	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
@@ -270,7 +269,7 @@ CREATE TABLE osc_physrisk_financial.financial_function (
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
-    osc_tags hstore DEFAULT NULL,
+    osc_tags jsonb DEFAULT NULL,
 	osc_datetime_created TIMESTAMPTZ NOT NULL,
 	osc_creator_user_id BIGINT NOT NULL,
 	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
@@ -306,7 +305,7 @@ CREATE TABLE osc_physrisk_core_assets.asset_class (
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
-    osc_tags hstore DEFAULT NULL,
+    osc_tags jsonb DEFAULT NULL,
 	osc_datetime_created TIMESTAMPTZ NOT NULL,
 	osc_creator_user_id BIGINT NOT NULL,
 	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
@@ -339,7 +338,7 @@ CREATE TABLE osc_physrisk_core_assets.asset_type (
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
-    osc_tags hstore DEFAULT NULL,
+    osc_tags jsonb DEFAULT NULL,
 	osc_datetime_created TIMESTAMPTZ NOT NULL,
 	osc_creator_user_id BIGINT NOT NULL,
 	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
@@ -374,7 +373,7 @@ CREATE TABLE osc_physrisk_core_assets.portfolio (
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
-    osc_tags hstore DEFAULT NULL,
+    osc_tags jsonb DEFAULT NULL,
 	osc_datetime_created TIMESTAMPTZ NOT NULL,
 	osc_creator_user_id BIGINT NOT NULL,
 	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
@@ -410,7 +409,7 @@ CREATE TABLE osc_physrisk_core_assets.generic_asset (
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
-    osc_tags hstore DEFAULT NULL,
+    osc_tags jsonb DEFAULT NULL,
 	osc_datetime_created TIMESTAMPTZ NOT NULL,
 	osc_creator_user_id BIGINT NOT NULL,
 	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
@@ -497,7 +496,7 @@ CREATE TABLE osc_physrisk_financial.financial_impact_type (
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
-    osc_tags hstore DEFAULT NULL,
+    osc_tags jsonb DEFAULT NULL,
 	osc_datetime_created TIMESTAMPTZ NOT NULL,
 	osc_creator_user_id BIGINT NOT NULL,
 	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
@@ -532,7 +531,7 @@ CREATE TABLE osc_physrisk_core_impacts.impact_type (
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
-    osc_tags hstore DEFAULT NULL,
+    osc_tags jsonb DEFAULT NULL,
 	osc_datetime_created TIMESTAMPTZ NOT NULL,
 	osc_creator_user_id BIGINT NOT NULL,
 	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
@@ -566,7 +565,7 @@ CREATE TABLE osc_physrisk_financial.portfolio_impact (
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
-    osc_tags hstore DEFAULT NULL,
+    osc_tags jsonb DEFAULT NULL,
 	osc_datetime_created TIMESTAMPTZ NOT NULL,
 	osc_creator_user_id BIGINT NOT NULL,
 	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
@@ -612,7 +611,7 @@ CREATE TABLE osc_physrisk_core_impacts.asset_impact (
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
-    osc_tags hstore DEFAULT NULL,
+    osc_tags jsonb DEFAULT NULL,
 	osc_datetime_created TIMESTAMPTZ NOT NULL,
 	osc_creator_user_id BIGINT NOT NULL,
 	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
@@ -692,7 +691,7 @@ CREATE TABLE osc_physrisk_core_impacts.geolocated_precalculated_impact (
 	osc_abbreviation VARCHAR(12),
 	osc_description_full  TEXT NOT NULL,
 	osc_description_short  VARCHAR(256) NOT NULL,
-    osc_tags hstore DEFAULT NULL,
+    osc_tags jsonb DEFAULT NULL,
 	osc_datetime_created TIMESTAMPTZ NOT NULL,
 	osc_creator_user_id BIGINT NOT NULL,
 	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
@@ -741,7 +740,6 @@ CREATE TABLE osc_physrisk_core_impacts.geolocated_precalculated_impact (
  );
  COMMENT ON TABLE osc_physrisk_core_impacts.geolocated_precalculated_impact IS 'To help with indexing and searching, geographic locations may have precalculated information for hazard impacts. This can be historic (it actually happened) or projected (it is likely to happen). Note that this information is not aware of or concerned by whether or which physical assets may be present insosc_ide its borders.';
 
-
 -- SETUP PERMISSIONS FOR A READER SQL SERVICE ACCOUNT (CREATE THAT USING A DATABASE TOOL)
 --GRANT USAGE ON SCHEMA "osc_physrisk_backend" TO physrisk_reader_service;
 --GRANT SELECT ON ALL TABLES IN SCHEMA "osc_physrisk_backend" TO physrisk_reader_service;
@@ -776,451 +774,450 @@ VALUES
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(-1, 'Unknown/Not Selected', 'Unknown/Not Selected', 'Unknown/Not Selected', 'Unknown/Not Selected','key1=>value1_en,key2=>value2_en', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'f098938cd8cc7c4f1c71c8e97db0f075',1,-1, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(-1, 'Unknown/Not Selected', 'Unknown/Not Selected', 'Unknown/Not Selected', 'Unknown/Not Selected','{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'f098938cd8cc7c4f1c71c8e97db0f075',1,-1, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(0, 'History (before 2014). See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'History (before 2014)', 'History (- 2014)', 'History (- 2014)','key1=>value3_en,key2=>value4_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,0, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(0,'en-climate-scenario-historical', 'History (before 2014). See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'History (before 2014)', 'History (- 2014)', 'History (- 2014)','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,0, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(1, 'SSP1-1.9 -  very low GHG emissions: CO2 emissions cut to net zero around 2050. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP1-1.9', 'SSP1-1.9', 'SSP1-1.9','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,1, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(1,'en-climate-scenario-SSP1-19', 'SSP1-1.9 -  very low GHG emissions: CO2 emissions cut to net zero around 2050. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP1-1.9', 'SSP1-1.9', 'SSP1-1.9','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,1, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(2, 'SSP1-2.6 - low GHG emissions: CO2 emissions cut to net zero around 2075. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP1-2.6', 'SSP1-2.6', 'SSP1-2.6','key1=>value3_en,key2=>value4_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,2, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(2, 'en-climate-scenario-SSP1-26', 'SSP1-2.6 - low GHG emissions: CO2 emissions cut to net zero around 2075. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP1-2.6', 'SSP1-2.6', 'SSP1-2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,2, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(3, 'SSP2-4.5 - intermediate GHG emissions: CO2 emissions around current levels until 2050, then falling but not reaching net zero by 2100. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP2-4.5', 'SSP2-4.5', 'SSP2-4.5','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,3, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(3, 'en-climate-scenario-SSP2-45', 'SSP2-4.5 - intermediate GHG emissions: CO2 emissions around current levels until 2050, then falling but not reaching net zero by 2100. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP2-4.5', 'SSP2-4.5', 'SSP2-4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,3, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(4, 'SSP3-7.0 - high GHG emissions: CO2 emissions double by 2100. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP3-7.0', 'SSP3-7.0', 'SSP3-7.0','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,4, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(4, 'en-climate-scenario-SSP3-70', 'SSP3-7.0 - high GHG emissions: CO2 emissions double by 2100. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP3-7.0', 'SSP3-7.0', 'SSP3-7.0','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,4, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(5, 'SSP5-8.5 - very high GHG emissions: CO2 emissions triple by 2075. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP5-8.5', 'SSP5-8.5', 'SSP5-8.5','key1=>value5_en,key2=>value6_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,5, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(5, 'en-climate-scenario-SSP5-85', 'SSP5-8.5 - very high GHG emissions: CO2 emissions triple by 2075. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP5-8.5', 'SSP5-8.5', 'SSP5-8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,5, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(6, 'RCP2.6 - Peak in radiative forcing at ~ 3 W/m2 before 2100 and decline. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP2.6', 'RCP2.6', 'RCP2.6','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,6, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(6, 'en-climate-scenario-RCP26', 'RCP2.6 - Peak in radiative forcing at ~ 3 W/m2 before 2100 and decline. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP2.6', 'RCP2.6', 'RCP2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,6, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(7, 'RCP4.5 - Stabilization without overshoot pathway to 4.5 W/m2 at stabilization after 2100. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP4.5', 'RCP4.5', 'RCP4.5','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,7, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(7, 'en-climate-scenario-RCP45', 'RCP4.5 - Stabilization without overshoot pathway to 4.5 W/m2 at stabilization after 2100. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP4.5', 'RCP4.5', 'RCP4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,7, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(8, 'RCP6 - Stabilization without overshoot pathway to 6 W/m2 at stabilization after 2100. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP6', 'RCP6', 'RCP6','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,8, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(8,  'en-climate-scenario-RCP6', 'RCP6 - Stabilization without overshoot pathway to 6 W/m2 at stabilization after 2100. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP6', 'RCP6', 'RCP6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,8, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(9, 'RCP8.5 - Rising radiative forcing pathway leading to 8.5 W/m2 in 2100. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP8.5', 'RCP8.5', 'RCP8.5','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,9, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(9, 'en-climate-scenario-RCP85', 'RCP8.5 - Rising radiative forcing pathway leading to 8.5 W/m2 in 2100. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP8.5', 'RCP8.5', 'RCP8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,9, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
-
 
 
 INSERT INTO osc_physrisk.osc_physrisk_core_impacts.impact_type
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(-1, 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z')
+	(-1, 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_impacts.impact_type
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(1, 'Damage as percentage of asset value', 'Damage as percentage of asset value', 'Damage as percentage of asset value', 'Damage as percentage of asset value','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z')
+	(1, 'Damage as percentage of asset value', 'Damage as percentage of asset value', 'Damage as percentage of asset value', 'Damage as percentage of asset value','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_impacts.impact_type
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(2, 'Disruption in number of production units', 'Disruption in number of production units', 'Disruption in number of production units', 'Disruption in number of production units','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z')
+	(2, 'Disruption in number of production units', 'Disruption in number of production units', 'Disruption in number of production units', 'Disruption in number of production units','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z')
 ;
 
 INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(-1, 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption','key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z')
+	(-1, 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, accounting_category)
 VALUES 
-	(1, 'Asset repairs and construction', 'Asset repairs and construction', 'Asset repairs and construction','Asset repairs and construction', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','Capex' );
+	(1, 'Asset repairs and construction', 'Asset repairs and construction', 'Asset repairs and construction','Asset repairs and construction', '{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','Capex' );
 INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, accounting_category)
 VALUES 
-	(2, 'Revenue loss due to asset restoration', 'Revenue loss due to asset restoration', 'Revenue loss due to asset restoration','Revenue loss due to asset restoration', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','Revenue' );
+	(2, 'Revenue loss due to asset restoration', 'Revenue loss due to asset restoration', 'Revenue loss due to asset restoration','Revenue loss due to asset restoration', '{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','Revenue' );
 INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, accounting_category)
 VALUES 
-	(3, 'Revenue loss due to productivity impact', 'Revenue loss due to productivity impact', 'Revenue loss due to productivity impact','Revenue loss due to productivity impact', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','Revenue' );
+	(3, 'Revenue loss due to productivity impact', 'Revenue loss due to productivity impact', 'Revenue loss due to productivity impact','Revenue loss due to productivity impact', '{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','Revenue' );
 INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, accounting_category)
 VALUES 
-	(4, 'Recurring cost increase (chronic)', 'Recurring cost increase (chronic)', 'Recurring cost increase (chronic)','Recurring cost increase (chronic)', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','OpEx' );
+	(4, 'Recurring cost increase (chronic)', 'Recurring cost increase (chronic)', 'Recurring cost increase (chronic)','Recurring cost increase (chronic)', '{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','OpEx' );
 INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, accounting_category)
 VALUES 
-	(5, 'Recurring cost increase (acute)', 'Recurring cost increase (acute)', 'Recurring cost increase (acute)','Recurring cost increase (acute)', 'key1=>value1_fr,key2=>value2_fr', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','OpEx' );
+	(5, 'Recurring cost increase (acute)', 'Recurring cost increase (acute)', 'Recurring cost increase (acute)','Recurring cost increase (acute)', '{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','OpEx' );
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
 	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('8159d927-e596-444d-8f1a-494494339fad', 'climate-hazard-type-unknown', 'Unknown hazard/Not selected', 'Unknown hazard/Not selected', 'Unknown hazard/Not selected', 'Unknown hazard/Not selected', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('8159d927-e596-444d-8f1a-494494339fad', 'en-climate-hazard-type-unknown', 'Unknown hazard/Not selected', 'Unknown hazard/Not selected', 'Unknown hazard/Not selected', 'Unknown hazard/Not selected', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
 	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('63ed7943-c4c4-43ea-abd2-86bb1997a094', 'climate-hazard-type-inundation-riverine', 'Riverine Inundation', 'Riverine Inundation', 'Riverine Inundation', 'Riverine Inundation', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y', 'y',1,'2024-07-15T00:00:01Z')
+	('63ed7943-c4c4-43ea-abd2-86bb1997a094', 'en-climate-hazard-type-inundation-riverine', 'Riverine Inundation', 'Riverine Inundation', 'Riverine Inundation', 'Riverine Inundation', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y', 'y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
 	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('28a095cd-4cde-40a1-90d9-cbb0ca673c06', 'climate-hazard-type-inundation-coastal', 'Coastal Inundation', 'Coastal Inundation', 'Coastal Inundation', 'Coastal Inundation', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('28a095cd-4cde-40a1-90d9-cbb0ca673c06', 'en-climate-hazard-type-inundation-coastal', 'Coastal Inundation', 'Coastal Inundation', 'Coastal Inundation', 'Coastal Inundation', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
 	(osc_id, osc_slug,osc_name,  osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('338ea109-828e-4aaf-b212-12d8eaf70a7e', 'climate-hazard-type-inundation-combined','Combined Inundation', 'Combined Inundation', 'Combined Inundation', 'Combined Inundation', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('338ea109-828e-4aaf-b212-12d8eaf70a7e', 'en-climate-hazard-type-inundation-combined','Combined Inundation', 'Combined Inundation', 'Combined Inundation', 'Combined Inundation', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
 	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('d08db675-ee1e-48fe-b9e1-b0da27de8f2b', 'climate-hazard-type-chronic-heat', 'Chronic Heat', 'Chronic Heat', 'Chronic Heat', 'Chronic Heat', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('d08db675-ee1e-48fe-b9e1-b0da27de8f2b', 'en-climate-hazard-type-chronic-heat', 'Chronic Heat', 'Chronic Heat', 'Chronic Heat', 'Chronic Heat', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
 	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('64fee0d3-b78b-49bf-911a-029695585d6a', 'climate-hazard-type-fire','Fire', 'Fire', 'Fire', 'Fire', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('64fee0d3-b78b-49bf-911a-029695585d6a', 'en-climate-hazard-type-fire','Fire', 'Fire', 'Fire', 'Fire', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
 	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('35ace20f-86dc-4735-9536-129b51b6d25d', 'climate-hazard-type-drought','Drought', 'Drought', 'Drought', 'Drought', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('35ace20f-86dc-4735-9536-129b51b6d25d', 'en-climate-hazard-type-drought','Drought', 'Drought', 'Drought', 'Drought', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
 	(osc_id, osc_slug,osc_name,  osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('2faed491-2c5d-499e-9568-fad6e3b3c0ec', 'climate-hazard-type-precipitation','Precipitation', 'Precipitation', 'Precipitation', 'Precipitation', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('2faed491-2c5d-499e-9568-fad6e3b3c0ec', 'en-climate-hazard-type-precipitation','Precipitation', 'Precipitation', 'Precipitation', 'Precipitation', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
 	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('29514258-18cb-4f2b-8798-203e0d513803', 'climate-hazard-type-water-risk','Water Risk', 'Water Risk', 'Water Risk', 'Water Risk', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('29514258-18cb-4f2b-8798-203e0d513803', 'en-climate-hazard-type-water-risk','Water Risk', 'Water Risk', 'Water Risk', 'Water Risk', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
 	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('e4e4e199-367e-4568-824d-3f916e355567', 'climate-hazard-type-hail','Hail', 'Hail', 'Hail', 'Hail', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('e4e4e199-367e-4568-824d-3f916e355567', 'en-climate-hazard-type-hail','Hail', 'Hail', 'Hail', 'Hail', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
 	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('0184b858-404d-4282-8f0d-2b4c42f7acd7', 'climate-hazard-type-wind','Wind', 'Wind', 'Wind', 'Wind', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('0184b858-404d-4282-8f0d-2b4c42f7acd7', 'en-climate-hazard-type-wind','Wind', 'Wind', 'Wind', 'Wind', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
 	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('4441cf3b-1460-4131-aff6-b51bf01cd084', 'climate-hazard-type-subsidence','subsidence', 'subsidence', 'subsidence', 'subsidence', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
+	('4441cf3b-1460-4131-aff6-b51bf01cd084', 'en-climate-hazard-type-subsidence','subsidence', 'subsidence', 'subsidence', 'subsidence', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('57a7df66-420d-4730-9669-1547f8200272', 'Flood depth (TUDelft)', 'Flood depth (TUDelft)', 'Flood depth (TUDelft)', 'Flood depth (TUDelft)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '63ed7943-c4c4-43ea-abd2-86bb1997a094')
+	('57a7df66-420d-4730-9669-1547f8200272', 'Flood depth (TUDelft)', 'Flood depth (TUDelft)', 'Flood depth (TUDelft)', 'Flood depth (TUDelft)', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '63ed7943-c4c4-43ea-abd2-86bb1997a094')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('5fb27cc6-ee01-4133-b2e9-6c1f22ed5b40', 'Flood depth/GFDL-ESM2M (WRI)', 'Flood depth/GFDL-ESM2M (WRI)', 'Flood depth/GFDL-ESM2M (WRI)', 'Flood depth/GFDL-ESM2M (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '63ed7943-c4c4-43ea-abd2-86bb1997a094')
+	('5fb27cc6-ee01-4133-b2e9-6c1f22ed5b40', 'Flood depth/GFDL-ESM2M (WRI)', 'Flood depth/GFDL-ESM2M (WRI)', 'Flood depth/GFDL-ESM2M (WRI)', 'Flood depth/GFDL-ESM2M (WRI)', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '63ed7943-c4c4-43ea-abd2-86bb1997a094')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('79555143-ba2a-47b0-bbe7-7aac3685dedb', 'Flood depth/HadGEM2-ES (WRI)', 'Flood depth/HadGEM2-ES (WRI)', 'Flood depth/HadGEM2-ES (WRI)', 'Flood depth/HadGEM2-ES (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '63ed7943-c4c4-43ea-abd2-86bb1997a094')
+	('79555143-ba2a-47b0-bbe7-7aac3685dedb', 'Flood depth/HadGEM2-ES (WRI)', 'Flood depth/HadGEM2-ES (WRI)', 'Flood depth/HadGEM2-ES (WRI)', 'Flood depth/HadGEM2-ES (WRI)', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '63ed7943-c4c4-43ea-abd2-86bb1997a094')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('6fe5ccb1-5d38-4a3e-b0a5-d4cc70981035', 'Flood depth/IPSL-CM5A-LR (WRI)', 'Flood depth/IPSL-CM5A-LR (WRI)', 'Flood depth/IPSL-CM5A-LR (WRI)', 'Flood depth/IPSL-CM5A-LR (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '63ed7943-c4c4-43ea-abd2-86bb1997a094')
+	('6fe5ccb1-5d38-4a3e-b0a5-d4cc70981035', 'Flood depth/IPSL-CM5A-LR (WRI)', 'Flood depth/IPSL-CM5A-LR (WRI)', 'Flood depth/IPSL-CM5A-LR (WRI)', 'Flood depth/IPSL-CM5A-LR (WRI)', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '63ed7943-c4c4-43ea-abd2-86bb1997a094')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('e4f10569-95be-4b5b-8d34-763eb95e730b', 'Flood depth/MIROC-ESM-CHEM (WRI)', 'Flood depth/MIROC-ESM-CHEM (WRI)', 'Flood depth/MIROC-ESM-CHEM (WRI)', 'Flood depth/MIROC-ESM-CHEM (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '63ed7943-c4c4-43ea-abd2-86bb1997a094')
+	('e4f10569-95be-4b5b-8d34-763eb95e730b', 'Flood depth/MIROC-ESM-CHEM (WRI)', 'Flood depth/MIROC-ESM-CHEM (WRI)', 'Flood depth/MIROC-ESM-CHEM (WRI)', 'Flood depth/MIROC-ESM-CHEM (WRI)', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '63ed7943-c4c4-43ea-abd2-86bb1997a094')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('690e01eb-f7e6-4fbf-84e4-f8195656abb3', 'Flood depth/NorESM1-M (WRI)', 'Flood depth/NorESM1-M (WRI)', 'Flood depth/NorESM1-M (WRI)', 'Flood depth/NorESM1-M (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '63ed7943-c4c4-43ea-abd2-86bb1997a094')
+	('690e01eb-f7e6-4fbf-84e4-f8195656abb3', 'Flood depth/NorESM1-M (WRI)', 'Flood depth/NorESM1-M (WRI)', 'Flood depth/NorESM1-M (WRI)', 'Flood depth/NorESM1-M (WRI)', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '63ed7943-c4c4-43ea-abd2-86bb1997a094')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('5f396b97-badc-40d2-b0b3-c8be8f3053ba', 'Flood depth/baseline (WRI)', 'Flood depth/baseline (WRI)', 'Flood depth/baseline (WRI)', 'Flood depth/baseline (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '63ed7943-c4c4-43ea-abd2-86bb1997a094')
+	('5f396b97-badc-40d2-b0b3-c8be8f3053ba', 'Flood depth/baseline (WRI)', 'Flood depth/baseline (WRI)', 'Flood depth/baseline (WRI)', 'Flood depth/baseline (WRI)', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '63ed7943-c4c4-43ea-abd2-86bb1997a094')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('901cbd14-9223-4d36-8ab4-658945d913a4', 'Standard of protection (TUDelft)', 'Standard of protection (TUDelft)', 'Standard of protection (TUDelft)', 'Standard of protection (TUDelft)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '63ed7943-c4c4-43ea-abd2-86bb1997a094')
+	('901cbd14-9223-4d36-8ab4-658945d913a4', 'Standard of protection (TUDelft)', 'Standard of protection (TUDelft)', 'Standard of protection (TUDelft)', 'Standard of protection (TUDelft)', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '63ed7943-c4c4-43ea-abd2-86bb1997a094')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('be44d6fb-08cb-4f52-8ff2-bf1b7366a7a0', 'Flood depth/5%, no subsosc_idence (WRI)', 'Flood depth/5%, no subsosc_idence (WRI)', 'Flood depth/5%, no subsosc_idence (WRI)', 'Flood depth/5%, no subsosc_idence (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '28a095cd-4cde-40a1-90d9-cbb0ca673c06')
+	('be44d6fb-08cb-4f52-8ff2-bf1b7366a7a0', 'Flood depth/5%, no subsosc_idence (WRI)', 'Flood depth/5%, no subsosc_idence (WRI)', 'Flood depth/5%, no subsosc_idence (WRI)', 'Flood depth/5%, no subsosc_idence (WRI)', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '28a095cd-4cde-40a1-90d9-cbb0ca673c06')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('c87fc5c3-c2ae-4732-ba52-7d9156044d7b', 'Flood depth/5%, with subsosc_idence (WRI)', 'Flood depth/5%, with subsosc_idence (WRI)', 'Flood depth/5%, with subsosc_idence (WRI)', 'Flood depth/5%, with subsosc_idence (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '28a095cd-4cde-40a1-90d9-cbb0ca673c06')
+	('c87fc5c3-c2ae-4732-ba52-7d9156044d7b', 'Flood depth/5%, with subsosc_idence (WRI)', 'Flood depth/5%, with subsosc_idence (WRI)', 'Flood depth/5%, with subsosc_idence (WRI)', 'Flood depth/5%, with subsosc_idence (WRI)', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '28a095cd-4cde-40a1-90d9-cbb0ca673c06')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('60c90be9-5cfb-4f6a-b9eb-e84e7da5a456', 'Flood depth/50%, no subsosc_idence (WRI)', 'Flood depth/50%, no subsosc_idence (WRI)', 'Flood depth/50%, no subsosc_idence (WRI)', 'Flood depth/50%, no subsosc_idence (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '28a095cd-4cde-40a1-90d9-cbb0ca673c06')
+	('60c90be9-5cfb-4f6a-b9eb-e84e7da5a456', 'Flood depth/50%, no subsosc_idence (WRI)', 'Flood depth/50%, no subsosc_idence (WRI)', 'Flood depth/50%, no subsosc_idence (WRI)', 'Flood depth/50%, no subsosc_idence (WRI)', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '28a095cd-4cde-40a1-90d9-cbb0ca673c06')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('e7623e9e-649e-460a-8b81-ae9d01711f75', 'Flood depth/50%, with subsosc_idence (WRI)', 'Flood depth/50%, with subsosc_idence (WRI)', 'Flood depth/50%, with subsosc_idence (WRI)', 'Flood depth/50%, with subsosc_idence (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '28a095cd-4cde-40a1-90d9-cbb0ca673c06')
+	('e7623e9e-649e-460a-8b81-ae9d01711f75', 'Flood depth/50%, with subsosc_idence (WRI)', 'Flood depth/50%, with subsosc_idence (WRI)', 'Flood depth/50%, with subsosc_idence (WRI)', 'Flood depth/50%, with subsosc_idence (WRI)', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '28a095cd-4cde-40a1-90d9-cbb0ca673c06')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('28fbe059-a661-4fe6-8ba7-0fa626a9312b', 'Flood depth/95%, no subsosc_idence (WRI)', 'Flood depth/95%, no subsosc_idence (WRI)', 'Flood depth/95%, no subsosc_idence (WRI)', 'Flood depth/95%, no subsosc_idence (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '28a095cd-4cde-40a1-90d9-cbb0ca673c06')
+	('28fbe059-a661-4fe6-8ba7-0fa626a9312b', 'Flood depth/95%, no subsosc_idence (WRI)', 'Flood depth/95%, no subsosc_idence (WRI)', 'Flood depth/95%, no subsosc_idence (WRI)', 'Flood depth/95%, no subsosc_idence (WRI)', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '28a095cd-4cde-40a1-90d9-cbb0ca673c06')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('ea005e03-f025-4aa4-a37e-981eea5bcfdb', 'Flood depth/95%, with subsosc_idence (WRI)', 'Flood depth/95%, with subsosc_idence (WRI)', 'Flood depth/95%, with subsosc_idence (WRI)', 'Flood depth/95%, with subsosc_idence (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '28a095cd-4cde-40a1-90d9-cbb0ca673c06')
+	('ea005e03-f025-4aa4-a37e-981eea5bcfdb', 'Flood depth/95%, with subsosc_idence (WRI)', 'Flood depth/95%, with subsosc_idence (WRI)', 'Flood depth/95%, with subsosc_idence (WRI)', 'Flood depth/95%, with subsosc_idence (WRI)', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '28a095cd-4cde-40a1-90d9-cbb0ca673c06')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('12651bc5-04a2-4225-ba25-f1c0e09bdb90', 'Flood depth/baseline, no subsosc_idence (WRI)', 'Flood depth/baseline, no subsosc_idence (WRI)', 'Flood depth/baseline, no subsosc_idence (WRI)', 'Flood depth/baseline, no subsosc_idence (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '28a095cd-4cde-40a1-90d9-cbb0ca673c06')
+	('12651bc5-04a2-4225-ba25-f1c0e09bdb90', 'Flood depth/baseline, no subsosc_idence (WRI)', 'Flood depth/baseline, no subsosc_idence (WRI)', 'Flood depth/baseline, no subsosc_idence (WRI)', 'Flood depth/baseline, no subsosc_idence (WRI)', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '28a095cd-4cde-40a1-90d9-cbb0ca673c06')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('6ba57474-6c7a-4ea3-aca8-25e30f27cec1', 'Flood depth/baseline, with subsosc_idence (WRI)', 'Flood depth/baseline, with subsosc_idence (WRI)', 'Flood depth/baseline, with subsosc_idence (WRI)', 'Flood depth/baseline, with subsosc_idence (WRI)', 'key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '28a095cd-4cde-40a1-90d9-cbb0ca673c06')
+	('6ba57474-6c7a-4ea3-aca8-25e30f27cec1', 'Flood depth/baseline, with subsosc_idence (WRI)', 'Flood depth/baseline, with subsosc_idence (WRI)', 'Flood depth/baseline, with subsosc_idence (WRI)', 'Flood depth/baseline, with subsosc_idence (WRI)', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', '28a095cd-4cde-40a1-90d9-cbb0ca673c06')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('e0b5afc2-eed8-4760-9667-c14fdbf374db', 'Days with average temperature above 25°C/ACCESS-CM2', 'Days with average temperature above 25°C/ACCESS-CM2', 'Days with average temperature above 25°C/ACCESS-CM2', 'Days with average temperature above 25°C/ACCESS-CM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('e0b5afc2-eed8-4760-9667-c14fdbf374db', 'Days with average temperature above 25°C/ACCESS-CM2', 'Days with average temperature above 25°C/ACCESS-CM2', 'Days with average temperature above 25°C/ACCESS-CM2', 'Days with average temperature above 25°C/ACCESS-CM2', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('b795a8af-12cc-4773-83ee-a50badd1fe74', 'Days with average temperature above 25°C/CMCC-ESM2', 'Days with average temperature above 25°C/CMCC-ESM2', 'Days with average temperature above 25°C/CMCC-ESM2', 'Days with average temperature above 25°C/CMCC-ESM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('b795a8af-12cc-4773-83ee-a50badd1fe74', 'Days with average temperature above 25°C/CMCC-ESM2', 'Days with average temperature above 25°C/CMCC-ESM2', 'Days with average temperature above 25°C/CMCC-ESM2', 'Days with average temperature above 25°C/CMCC-ESM2', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('81213608-0a01-42b0-a54f-a070fb104b95', 'Days with average temperature above 25°C/CNRM-CM6-1', 'Days with average temperature above 25°C/CNRM-CM6-1', 'Days with average temperature above 25°C/CNRM-CM6-1', 'Days with average temperature above 25°C/CNRM-CM6-1', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('81213608-0a01-42b0-a54f-a070fb104b95', 'Days with average temperature above 25°C/CNRM-CM6-1', 'Days with average temperature above 25°C/CNRM-CM6-1', 'Days with average temperature above 25°C/CNRM-CM6-1', 'Days with average temperature above 25°C/CNRM-CM6-1', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('98692238-6a8f-4e58-a779-9f96eeaf1abd', 'Days with average temperature above 25°C/MIROC6', 'Days with average temperature above 25°C/MIROC6', 'Days with average temperature above 25°C/MIROC6', 'Days with average temperature above 25°C/MIROC6', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('98692238-6a8f-4e58-a779-9f96eeaf1abd', 'Days with average temperature above 25°C/MIROC6', 'Days with average temperature above 25°C/MIROC6', 'Days with average temperature above 25°C/MIROC6', 'Days with average temperature above 25°C/MIROC6', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('3dbf253a-d880-4440-baa5-3e4a9fcac355', 'Days with average temperature above 25°C/ESM1-2-LR', 'Days with average temperature above 25°C/ESM1-2-LR', 'Days with average temperature above 25°C/ESM1-2-LR', 'Days with average temperature above 25°C/ESM1-2-LR', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('3dbf253a-d880-4440-baa5-3e4a9fcac355', 'Days with average temperature above 25°C/ESM1-2-LR', 'Days with average temperature above 25°C/ESM1-2-LR', 'Days with average temperature above 25°C/ESM1-2-LR', 'Days with average temperature above 25°C/ESM1-2-LR', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('5fcca03b-ffff-4632-b896-78ceb9777e4b', 'Days with average temperature above 25°C/NorESM2-MM', 'Days with average temperature above 25°C/NorESM2-MM', 'Days with average temperature above 25°C/NorESM2-MM', 'Days with average temperature above 25°C/NorESM2-MM', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('5fcca03b-ffff-4632-b896-78ceb9777e4b', 'Days with average temperature above 25°C/NorESM2-MM', 'Days with average temperature above 25°C/NorESM2-MM', 'Days with average temperature above 25°C/NorESM2-MM', 'Days with average temperature above 25°C/NorESM2-MM', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('77f04d46-303f-40f2-a892-d0068d6ab64a', 'Days with average temperature above 30°C/ACCESS-CM2', 'Days with average temperature above 30°C/ACCESS-CM2', 'Days with average temperature above 30°C/ACCESS-CM2', 'Days with average temperature above 30°C/ACCESS-CM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('77f04d46-303f-40f2-a892-d0068d6ab64a', 'Days with average temperature above 30°C/ACCESS-CM2', 'Days with average temperature above 30°C/ACCESS-CM2', 'Days with average temperature above 30°C/ACCESS-CM2', 'Days with average temperature above 30°C/ACCESS-CM2', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('c47e4dfa-e850-4060-aed9-af9100c65986', 'Days with average temperature above 30°C/CMCC-ESM2', 'Days with average temperature above 30°C/CMCC-ESM2', 'Days with average temperature above 30°C/CMCC-ESM2', 'Days with average temperature above 30°C/CMCC-ESM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('c47e4dfa-e850-4060-aed9-af9100c65986', 'Days with average temperature above 30°C/CMCC-ESM2', 'Days with average temperature above 30°C/CMCC-ESM2', 'Days with average temperature above 30°C/CMCC-ESM2', 'Days with average temperature above 30°C/CMCC-ESM2', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('ba1e06be-1cf5-4b5d-8f93-8f64e47af2b8', 'Days with average temperature above 30°C/CNRM-CM6-1', 'Days with average temperature above 30°C/CNRM-CM6-1', 'Days with average temperature above 30°C/CNRM-CM6-1', 'Days with average temperature above 30°C/CNRM-CM6-1', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('ba1e06be-1cf5-4b5d-8f93-8f64e47af2b8', 'Days with average temperature above 30°C/CNRM-CM6-1', 'Days with average temperature above 30°C/CNRM-CM6-1', 'Days with average temperature above 30°C/CNRM-CM6-1', 'Days with average temperature above 30°C/CNRM-CM6-1', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('b882a67c-acea-4dbe-9939-1594775e6f78', 'Days with average temperature above 30°C/MIROC6', 'Days with average temperature above 30°C/MIROC6', 'Days with average temperature above 30°C/MIROC6', 'Days with average temperature above 30°C/MIROC6', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('b882a67c-acea-4dbe-9939-1594775e6f78', 'Days with average temperature above 30°C/MIROC6', 'Days with average temperature above 30°C/MIROC6', 'Days with average temperature above 30°C/MIROC6', 'Days with average temperature above 30°C/MIROC6', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('0ae16260-45b7-48fe-924e-a2bd2bc25f39', 'Days with average temperature above 30°C/ESM1-2-LR', 'Days with average temperature above 30°C/ESM1-2-LR', 'Days with average temperature above 30°C/ESM1-2-LR', 'Days with average temperature above 30°C/ESM1-2-LR', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('0ae16260-45b7-48fe-924e-a2bd2bc25f39', 'Days with average temperature above 30°C/ESM1-2-LR', 'Days with average temperature above 30°C/ESM1-2-LR', 'Days with average temperature above 30°C/ESM1-2-LR', 'Days with average temperature above 30°C/ESM1-2-LR', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('151fe933-f1be-4fb1-bcaf-d534a5023c78', 'Days with average temperature above 30°C/NorESM2-MM', 'Days with average temperature above 30°C/NorESM2-MM', 'Days with average temperature above 30°C/NorESM2-MM', 'Days with average temperature above 30°C/NorESM2-MM', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('151fe933-f1be-4fb1-bcaf-d534a5023c78', 'Days with average temperature above 30°C/NorESM2-MM', 'Days with average temperature above 30°C/NorESM2-MM', 'Days with average temperature above 30°C/NorESM2-MM', 'Days with average temperature above 30°C/NorESM2-MM', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('96e6fcc5-d843-4f59-9746-2d0d341b6bdc', 'Days with average temperature above 35°C/ACCESS-CM2', 'Days with average temperature above 35°C/ACCESS-CM2', 'Days with average temperature above 35°C/ACCESS-CM2', 'Days with average temperature above 35°C/ACCESS-CM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('96e6fcc5-d843-4f59-9746-2d0d341b6bdc', 'Days with average temperature above 35°C/ACCESS-CM2', 'Days with average temperature above 35°C/ACCESS-CM2', 'Days with average temperature above 35°C/ACCESS-CM2', 'Days with average temperature above 35°C/ACCESS-CM2', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('2c485594-5220-4e5e-85f0-3e67a09bacd9', 'Days with average temperature above 35°C/CMCC-ESM2', 'Days with average temperature above 35°C/CMCC-ESM2', 'Days with average temperature above 35°C/CMCC-ESM2', 'Days with average temperature above 35°C/CMCC-ESM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('2c485594-5220-4e5e-85f0-3e67a09bacd9', 'Days with average temperature above 35°C/CMCC-ESM2', 'Days with average temperature above 35°C/CMCC-ESM2', 'Days with average temperature above 35°C/CMCC-ESM2', 'Days with average temperature above 35°C/CMCC-ESM2', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('db9a09b3-3386-4081-bf0c-79b6c8ebd38e', 'Days with average temperature above 35°C/CNRM-CM6-1', 'Days with average temperature above 35°C/CNRM-CM6-1', 'Days with average temperature above 35°C/CNRM-CM6-1', 'Days with average temperature above 35°C/CNRM-CM6-1', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('db9a09b3-3386-4081-bf0c-79b6c8ebd38e', 'Days with average temperature above 35°C/CNRM-CM6-1', 'Days with average temperature above 35°C/CNRM-CM6-1', 'Days with average temperature above 35°C/CNRM-CM6-1', 'Days with average temperature above 35°C/CNRM-CM6-1', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('3f77c47d-9a26-4a3f-a289-ecf56678ec69', 'Days with average temperature above 35°C/MIROC6', 'Days with average temperature above 35°C/MIROC6', 'Days with average temperature above 35°C/MIROC6', 'Days with average temperature above 35°C/MIROC6', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('3f77c47d-9a26-4a3f-a289-ecf56678ec69', 'Days with average temperature above 35°C/MIROC6', 'Days with average temperature above 35°C/MIROC6', 'Days with average temperature above 35°C/MIROC6', 'Days with average temperature above 35°C/MIROC6', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('f197975a-acea-4514-acbf-35cb070b0b5c', 'Days with average temperature above 35°C/ESM1-2-LR', 'Days with average temperature above 35°C/ESM1-2-LR', 'Days with average temperature above 35°C/ESM1-2-LR', 'Days with average temperature above 35°C/ESM1-2-LR', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('f197975a-acea-4514-acbf-35cb070b0b5c', 'Days with average temperature above 35°C/ESM1-2-LR', 'Days with average temperature above 35°C/ESM1-2-LR', 'Days with average temperature above 35°C/ESM1-2-LR', 'Days with average temperature above 35°C/ESM1-2-LR', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('d4d610b4-060e-4212-9b0c-05fe551a0128', 'Days with average temperature above 35°C/NorESM2-MM', 'Days with average temperature above 35°C/NorESM2-MM', 'Days with average temperature above 35°C/NorESM2-MM', 'Days with average temperature above 35°C/NorESM2-MM', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('d4d610b4-060e-4212-9b0c-05fe551a0128', 'Days with average temperature above 35°C/NorESM2-MM', 'Days with average temperature above 35°C/NorESM2-MM', 'Days with average temperature above 35°C/NorESM2-MM', 'Days with average temperature above 35°C/NorESM2-MM', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('f38a4529-0b9e-4a31-9b16-f6e070a4f001', 'Days with average temperature above 40°C/ACCESS-CM2', 'Days with average temperature above 40°C/ACCESS-CM2', 'Days with average temperature above 40°C/ACCESS-CM2', 'Days with average temperature above 40°C/ACCESS-CM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('f38a4529-0b9e-4a31-9b16-f6e070a4f001', 'Days with average temperature above 40°C/ACCESS-CM2', 'Days with average temperature above 40°C/ACCESS-CM2', 'Days with average temperature above 40°C/ACCESS-CM2', 'Days with average temperature above 40°C/ACCESS-CM2', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('bae5ce0d-079c-44c8-87f2-705e13806371', 'Days with average temperature above 40°C/CMCC-ESM2', 'Days with average temperature above 40°C/CMCC-ESM2', 'Days with average temperature above 40°C/CMCC-ESM2', 'Days with average temperature above 40°C/CMCC-ESM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('bae5ce0d-079c-44c8-87f2-705e13806371', 'Days with average temperature above 40°C/CMCC-ESM2', 'Days with average temperature above 40°C/CMCC-ESM2', 'Days with average temperature above 40°C/CMCC-ESM2', 'Days with average temperature above 40°C/CMCC-ESM2', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('19049eb2-9270-4b1b-9aea-8e2c610ea6b0', 'Days with average temperature above 40°C/CNRM-CM6-1', 'Days with average temperature above 40°C/CNRM-CM6-1', 'Days with average temperature above 40°C/CNRM-CM6-1', 'Days with average temperature above 40°C/CNRM-CM6-1', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('19049eb2-9270-4b1b-9aea-8e2c610ea6b0', 'Days with average temperature above 40°C/CNRM-CM6-1', 'Days with average temperature above 40°C/CNRM-CM6-1', 'Days with average temperature above 40°C/CNRM-CM6-1', 'Days with average temperature above 40°C/CNRM-CM6-1', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('a35f8652-5736-4b83-b9ec-2bcd53dd2b75', 'Days with average temperature above 40°C/MIROC6', 'Days with average temperature above 40°C/MIROC6', 'Days with average temperature above 40°C/MIROC6', 'Days with average temperature above 40°C/MIROC6', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('a35f8652-5736-4b83-b9ec-2bcd53dd2b75', 'Days with average temperature above 40°C/MIROC6', 'Days with average temperature above 40°C/MIROC6', 'Days with average temperature above 40°C/MIROC6', 'Days with average temperature above 40°C/MIROC6', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('6a23417d-27fc-49f5-9147-43f9a761e13d', 'Days with average temperature above 40°C/ESM1-2-LR', 'Days with average temperature above 40°C/ESM1-2-LR', 'Days with average temperature above 40°C/ESM1-2-LR', 'Days with average temperature above 40°C/ESM1-2-LR', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('6a23417d-27fc-49f5-9147-43f9a761e13d', 'Days with average temperature above 40°C/ESM1-2-LR', 'Days with average temperature above 40°C/ESM1-2-LR', 'Days with average temperature above 40°C/ESM1-2-LR', 'Days with average temperature above 40°C/ESM1-2-LR', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('9fd1aafe-d942-4dd7-8b5f-cc3983d12616', 'Days with average temperature above 40°C/NorESM2-MM', 'Days with average temperature above 40°C/NorESM2-MM', 'Days with average temperature above 40°C/NorESM2-MM', 'Days with average temperature above 40°C/NorESM2-MM', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('9fd1aafe-d942-4dd7-8b5f-cc3983d12616', 'Days with average temperature above 40°C/NorESM2-MM', 'Days with average temperature above 40°C/NorESM2-MM', 'Days with average temperature above 40°C/NorESM2-MM', 'Days with average temperature above 40°C/NorESM2-MM', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('801009ff-7135-4252-a956-8f32cd9fb17d', 'Days with average temperature above 45°C/ACCESS-CM2', 'Days with average temperature above 45°C/ACCESS-CM2', 'Days with average temperature above 45°C/ACCESS-CM2', 'Days with average temperature above 45°C/ACCESS-CM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('801009ff-7135-4252-a956-8f32cd9fb17d', 'Days with average temperature above 45°C/ACCESS-CM2', 'Days with average temperature above 45°C/ACCESS-CM2', 'Days with average temperature above 45°C/ACCESS-CM2', 'Days with average temperature above 45°C/ACCESS-CM2', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('ea8be4c4-a3f0-441f-b1cd-b4de8b9e885c', 'Days with average temperature above 45°C/CMCC-ESM2', 'Days with average temperature above 45°C/CMCC-ESM2', 'Days with average temperature above 45°C/CMCC-ESM2', 'Days with average temperature above 45°C/CMCC-ESM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('ea8be4c4-a3f0-441f-b1cd-b4de8b9e885c', 'Days with average temperature above 45°C/CMCC-ESM2', 'Days with average temperature above 45°C/CMCC-ESM2', 'Days with average temperature above 45°C/CMCC-ESM2', 'Days with average temperature above 45°C/CMCC-ESM2', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('69053bee-35fd-45bd-9dd1-8fe485ae7715', 'Days with average temperature above 45°C/CNRM-CM6-1', 'Days with average temperature above 45°C/CNRM-CM6-1', 'Days with average temperature above 45°C/CNRM-CM6-1', 'Days with average temperature above 45°C/CNRM-CM6-1', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('69053bee-35fd-45bd-9dd1-8fe485ae7715', 'Days with average temperature above 45°C/CNRM-CM6-1', 'Days with average temperature above 45°C/CNRM-CM6-1', 'Days with average temperature above 45°C/CNRM-CM6-1', 'Days with average temperature above 45°C/CNRM-CM6-1', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('1f48f1f2-03ab-43b8-9185-038fd656ebcd', 'Days with average temperature above 45°C/MIROC6', 'Days with average temperature above 45°C/MIROC6', 'Days with average temperature above 45°C/MIROC6', 'Days with average temperature above 45°C/MIROC6', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('1f48f1f2-03ab-43b8-9185-038fd656ebcd', 'Days with average temperature above 45°C/MIROC6', 'Days with average temperature above 45°C/MIROC6', 'Days with average temperature above 45°C/MIROC6', 'Days with average temperature above 45°C/MIROC6', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('8960452e-86b1-4134-b03d-5bea69079fcc', 'Days with average temperature above 45°C/ESM1-2-LR', 'Days with average temperature above 45°C/ESM1-2-LR', 'Days with average temperature above 45°C/ESM1-2-LR', 'Days with average temperature above 45°C/ESM1-2-LR', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('8960452e-86b1-4134-b03d-5bea69079fcc', 'Days with average temperature above 45°C/ESM1-2-LR', 'Days with average temperature above 45°C/ESM1-2-LR', 'Days with average temperature above 45°C/ESM1-2-LR', 'Days with average temperature above 45°C/ESM1-2-LR', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('3676521f-16ee-4ce6-b8b4-d00aaba44281', 'Days with average temperature above 45°C/NorESM2-MM', 'Days with average temperature above 45°C/NorESM2-MM', 'Days with average temperature above 45°C/NorESM2-MM', 'Days with average temperature above 45°C/NorESM2-MM', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('3676521f-16ee-4ce6-b8b4-d00aaba44281', 'Days with average temperature above 45°C/NorESM2-MM', 'Days with average temperature above 45°C/NorESM2-MM', 'Days with average temperature above 45°C/NorESM2-MM', 'Days with average temperature above 45°C/NorESM2-MM', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('8bfe29fb-85e3-4497-b340-ad3f4eadfc3f', 'Days with average temperature above 50°C/ACCESS-CM2', 'Days with average temperature above 50°C/ACCESS-CM2', 'Days with average temperature above 50°C/ACCESS-CM2', 'Days with average temperature above 50°C/ACCESS-CM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('8bfe29fb-85e3-4497-b340-ad3f4eadfc3f', 'Days with average temperature above 50°C/ACCESS-CM2', 'Days with average temperature above 50°C/ACCESS-CM2', 'Days with average temperature above 50°C/ACCESS-CM2', 'Days with average temperature above 50°C/ACCESS-CM2', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('fb684a2f-ce48-4d02-ba49-9c5cd49654df', 'Days with average temperature above 50°C/CMCC-ESM2', 'Days with average temperature above 50°C/CMCC-ESM2', 'Days with average temperature above 50°C/CMCC-ESM2', 'Days with average temperature above 50°C/CMCC-ESM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('fb684a2f-ce48-4d02-ba49-9c5cd49654df', 'Days with average temperature above 50°C/CMCC-ESM2', 'Days with average temperature above 50°C/CMCC-ESM2', 'Days with average temperature above 50°C/CMCC-ESM2', 'Days with average temperature above 50°C/CMCC-ESM2', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('56fb7c3a-7d9c-41d2-ab1d-37bab5544748', 'Days with average temperature above 50°C/CNRM-CM6-1', 'Days with average temperature above 50°C/CNRM-CM6-1', 'Days with average temperature above 50°C/CNRM-CM6-1', 'Days with average temperature above 50°C/CNRM-CM6-1', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('56fb7c3a-7d9c-41d2-ab1d-37bab5544748', 'Days with average temperature above 50°C/CNRM-CM6-1', 'Days with average temperature above 50°C/CNRM-CM6-1', 'Days with average temperature above 50°C/CNRM-CM6-1', 'Days with average temperature above 50°C/CNRM-CM6-1', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('12a84609-f114-4975-a90a-aed809452897', 'Days with average temperature above 50°C/MIROC6', 'Days with average temperature above 50°C/MIROC6', 'Days with average temperature above 50°C/MIROC6', 'Days with average temperature above 50°C/MIROC6', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('12a84609-f114-4975-a90a-aed809452897', 'Days with average temperature above 50°C/MIROC6', 'Days with average temperature above 50°C/MIROC6', 'Days with average temperature above 50°C/MIROC6', 'Days with average temperature above 50°C/MIROC6', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('22ce6754-f68b-4f96-b083-8bb2a5c4deb6', 'Days with average temperature above 50°C/ESM1-2-LR', 'Days with average temperature above 50°C/ESM1-2-LR', 'Days with average temperature above 50°C/ESM1-2-LR', 'Days with average temperature above 50°C/ESM1-2-LR', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('22ce6754-f68b-4f96-b083-8bb2a5c4deb6', 'Days with average temperature above 50°C/ESM1-2-LR', 'Days with average temperature above 50°C/ESM1-2-LR', 'Days with average temperature above 50°C/ESM1-2-LR', 'Days with average temperature above 50°C/ESM1-2-LR', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('ec4c8b74-816a-4260-8321-fc03b6850c37', 'Days with average temperature above 50°C/NorESM2-MM', 'Days with average temperature above 50°C/NorESM2-MM', 'Days with average temperature above 50°C/NorESM2-MM', 'Days with average temperature above 50°C/NorESM2-MM', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('ec4c8b74-816a-4260-8321-fc03b6850c37', 'Days with average temperature above 50°C/NorESM2-MM', 'Days with average temperature above 50°C/NorESM2-MM', 'Days with average temperature above 50°C/NorESM2-MM', 'Days with average temperature above 50°C/NorESM2-MM', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('7f06ac9f-f6ac-467a-9a88-d14a91465141', 'Days with average temperature above 55°C/ACCESS-CM2', 'Days with average temperature above 55°C/ACCESS-CM2', 'Days with average temperature above 55°C/ACCESS-CM2', 'Days with average temperature above 55°C/ACCESS-CM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('7f06ac9f-f6ac-467a-9a88-d14a91465141', 'Days with average temperature above 55°C/ACCESS-CM2', 'Days with average temperature above 55°C/ACCESS-CM2', 'Days with average temperature above 55°C/ACCESS-CM2', 'Days with average temperature above 55°C/ACCESS-CM2', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('c9edfa0d-5450-4de5-8680-4a26874cac2d', 'Days with average temperature above 55°C/CMCC-ESM2', 'Days with average temperature above 55°C/CMCC-ESM2', 'Days with average temperature above 55°C/CMCC-ESM2', 'Days with average temperature above 55°C/CMCC-ESM2', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('c9edfa0d-5450-4de5-8680-4a26874cac2d', 'Days with average temperature above 55°C/CMCC-ESM2', 'Days with average temperature above 55°C/CMCC-ESM2', 'Days with average temperature above 55°C/CMCC-ESM2', 'Days with average temperature above 55°C/CMCC-ESM2', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('431a89ea-17bd-4dee-a2af-9ba18e737fe5', 'Days with average temperature above 55°C/CNRM-CM6-1', 'Days with average temperature above 55°C/CNRM-CM6-1', 'Days with average temperature above 55°C/CNRM-CM6-1', 'Days with average temperature above 55°C/CNRM-CM6-1', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('431a89ea-17bd-4dee-a2af-9ba18e737fe5', 'Days with average temperature above 55°C/CNRM-CM6-1', 'Days with average temperature above 55°C/CNRM-CM6-1', 'Days with average temperature above 55°C/CNRM-CM6-1', 'Days with average temperature above 55°C/CNRM-CM6-1', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('158038b5-1f09-471a-ac5b-85aae409148b', 'Days with average temperature above 55°C/MIROC6', 'Days with average temperature above 55°C/MIROC6', 'Days with average temperature above 55°C/MIROC6', 'Days with average temperature above 55°C/MIROC6', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('158038b5-1f09-471a-ac5b-85aae409148b', 'Days with average temperature above 55°C/MIROC6', 'Days with average temperature above 55°C/MIROC6', 'Days with average temperature above 55°C/MIROC6', 'Days with average temperature above 55°C/MIROC6', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('a5810ce7-eec7-4881-a182-33e0e3156a26', 'Days with average temperature above 55°C/ESM1-2-LR', 'Days with average temperature above 55°C/ESM1-2-LR', 'Days with average temperature above 55°C/ESM1-2-LR', 'Days with average temperature above 55°C/ESM1-2-LR', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('a5810ce7-eec7-4881-a182-33e0e3156a26', 'Days with average temperature above 55°C/ESM1-2-LR', 'Days with average temperature above 55°C/ESM1-2-LR', 'Days with average temperature above 55°C/ESM1-2-LR', 'Days with average temperature above 55°C/ESM1-2-LR', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard_indicator
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id)
 VALUES 
-	('41705043-bdad-4d2d-ab2b-3d884375b52d', 'Days with average temperature above 55°C/NorESM2-MM', 'Days with average temperature above 55°C/NorESM2-MM', 'Days with average temperature above 55°C/NorESM2-MM', 'Days with average temperature above 55°C/NorESM2-MM', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
+	('41705043-bdad-4d2d-ab2b-3d884375b52d', 'Days with average temperature above 55°C/NorESM2-MM', 'Days with average temperature above 55°C/NorESM2-MM', 'Days with average temperature above 55°C/NorESM2-MM', 'Days with average temperature above 55°C/NorESM2-MM', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1, NULL,'y','y',1,'2024-07-15T00:00:01Z', 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b')
 ;
 
 -- DATA IN ENGLISH ENDS
@@ -1228,114 +1225,114 @@ VALUES
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(10, 'Inconnu/Aucun selection', 'Inconnu/Aucun selection', 'Inconnu/Aucun selection', 'Inconnu/Aucun selection','key1=>value1_fr,key2=>value2_fr','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,-1, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(10, 'Inconnu/Aucun selection', 'Inconnu/Aucun selection', 'Inconnu/Aucun selection', 'Inconnu/Aucun selection','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,-1, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(11, 'Historique (avant 2014). Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'Historique (avant 2014)', 'Historique (avant 2014)', 'Historique (avant 2014)','key1=>value1_fr,key2=>value2_fr','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,0, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(11, 'Historique (avant 2014). Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'Historique (avant 2014)', 'Historique (avant 2014)', 'Historique (avant 2014)','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,0, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(12, 'SSP1-1,9 — émissions de GES en baisse dès 2025, zéro émission nette de CO2 avant 2050, émissions négatives ensuite. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP1-1,9', 'SSP1-1,9', 'SSP1-1,9','key1=>value1_fr,key2=>value2_fr','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,1, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(12, 'SSP1-1,9 — émissions de GES en baisse dès 2025, zéro émission nette de CO2 avant 2050, émissions négatives ensuite. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP1-1,9', 'SSP1-1,9', 'SSP1-1,9','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,1, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(13, 'SSP1-2,6 — similaire au précédent, mais le zéro émission nette de CO2 est atteint après 2050. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP1-2,6', 'SSP1-2,6', 'SSP1-2,6','key1=>value1_fr,key2=>value2_fr','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,2, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(13, 'SSP1-2,6 — similaire au précédent, mais le zéro émission nette de CO2 est atteint après 2050. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP1-2,6', 'SSP1-2,6', 'SSP1-2,6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,2, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(14, 'SSP2-4,5 — maintien des émissions courantes jusqu''en 2050, division par quatre d''ici 2100. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP2-4,5', 'SSP2-4,5', 'SSP2-4,5','key1=>value1_fr,key2=>value2_fr','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,3, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(14, 'SSP2-4,5 — maintien des émissions courantes jusqu''en 2050, division par quatre d''ici 2100. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP2-4,5', 'SSP2-4,5', 'SSP2-4,5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,3, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(15, 'SSP3-7,0 — doublement des émissions de GES en 2100. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP3-7,0', 'SSP3-7,0', 'SSP3-7,0','key1=>value1_fr,key2=>value2_fr','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,4, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(15, 'SSP3-7,0 — doublement des émissions de GES en 2100. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP3-7,0', 'SSP3-7,0', 'SSP3-7,0','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,4, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(16, 'SSP5-8,5 — émissions de GES en forte augmentation, doublement en 2050. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP5-8,5', 'SSP5-8,5', 'SSP5-8,5','key1=>value1_fr,key2=>value2_fr','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,5, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(16, 'SSP5-8,5 — émissions de GES en forte augmentation, doublement en 2050. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP5-8,5', 'SSP5-8,5', 'SSP5-8,5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,5, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(17, 'RCP2.6 - le scénario d''émissions faibles, nous présente un futur où nous limitons les changements climatiques d''origine humaine. Le maximum des émissions de carbone est atteint raposc_idement, suivi d''une réduction qui mène vers une valeur presque nulle bien avant la fin du siècle. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP2.6', 'RCP2.6', 'RCP2.6','key1=>value1_fr,key2=>value2_fr','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,6, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(17, 'RCP2.6 - le scénario d''émissions faibles, nous présente un futur où nous limitons les changements climatiques d''origine humaine. Le maximum des émissions de carbone est atteint raposc_idement, suivi d''une réduction qui mène vers une valeur presque nulle bien avant la fin du siècle. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP2.6', 'RCP2.6', 'RCP2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,6, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(18, 'RCP4.5 - un scénario d''émissions modérées, nous présente un futur où nous incluons des mesures pour limiter les changements climatiques d''origine humaine. Ce scénario exige que les émissions mondiales de carbone soient stabilisées d''ici la fin du siècle. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP4.5', 'RCP4.5', 'RCP4.5','key1=>value1_fr,key2=>value2_fr','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,7, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(18, 'RCP4.5 - un scénario d''émissions modérées, nous présente un futur où nous incluons des mesures pour limiter les changements climatiques d''origine humaine. Ce scénario exige que les émissions mondiales de carbone soient stabilisées d''ici la fin du siècle. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP4.5', 'RCP4.5', 'RCP4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,7, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(19, 'RCP6 -  Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP6', 'RCP6', 'RCP6','key1=>value1_fr,key2=>value2_fr','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,8, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(19, 'RCP6 -  Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP6', 'RCP6', 'RCP6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,8, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(20, 'RCP8.5 - le scénario d''émissions élevées, nous présente un futur où peu de restrictions aux émissions ont été mises en place. Les émissions continuent d''augmenter raposc_idement au cours de ce siècle, et se stabilisent seulement après 2250. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP8.5', 'RCP8.5', 'RCP8.5','key1=>value1_fr,key2=>value2_fr','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,9, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(20, 'RCP8.5 - le scénario d''émissions élevées, nous présente un futur où peu de restrictions aux émissions ont été mises en place. Les émissions continuent d''augmenter raposc_idement au cours de ce siècle, et se stabilisent seulement après 2250. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP8.5', 'RCP8.5', 'RCP8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,9, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 -- DATA IN FRENCH ENDS
 -- DATA IN SPANISH BEGINS
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(21, 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado','key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,-1, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(21, 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,-1, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(22, 'Histórico (antes 2014). Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'Histórico (antes 2014)', 'Histórico (antes 2014)', 'Histórico (antes 2014)','key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,0, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(22, 'Histórico (antes 2014). Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'Histórico (antes 2014)', 'Histórico (antes 2014)', 'Histórico (antes 2014)','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,0, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(23, 'SSP1-1.9 — Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP1-1,9', 'SSP1-1,9', 'SSP1-1,9','key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,1, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(23, 'SSP1-1.9 — Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP1-1,9', 'SSP1-1,9', 'SSP1-1,9','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,1, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(24, 'SSP1-2.6 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP1-2.6', 'SSP1-2.6', 'SSP1-2.6','key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,2, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(24, 'SSP1-2.6 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP1-2.6', 'SSP1-2.6', 'SSP1-2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,2, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(25, 'SSP2-4.5 Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP2-4.5', 'SSP2-4.5', 'SSP2-4.5','key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,3, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(25, 'SSP2-4.5 Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP2-4.5', 'SSP2-4.5', 'SSP2-4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,3, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(26, 'SSP3-7.0 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP3-7.0', 'SSP3-7.0', 'SSP3-7.0','key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,4, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(26, 'SSP3-7.0 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP3-7.0', 'SSP3-7.0', 'SSP3-7.0','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,4, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(27, 'SSP5-8.5 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP5-8.5', 'SSP5-8.5', 'SSP5-8.5','key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,5, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(27, 'SSP5-8.5 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP5-8.5', 'SSP5-8.5', 'SSP5-8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,5, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(28, 'RCP2.6 Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP2.6', 'RCP2.6', 'RCP2.6','key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,6, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(28, 'RCP2.6 Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP2.6', 'RCP2.6', 'RCP2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,6, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(29, 'RCP4.5 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP4.5', 'RCP4.5', 'RCP4.5','key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,7, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(29, 'RCP4.5 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP4.5', 'RCP4.5', 'RCP4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,7, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(30, 'RCP6 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP6', 'RCP6', 'RCP6','key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,8, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(30, 'RCP6 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP6', 'RCP6', 'RCP6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,8, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(31, 'RCP8.5 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP8.5', 'RCP8.5', 'RCP8.5','key1=>value1_es,key2=>value2_es','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,9, 'y','y', 1,'2024-07-15T00:00:01Z')
+	(31, 'RCP8.5 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP8.5', 'RCP8.5', 'RCP8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,9, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 
 -- DATA IN SPANISH ENDS
@@ -1346,150 +1343,150 @@ VALUES
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_class
 	(osc_id, osc_abbreviation, osc_name, osc_slug, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('db4a14a2-a27b-4bb0-8249-a07fb78438f4', 'Residential','Residential Buildings','asset-class-residential', 'Residential Buildings', 'Homes, apartments, and other residential structures.', 'Homes, apartments, and other residential structures.', 'naics=>53,oed:occupancy:oed_code=>1050,oed:occupancy:air_code=>301','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('db4a14a2-a27b-4bb0-8249-a07fb78438f4', 'Residential','Residential Buildings','en-asset-class-residential', 'Residential Buildings', 'Homes, apartments, and other residential structures.', 'Homes, apartments, and other residential structures.', '{"naics":[53],"oed:occupancy:oed_code":1050,"oed:occupancy:air_code":301}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_class
 	(osc_id, osc_abbreviation, osc_name, osc_slug, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('536e8cee-682f-4cd6-b23e-b32e885cc094', 'Commercial', 'Commercial Buildings','asset-class-commercial', 'Commercial Buildings', 'Offices, retail spaces, and other commercial properties.', 'Offices, retail spaces, and other commercial properties.', 'naics=>44|45|49,oed:occupancy:oed_code=>1100,oed:occupancy:air_code=>311','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('536e8cee-682f-4cd6-b23e-b32e885cc094', 'Commercial', 'Commercial Buildings','en-asset-class-commercial', 'Commercial Buildings', 'Offices, retail spaces, and other commercial properties.', 'Offices, retail spaces, and other commercial properties.', '{"naics":[44,45,49],"oed:occupancy:oed_code":1100,"oed:occupancy:air_code":311}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_class
 	(osc_id, osc_abbreviation, osc_name, osc_slug, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('f2baa602-44fe-49be-a5c9-d8b8208d9499', 'Infra','Infrastructure','asset-class-infrastructure', 'Infrastructure', 'Roads, bridges, railways, airports, ports, and utilities (water, electricity, telecommunications).', 'Roads, bridges, railways, airports, ports, and utilities (water, electricity, telecommunications).', 'oed:occupancy:oed_code=>1256,oed:occupancy:oed_code=>1305','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('f2baa602-44fe-49be-a5c9-d8b8208d9499', 'Infra','Infrastructure','en-asset-class-infrastructure', 'Infrastructure', 'Roads, bridges, railways, airports, ports, and utilities (water, electricity, telecommunications).', 'Roads, bridges, railways, airports, ports, and utilities (water, electricity, telecommunications).', '{"oed:occupancy:oed_code":1256,"oed:occupancy:oed_code":1305}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_class
 	(osc_id, osc_abbreviation, osc_name, osc_slug, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('a9da716f-6667-4efe-bac7-f91c1cdcc2f1', 'Agri','Agricultural Assets','asset-class-agricultural', 'Agricultural Assets', 'Cropland, livestock, agricultural facilities, and equipment.', 'Cropland, livestock, agricultural facilities, and equipment.', 'oed:occupancy:oed_code=>2700,oed:occupancy:air_code=>484','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('a9da716f-6667-4efe-bac7-f91c1cdcc2f1', 'Agri','Agricultural Assets','en-asset-class-agricultural', 'Agricultural Assets', 'Cropland, livestock, agricultural facilities, and equipment.', 'Cropland, livestock, agricultural facilities, and equipment.', '{"oed:occupancy:oed_code":2700,"oed:occupancy:air_code":484}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_class
 	(osc_id, osc_abbreviation, osc_name, osc_slug, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('1ad910c8-fba0-4f45-845e-5a1901b9ffbe', 'Industrial','Industrial Facilities', 'asset-class-industrial','Industrial Facilities', 'Factories, warehouses, and other industrial properties.', 'Factories, warehouses, and other industrial properties.', 'oed:occupancy:oed_code=>1150,oed:occupancy:air_code=>321','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('1ad910c8-fba0-4f45-845e-5a1901b9ffbe', 'Industrial','Industrial Facilities', 'en-asset-class-industrial','Industrial Facilities', 'Factories, warehouses, and other industrial properties.', 'Factories, warehouses, and other industrial properties.', '{"oed:occupancy:oed_code":1150,"oed:occupancy:air_code":321}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_class
 	(osc_id, osc_abbreviation, osc_name, osc_slug, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('2b5557e6-05ee-49d6-b6a6-b7ef54948af7', 'Natural','Natural Assets', 'asset-class-natural','Natural Assets', 'Forests, wetlands, rivers, and other natural environments.', 'Forests, wetlands, rivers, and other natural environments.', 'oed:occupancy:oed_code=>1000,oed:occupancy:air_code=>300','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('2b5557e6-05ee-49d6-b6a6-b7ef54948af7', 'Natural','Natural Assets', 'en-asset-class-natural','Natural Assets', 'Forests, wetlands, rivers, and other natural environments.', 'Forests, wetlands, rivers, and other natural environments.', '{"oed:occupancy:oed_code":1000,"oed:occupancy:air_code":300}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_class
 	(osc_id, osc_abbreviation, osc_name, osc_slug, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	('beafc1fa-f6c8-4c72-9717-a243eea1a2ef', 'Cultural','Cultural Heritage Sites', 'asset-class-cultural','Cultural Heritage Sites', 'Historical buildings, monuments, and sites of cultural significance.', 'Historical buildings, monuments, and sites of cultural significance.', 'oed:occupancy:oed_code=>1000,oed:occupancy:air_code=>300','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
+	('beafc1fa-f6c8-4c72-9717-a243eea1a2ef', 'Cultural','Cultural Heritage Sites', 'en-asset-class-cultural','Cultural Heritage Sites', 'Historical buildings, monuments, and sites of cultural significance.', 'Historical buildings, monuments, and sites of cultural significance.', '{"oed:occupancy:oed_code":1000,"oed:occupancy:air_code":300}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z');
 
 
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('fa3d647a-4ab8-494a-b68e-6abf48404462', 'Single-family Homes', 'Single-family Homes', 'Single-family Homes', 'Single-family Homes', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','db4a14a2-a27b-4bb0-8249-a07fb78438f4');
+	('fa3d647a-4ab8-494a-b68e-6abf48404462', 'Single-family Homes', 'Single-family Homes', 'Single-family Homes', 'Single-family Homes', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','db4a14a2-a27b-4bb0-8249-a07fb78438f4');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('d1317024-2a21-4c89-8e7c-8609798dcc09', 'Multi-family apartments', 'Multi-family apartments', 'Multi-family apartments', 'Multi-family apartments', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','db4a14a2-a27b-4bb0-8249-a07fb78438f4');
+	('d1317024-2a21-4c89-8e7c-8609798dcc09', 'Multi-family apartments', 'Multi-family apartments', 'Multi-family apartments', 'Multi-family apartments', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','db4a14a2-a27b-4bb0-8249-a07fb78438f4');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('6ba2fda4-c6a7-4142-9e63-19948fe385f3', 'High-rise residential buildings', 'High-rise residential buildings', 'High-rise residential buildings', 'High-rise residential buildings', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','db4a14a2-a27b-4bb0-8249-a07fb78438f4');
+	('6ba2fda4-c6a7-4142-9e63-19948fe385f3', 'High-rise residential buildings', 'High-rise residential buildings', 'High-rise residential buildings', 'High-rise residential buildings', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','db4a14a2-a27b-4bb0-8249-a07fb78438f4');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('85246f30-e622-4af9-af86-16b23e8671a7', 'Retail Stores', 'Retail Stores', 'Retail Stores', 'Retail Stores', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','536e8cee-682f-4cd6-b23e-b32e885cc094');
+	('85246f30-e622-4af9-af86-16b23e8671a7', 'Retail Stores', 'Retail Stores', 'Retail Stores', 'Retail Stores', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','536e8cee-682f-4cd6-b23e-b32e885cc094');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('e9d9c1d6-915b-4450-ae2e-9fb2ad624478', 'Office buildings', 'Office buildings', 'Office buildings', 'Office buildings', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','536e8cee-682f-4cd6-b23e-b32e885cc094');
+	('e9d9c1d6-915b-4450-ae2e-9fb2ad624478', 'Office buildings', 'Office buildings', 'Office buildings', 'Office buildings', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','536e8cee-682f-4cd6-b23e-b32e885cc094');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('f403566e-04eb-47aa-8327-ce6a43220867', 'Hotels and hospitality facilities', 'Hotels and hospitality facilities', 'Hotels and hospitality facilities', 'Hotels and hospitality facilities', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','536e8cee-682f-4cd6-b23e-b32e885cc094');
+	('f403566e-04eb-47aa-8327-ce6a43220867', 'Hotels and hospitality facilities', 'Hotels and hospitality facilities', 'Hotels and hospitality facilities', 'Hotels and hospitality facilities', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','536e8cee-682f-4cd6-b23e-b32e885cc094');
 
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('ce606ca8-8f4c-429b-bdea-da87ed28087e', 'Highways', 'Highways', 'Highways', 'Highways', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
+	('ce606ca8-8f4c-429b-bdea-da87ed28087e', 'Highways', 'Highways', 'Highways', 'Highways', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('20265e12-495b-46ee-af68-246216f0dacb', 'Bridges', 'Bridges', 'Bridges', 'Bridges', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
+	('20265e12-495b-46ee-af68-246216f0dacb', 'Bridges', 'Bridges', 'Bridges', 'Bridges', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('64d4ffe2-e8b2-480d-9234-da51e53661d1', 'Railroads', 'Railroads', 'Railroads', 'Railroads', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
+	('64d4ffe2-e8b2-480d-9234-da51e53661d1', 'Railroads', 'Railroads', 'Railroads', 'Railroads', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('3a568df0-cf71-4598-9bc7-2fb5997fb30d', 'Power transmission lines', 'Power transmission lines', 'Power transmission lines', 'Power transmission lines', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
+	('3a568df0-cf71-4598-9bc7-2fb5997fb30d', 'Power transmission lines', 'Power transmission lines', 'Power transmission lines', 'Power transmission lines', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('c7431f81-f1a7-42ca-90bd-6f43defe7931', 'Water treatment plants', 'Water treatment plants', 'Water treatment plants', 'Water treatment plants', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
+	('c7431f81-f1a7-42ca-90bd-6f43defe7931', 'Water treatment plants', 'Water treatment plants', 'Water treatment plants', 'Water treatment plants', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','f2baa602-44fe-49be-a5c9-d8b8208d9499');
 
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('34ec5bde-96dc-4f50-86f4-71bef7f2271a', 'Irrigated cropland', 'Irrigated cropland', 'Irrigated cropland', 'Irrigated cropland', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','a9da716f-6667-4efe-bac7-f91c1cdcc2f1');
+	('34ec5bde-96dc-4f50-86f4-71bef7f2271a', 'Irrigated cropland', 'Irrigated cropland', 'Irrigated cropland', 'Irrigated cropland', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','a9da716f-6667-4efe-bac7-f91c1cdcc2f1');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('9115c6ec-776f-45c2-a74b-010f7a21355c', 'Non-irrigated cropland', 'Non-irrigated cropland', 'Non-irrigated cropland', 'Non-irrigated cropland', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','a9da716f-6667-4efe-bac7-f91c1cdcc2f1');
+	('9115c6ec-776f-45c2-a74b-010f7a21355c', 'Non-irrigated cropland', 'Non-irrigated cropland', 'Non-irrigated cropland', 'Non-irrigated cropland', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','a9da716f-6667-4efe-bac7-f91c1cdcc2f1');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('076c1110-a9e8-435c-994e-499bed18bc11', 'Livestock farms', 'Livestock farms', 'Livestock farms', 'Livestock farms', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','a9da716f-6667-4efe-bac7-f91c1cdcc2f1');
+	('076c1110-a9e8-435c-994e-499bed18bc11', 'Livestock farms', 'Livestock farms', 'Livestock farms', 'Livestock farms', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','a9da716f-6667-4efe-bac7-f91c1cdcc2f1');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('8135bb62-54e7-4eb4-ad76-5b2b8e08c02e', 'Greenhouses', 'Greenhouses', 'Greenhouses', 'Greenhouses', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','a9da716f-6667-4efe-bac7-f91c1cdcc2f1');
+	('8135bb62-54e7-4eb4-ad76-5b2b8e08c02e', 'Greenhouses', 'Greenhouses', 'Greenhouses', 'Greenhouses', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','a9da716f-6667-4efe-bac7-f91c1cdcc2f1');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('8bd9e90c-cfa9-404e-ad02-c3e53fad0210', 'Manufacturing plants', 'Manufacturing plants', 'Manufacturing plants', 'Manufacturing plants', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','1ad910c8-fba0-4f45-845e-5a1901b9ffbe');
+	('8bd9e90c-cfa9-404e-ad02-c3e53fad0210', 'Manufacturing plants', 'Manufacturing plants', 'Manufacturing plants', 'Manufacturing plants', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','1ad910c8-fba0-4f45-845e-5a1901b9ffbe');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('b5c703ea-336e-4a97-8883-971f1a275b69', 'Storage warehouses', 'Storage warehouses', 'Storage warehouses', 'Storage warehouses', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','1ad910c8-fba0-4f45-845e-5a1901b9ffbe');
+	('b5c703ea-336e-4a97-8883-971f1a275b69', 'Storage warehouses', 'Storage warehouses', 'Storage warehouses', 'Storage warehouses', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','1ad910c8-fba0-4f45-845e-5a1901b9ffbe');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('94face63-24ef-46ef-ac13-7565c7d81789', 'Chemical processing facilities', 'Chemical processing facilities', 'Chemical processing facilities', 'Chemical processing facilities', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','1ad910c8-fba0-4f45-845e-5a1901b9ffbe');
+	('94face63-24ef-46ef-ac13-7565c7d81789', 'Chemical processing facilities', 'Chemical processing facilities', 'Chemical processing facilities', 'Chemical processing facilities', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','1ad910c8-fba0-4f45-845e-5a1901b9ffbe');
 
 
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('7eb31e49-883b-4c0d-9464-404fc49b8eaa', 'Forest ecosystems', 'Forest ecosystems', 'Forest ecosystems', 'Forest ecosystems', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','2b5557e6-05ee-49d6-b6a6-b7ef54948af7');
+	('7eb31e49-883b-4c0d-9464-404fc49b8eaa', 'Forest ecosystems', 'Forest ecosystems', 'Forest ecosystems', 'Forest ecosystems', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','2b5557e6-05ee-49d6-b6a6-b7ef54948af7');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('ae7851b9-123f-4ab6-8d26-594c88e2a6f5', 'River basins', 'River basins', 'River basins', 'River basins', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','2b5557e6-05ee-49d6-b6a6-b7ef54948af7');
+	('ae7851b9-123f-4ab6-8d26-594c88e2a6f5', 'River basins', 'River basins', 'River basins', 'River basins', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','2b5557e6-05ee-49d6-b6a6-b7ef54948af7');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('ef7cbcbc-adec-462f-84e6-d49de80fb882', 'Coastal wetlands', 'Coastal wetlands', 'Coastal wetlands', 'Coastal wetlands', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','2b5557e6-05ee-49d6-b6a6-b7ef54948af7');
+	('ef7cbcbc-adec-462f-84e6-d49de80fb882', 'Coastal wetlands', 'Coastal wetlands', 'Coastal wetlands', 'Coastal wetlands', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','2b5557e6-05ee-49d6-b6a6-b7ef54948af7');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('27628236-0486-4816-9487-dd9d9ccc9c5d', 'Historic buildings', 'Historic buildings', 'Historic buildings', 'Historic buildings', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','beafc1fa-f6c8-4c72-9717-a243eea1a2ef');
+	('27628236-0486-4816-9487-dd9d9ccc9c5d', 'Historic buildings', 'Historic buildings', 'Historic buildings', 'Historic buildings', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','beafc1fa-f6c8-4c72-9717-a243eea1a2ef');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('82a14f2d-4db9-4df4-b62b-11b4aa157ebf', 'Archaeological Sites', 'Archaeological Sites', 'Archaeological Sites', 'Archaeological Sites', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','beafc1fa-f6c8-4c72-9717-a243eea1a2ef');
+	('82a14f2d-4db9-4df4-b62b-11b4aa157ebf', 'Archaeological Sites', 'Archaeological Sites', 'Archaeological Sites', 'Archaeological Sites', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','beafc1fa-f6c8-4c72-9717-a243eea1a2ef');
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published,osc_asset_class_id)
 VALUES 
-	('bdea3237-f764-4907-98cd-e0d131e099c5', 'Museums', 'Museums', 'Museums', 'Museums', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','beafc1fa-f6c8-4c72-9717-a243eea1a2ef');
+	('bdea3237-f764-4907-98cd-e0d131e099c5', 'Museums', 'Museums', 'Museums', 'Museums', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y',1,'2024-07-25T00:00:01Z','beafc1fa-f6c8-4c72-9717-a243eea1a2ef');
 
 
 
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.portfolio
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_tenant_id, osc_is_published, osc_publisher_id, osc_datetime_published, value_total, value_currency_alphabetic_code)
 VALUES 
-	('07c629be-42c6-4dbe-bd56-83e64253368d', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', '','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z', 12345678.90, 'USD');
+	('07c629be-42c6-4dbe-bd56-83e64253368d', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z', 12345678.90, 'USD');
 
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_realestate
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active,osc_tenant_id, osc_is_published, osc_publisher_id, osc_datetime_published, osc_portfolio_id, geo_location_name, geo_location_coordinates, geo_overture_features, geo_h3_index, geo_h3_resolution, osc_asset_type_id, osc_owner_bloomberg_id, osc_owner_lei_id, value_total, value_currency_alphabetic_code, value_ltv)
 VALUES 
-	('281d68cc-ffd3-4740-acd6-1ea23bce902f', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'naics=>531111,oed:occupancy:oed_code=>1050,oed:occupancy:air_code=>301','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, '85246f30-e622-4af9-af86-16b23e8671a7', 'BBG000BLNQ16', '', 12345678.90, 'USD','{LTV value ratio}')
+	('281d68cc-ffd3-4740-acd6-1ea23bce902f', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', '{"naics":[531111],"oed:occupancy:oed_code":1050,"oed:occupancy:air_code":301}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, '85246f30-e622-4af9-af86-16b23e8671a7', 'BBG000BLNQ16', '', 12345678.90, 'USD','{LTV value ratio}')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_powergeneratingutility
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_tenant_id, osc_is_published, osc_publisher_id, osc_datetime_published, osc_portfolio_id, geo_location_name, geo_location_coordinates, geo_overture_features, geo_h3_index, geo_h3_resolution,osc_asset_type_id,  osc_owner_bloomberg_id, osc_owner_lei_id, value_total, value_currency_alphabetic_code, production, capacity, availability_rate)
 VALUES 
-	('78cb5382-5e4f-4762-b2e8-7cb33954f788', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'naics=>22111,oed:occupancy:oed_code=>1300,oed:occupancy:air_code=>361','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, '3a568df0-cf71-4598-9bc7-2fb5997fb30d', 'BBG000BLNQ16', '', 12345678.90, 'USD', 12345.0,100.00,95.00)
+	('78cb5382-5e4f-4762-b2e8-7cb33954f788', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', '{"naics":[22111],"oed:occupancy:oed_code":1300,"oed:occupancy:air_code":361}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, '3a568df0-cf71-4598-9bc7-2fb5997fb30d', 'BBG000BLNQ16', '', 12345678.90, 'USD', 12345.0,100.00,95.00)
 ;
 
 
@@ -1497,7 +1494,7 @@ VALUES
 INSERT INTO osc_physrisk.osc_physrisk_core_impacts.geolocated_precalculated_impact
 	(osc_id, osc_name, osc_name_display, osc_abbreviation, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_tenant_id,osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id, osc_scenario_id, osc_scenario_year, analysis_data_source, geo_location_name, geo_location_address, geo_location_coordinates, geo_overture_features, geo_h3_index, geo_h3_resolution, is_impacted, is_historic_impact, historic_impact_started, historic_impact_ended, impact_data_raw)
 VALUES 
-	('3bbb4a0e-f719-4e78-864b-3962e7f9e3a4', 'Example stored precalculated impact damage curve for Utility', 'Example stored precalculated impact damage curve for Utility', NULL, 'Example stored precalculated impact damage curve for Utility','Example stored precalculated impact damage curve for Utility', 'key1=>value1_en,key2=>value2_en','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL,'y', 1,'y',1,'2024-07-15T00:00:01Z','63ed7943-c4c4-43ea-abd2-86bb1997a094', 3, 2040, 'WRI Data', '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, 'y', 'n',NULL ,NULL , '{
+	('3bbb4a0e-f719-4e78-864b-3962e7f9e3a4', 'Example stored precalculated impact damage curve for Utility', 'Example stored precalculated impact damage curve for Utility', NULL, 'Example stored precalculated impact damage curve for Utility','Example stored precalculated impact damage curve for Utility', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL,'y', 1,'y',1,'2024-07-15T00:00:01Z','63ed7943-c4c4-43ea-abd2-86bb1997a094', 3, 2040, 'WRI Data', '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, 'y', 'n',NULL ,NULL , '{
     "items": [
         {
             "asset_type": "Steam/OnceThrough",
@@ -1909,15 +1906,18 @@ INNER JOIN osc_physrisk.osc_physrisk_core_scenarios.scenario b ON a.osc_id = b.o
 WHERE b.osc_culture='es'  ;
 
 -- QUERY BY osc_tags EXAMPLE: FIND ASSETS WITH A CERTAIN NAICS OR OED OCCUPANCY VALUE (SHOWS HOW TO SUPPORT MULTIPLE STANDARDS)
-SELECT a.osc_name,  a.osc_description_full, a.osc_tags, b.osc_name as asset_class FROM osc_physrisk.osc_physrisk_core_assets.generic_asset a INNER JOIN osc_physrisk.osc_physrisk_core_assets.asset_class b ON a.osc_id = b.osc_id
-WHERE a.osc_tags -> 'naics'='22111' OR a.osc_tags -> 'oed:occupancy:oed_code'='1300' OR a.osc_tags -> 'oed:occupancy:air_code'='361' ;
+SELECT a.osc_name,  a.osc_description_full, a.osc_tags, b.osc_name as asset_class FROM osc_physrisk.osc_physrisk_core_assets.asset_powergeneratingutility a INNER JOIN osc_physrisk.osc_physrisk_core_assets.asset_class b ON a.osc_id = b.osc_id
+--WHERE a.osc_tags -> 'naics'='22111' OR a.osc_tags -> 'oed:occupancy:oed_code'='1300' OR a.osc_tags -> 'oed:occupancy:air_code'='361' 
+;
 
-SELECT a.osc_name,  a.osc_description_full, a.osc_tags, b.osc_name as asset_class FROM osc_physrisk.osc_physrisk_core_assets.generic_asset a INNER JOIN osc_physrisk.osc_physrisk_core_assets.asset_class b ON a.osc_id = b.osc_id
-WHERE a.osc_tags -> 'naics' LIKE '53%'  ;
+SELECT a.osc_name,  a.osc_description_full, a.osc_tags, b.osc_name as asset_class FROM osc_physrisk.osc_physrisk_core_assets.asset_powergeneratingutility a INNER JOIN osc_physrisk.osc_physrisk_core_assets.asset_class b ON a.osc_id = b.osc_id
+WHERE a.osc_tags -> 'naics' =  '53'
+ ;
 
 -- QUERY BY osc_tags EXAMPLE: FIND SCENARIOS WITH CERTAIN osc_tags
 SELECT a.osc_name,  a.osc_description_full, a.osc_tags FROM osc_physrisk.osc_physrisk_core_scenarios.scenario a
-WHERE a.osc_tags -> 'key1'='value1_en' OR a.osc_tags -> 'key2'='value4_en'  ;
+WHERE a.osc_tags -> 'key1'='"value1"' OR a.osc_tags -> 'key2'='"value4"'  
+;
 
 -- SHOW IMPACT ANALYSIS EXAMPLE (CURRENTLY EMPTY - TODO MISSING TEST DATA)
 SELECT	* FROM	osc_physrisk.osc_physrisk_financial.portfolio_impact;
@@ -1951,8 +1951,8 @@ WHERE haz.osc_id = 'd08db675-ee1e-48fe-b9e1-b0da27de8f2b'
 
 -- SELECT DIFFERENT ASSET TYPES
 SELECT b.osc_name as "Asset Class", a.osc_name as "Asset Type", a.osc_description_full as "Asset Type Description", b.osc_tags as "Asset Class Tags", a.osc_tags as "Asset Type Tags" FROM osc_physrisk_core_assets.asset_type a INNER JOIN osc_physrisk_core_assets.asset_class b ON a.osc_asset_class_id = b.osc_id
---WHERE b.osc_tags -> 'naics' LIKE '%12%'
---WHERE b.osc_tags -> 'oed:occupancy:oed_code' LIKE '%1%'
+WHERE b.osc_tags -> 'naics' @>  '45'
+--WHERE b.osc_tags ->> 'oed:occupancy:oed_code' = '1100'
 ORDER BY b.osc_name ASC
 ;
 
