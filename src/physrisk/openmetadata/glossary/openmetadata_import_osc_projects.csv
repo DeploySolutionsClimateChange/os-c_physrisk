@@ -1,0 +1,35 @@
+parent,name*,displayName,description,synonyms,relatedTerms,references,tags,reviewers,owner,status
+,osc-project-data-bazaar,Geospatial Data Bazaar,Geospatial Data Bazaar,,,,,,user;admin,Approved
+,osc-project-data-commons,Data Commons,"Data Commons Platform
+Data Extraction & Entity Matching Tooling
+
+OS-C's focus is factors identified by asset owners, asset managers, banks, and regulators as priorities from among SASB, TCFD, CDSB, GRI, and CDP as highly material.
+
+[Learn more at OS-Climate.org](https://os-climate.org/data-commons/)",Data Commons,,,,,user;admin,Approved
+,osc-project-pcaf,PCAF (Partnership for Carbon Accounting Financials),"Partnership for Carbon Accounting Financials (PCAF)
+
+What is it?
+* PCAF defined Scope 1, Scope 2 and Scope 3 carbon emissions for Sovereigns in analogy to the GHG Protocol's definition for Community-Scale Greenhouse Gas Inventories (Cities).
+* Linux Foundation's OS-Climate publicly released as open source the Carbon Footprint Datasets for Sovereign Bonds, consistent with the 2nd version of the Global GHG Accounting and Reporting Standard for the Financial Industry, a methodology published by the Partnership for Carbon Accounting Financials (PCAF) on 14-Dec.
+* The Partnership for Carbon Accounting Financials (PCAF) is a global partnership of financial institutions that work together to develop and implement a harmonized approach to assess and disclose the greenhouse gas (GHG) emissions associated with their loans and investments.
+* The sovereign footprint datasets, now available as a public good without restriction, include production and consumption emissions as well as intensity measures by country. Currently, the calculated data is available with history from 1990 until 2020/21. Investors around the globe can download the data and include it into their Scope 3 category 15 reporting.
+*  The rapid release of these datasets demonstrates that Open-Source best practices foster innovation and speed to delivery and how OS-C was an early mover in this space.
+
+[View the project readme on OS-Climate GitHub...](https://github.com/os-climate/OS-Climate-Community-Hub/blob/main/PCAF_RM.md#pcaf-sovereign-footprint-calculations-private-repos-q4-2022)",,,,,,user;admin,Approved
+,osc-project-phys-risk,Physical Risk & Resilience,"This project provides methodology, tools, and support for assessing the physical effects of climate change on physical assets under management, ideally leading to better monitoring and assessments, more informed decision-making, and improved resilience.
+
+An introduction and methodology is available [here](https://github.com/os-climate/physrisk/blob/main/methodology/PhysicalRiskMethodology.pdf).
+
+Physrisk is primarily designed to run 'bottom-up' calculations that model the impact of climate hazards on large numbers of individual assets (including natural) and operations. These calculations can be used to assess financial risks or socio-economic impacts. 
+
+To do this physrisk collects:
+* hazard indicators
+*  models of vulnerability of assets/operations to hazards.
+
+Hazard indicators are on-boarded from public resources or inferred from climate projections, e.g. from CMIP or CORDEX data sets. Indicators are created from code in the hazard repo to make calculations as transparent as possible.
+
+Physrisk is also designed to be a hosted, e.g. to provide on-demand calculations. physrisk-api and physrisk-ui provide an example API and user interface. A development version of the UI is hosted by OS-Climate. 
+
+[Learn more](https://github.com/os-climate/OS-Climate-Community-Hub/blob/main/PhysicalRiskRM.md#physical-risk--resilience) on OS-Climate's GitHub repository.",,,,,,user;admin,Approved
+,osc-project-portfolio-alignment,Portfolio Alignment Tools,Portfolio Alignment Tools,,,,,,user;admin,Approved
+,osc-project-transition-analysis,Transition Analysis,Transition Analysis,,,,,,user;admin,Approved

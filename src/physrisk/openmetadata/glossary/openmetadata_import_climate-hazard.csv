@@ -1,0 +1,12 @@
+parent,name*,displayName,description,synonyms,relatedTerms,references,tags,reviewers,owner,status
+,climate-hazard-type-chronic-heat,Chronic Heat,Chronic Heat,,,,,,user;admin,Approved
+,climate-hazard-type-drought,Drought,Drought,,,,,,user;admin,Approved
+,climate-hazard-type-fire,Fire,Fire,,,,,,user;admin,Approved
+,climate-hazard-type-hail,Hail,Hail,,,,,,user;admin,Approved
+,climate-hazard-type-inundation-coastal,Coastal Inundation,Coastal Inundation,,,,,,user;admin,Approved
+,climate-hazard-type-inundation-combined,Combined Inundation,Combined Inundation,,,,,,user;admin,Approved
+,climate-hazard-type-inundation-riverine,Riverine Inundation,Riverine Inundation,,,,,,user;admin,Approved
+,climate-hazard-type-precipitation,Precipitation,Precipitation,,,,,,user;admin,Approved
+,climate-hazard-type-water-risk,Water Risk,Water Risk,,,,,,user;admin,Approved
+,climate-hazard-type-wind,Wind,Wind,,,,,,user;admin,Approved
+,climate-hazard-type-subsidence,Subsidence,Subsidence,,,,,,user;admin,Approved

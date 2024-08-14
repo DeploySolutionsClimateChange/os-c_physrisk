@@ -1,0 +1,25 @@
+parent,name*,displayName,description,synonyms,relatedTerms,references,tags,reviewers,owner,status
+,asset-type-residential-single-family,Single-family Homes,Single-family Homes,,,,,,user;admin,Approved
+,asset-type-residential-multi-family,Multi-family apartments,Multi-family apartments,,,,,,user;admin,Approved
+,asset-type-residential-hirise,High-rise residential buildings,High-rise residential buildings,,,,,,user;admin,Approved
+,asset-type-commercial-retail-stores,Retail Stores,Retail Stores,,,,,,user;admin,Approved
+,asset-type-commercial-office,Office buildings,Office buildings,,,,,,user;admin,Approved
+,asset-type-commercial-hotels-hospitality,Hotels and hospitality facilities,Hotels and hospitality facilities,,,,,,user;admin,Approved
+,asset-type-infra-highways,Highways,Highways,,,,,,user;admin,Approved
+,asset-type-infra-bridges,Bridges,Bridges,,,,,,user;admin,Approved
+,asset-type-infra-railroads,Railroads,Railroads,,,,,,user;admin,Approved
+,asset-type-industrial-power,Power transmission lines,Power transmission lines,,,,,,user;admin,Approved
+,asset-type-industrial-water,Water treatment plants,Water treatment plants,,,,,,user;admin,Approved
+,asset-type-agricultural-crops-irrigated,Irrigated cropland,Irrigated cropland,,,,,,user;admin,Approved
+,asset-type-agricultural-crops-nonirrigated,Non-irrigated cropland,Non-irrigated cropland,,,,,,user;admin,Approved
+,asset-type-agricultural-livestock,Livestock farms,Livestock farms,,,,,,user;admin,Approved
+,asset-type-agricultural-greenhouse,Greenhouses,Greenhouses,,,,,,user;admin,Approved
+,asset-type-industrial-manufacturing-plant,Manufacturing plants,Manufacturing plants,,,,,,user;admin,Approved
+,asset-type-industrial-storage,Storage warehouses,Storage warehouses,,,,,,user;admin,Approved
+,asset-type-industrial-chemical-processing,Chemical processing facilities,Chemical processing facilities,,,,,,user;admin,Approved
+,asset-type-nature-forest,Forest ecosystems,Forest ecosystems,,,,,,user;admin,Approved
+,asset-type-nature-river,River basins,River basins,,,,,,user;admin,Approved
+,asset-type-nature-coastal-wetlands,Coastal wetlands,Coastal wetlands,,,,,,user;admin,Approved
+,asset-type-cultural-historic,Historic buildings,Historic buildings,,,,,,user;admin,Approved
+,asset-type-cultural-archaeological,Archaeological Sites,Archaeological Sites,,,,,,user;admin,Approved
+,asset-type-cultural-museums,Museums,Museums,,,,,,user;admin,Approved

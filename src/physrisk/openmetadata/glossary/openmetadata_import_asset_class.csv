@@ -1,0 +1,8 @@
+parent,name*,displayName,description,synonyms,relatedTerms,references,tags,reviewers,owner,status
+,asset-class-residential,Residential Buildings,"Homes, apartments, and other residential structures.",,,,,,user;admin,Approved
+,asset-class-commercial,Commercial Buildings,"Offices, retail spaces, and other commercial properties.",,,,,,user;admin,Approved
+,asset-class-infrastructure,Infrastructure,"Roads, bridges, railways, airports, ports, and utilities (water, electricity, telecommunications)",,,,,,user;admin,Approved
+,asset-class-agricultural,Agricultural Assets,"Cropland, livestock, agricultural facilities, and equipment.",,,,,,user;admin,Approved
+,asset-class-industrial,Industrial Facilities,"Factories, warehouses, and other industrial properties.",,,,,,user;admin,Approved
+,asset-class-natural,Natural Assets,"Forests, wetlands, rivers, and other natural environments.",,,,,,user;admin,Approved
+,asset-class-infra-cultural,Cultural Heritage Sites,"Historical buildings, monuments, and sites of cultural significance.",,,,,,user;admin,Approved
