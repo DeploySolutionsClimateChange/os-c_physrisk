@@ -4,8 +4,8 @@
 -- speed up application development, help internationalize and display the results of analyses, and more.
 -- The backend schema User and Tenant tables are derived from ASP.NET Boilerplate tables (https://aspnetboilerplate.com/). That code is available under the MIT license, here: https://github.com/aspnetboilerplate/aspnetboilerplate
 
--- Last Updated: 2024-08-15. 
--- Change tags to be a jsonb field. Updates to osc_slug. Update schema structure from Arfima feedback. Add tags to Asset Class rows. Add Asset Type table. Add osc_ prefix to most columns. Added Precalculated damage curve example. Added asset table inheritance examples, and some backend functionality such as user table and indexes for performance. Simplify table osc_names and consolosc_idate schemas.
+-- Last Updated: 2024-08-16. 
+-- Update start and end datetime fields. Change tags to be a jsonb field. Updates to osc_slug. Update schema structure from Arfima feedback. Add tags to Asset Class rows. Add Asset Type table. Add osc_ prefix to most columns. Added Precalculated damage curve example. Added asset table inheritance examples, and some backend functionality such as user table and indexes for performance. Simplify table osc_names and consolosc_idate schemas.
 
 -- SETUP EXTENSIONS
 CREATE EXTENSION postgis; -- used for geolocation
@@ -18,6 +18,7 @@ CREATE SCHEMA IF NOT EXISTS osc_physrisk_core_scenarios;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_financial;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_core_assets;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_core_impacts;
+CREATE SCHEMA IF NOT EXISTS osc_physrisk_core_data;
 
 -- SETUP TABLES
 -- SCHEMA osc_physrisk_backend
@@ -86,9 +87,10 @@ CREATE INDEX "ix_osc_physrisk_backend_tenants_osc_tenancy_name" ON osc_physrisk_
 
 COMMENT ON TABLE osc_physrisk_backend.tenant IS 'Stores tenant information to support multi-tenancy data (where appropriate). A default tenant is always provosc_ided.';
 
--- SCHEMA osc_physrisk_core_scenarios
-CREATE TABLE osc_physrisk_core_scenarios.scenario ( 
-	osc_id BIGINT NOT NULL,
+
+-- SCHEMA osc_physrisk_core_data
+CREATE TABLE osc_physrisk_core_data.dataset ( 
+	osc_id UUID  DEFAULT gen_random_UUID ()  NOT NULL,
 	osc_name VARCHAR(256) NOT NULL,
 	osc_name_display VARCHAR(256),
 	osc_slug VARCHAR(256),
@@ -106,13 +108,58 @@ CREATE TABLE osc_physrisk_core_scenarios.scenario (
 	osc_culture VARCHAR(5) NOT NULL DEFAULT 'en',
 	osc_checksum VARCHAR(40) DEFAULT NULL,
 	osc_seq_num SMALLINT  NOT NULL Default 1,
-	osc_translated_from_id BIGINT DEFAULT NULL,
+	osc_translated_from_id UUID DEFAULT NULL,
 	osc_is_active BOOLEAN NOT NULL DEFAULT 'y',
 	osc_is_published BOOLEAN DEFAULT 'n',
 	osc_publisher_id BIGINT DEFAULT NULL,
 	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
 	osc_version TEXT DEFAULT '1.0',
+	data_contact TEXT NOT NULL, -- Contact information for inquiries about the dataset.
+	data_quality TEXT NOT NULL, -- Information on the accuracy, completeness, and source of the data.
+	data_format TEXT NOT NULL, -- Formats in which the data is available.
+	data_schema TEXT NOT NULL, -- Describe the data schema, or reference the Json Schema or Frictionless CSV schema. Can be a hyperlink to a relevant schema file.
+	data_access_rights TEXT NOT NULL, -- Information on who can access the dataset.
+	data_license TEXT NOT NULL, -- The licensing terms under which the dataset is released. License(s) of the data as SPDX License identifier, SPDX License expression, or other. Link to the license text. 
+	data_usage_notes TEXT NOT NULL, -- Notes on how the dataset can be used.
+	data_related TEXT NOT NULL, -- Links to related datasets for further information or analysis. Could be a list of UUIDs or a textual description, or hyperlinks
 	CONSTRAINT pk_scenario PRIMARY KEY ( osc_id ),
+	CONSTRAINT fk_scenario_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
+	CONSTRAINT fk_scenario_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
+	CONSTRAINT fk_scenario_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id)
+ ); 
+
+ COMMENT ON TABLE osc_physrisk_core_data.dataset IS 'Contains a list of the data sets that are in use in this database, facilitating rigourous data hygeine, governance, and reporting tasks.';
+
+
+-- SCHEMA osc_physrisk_core_scenarios
+CREATE TABLE osc_physrisk_core_scenarios.scenario ( 
+	osc_id UUID  DEFAULT gen_random_UUID ()  NOT NULL,
+	osc_name VARCHAR(256) NOT NULL,
+	osc_name_display VARCHAR(256),
+	osc_slug VARCHAR(256),
+	osc_abbreviation VARCHAR(12),
+	osc_description_full  TEXT NOT NULL,
+	osc_description_short  VARCHAR(256) NOT NULL,
+    osc_tags jsonb DEFAULT NULL,
+	osc_datetime_created TIMESTAMPTZ NOT NULL,
+	osc_creator_user_id BIGINT NOT NULL,
+	osc_datetime_last_modified TIMESTAMPTZ NOT NULL,
+	osc_last_modifier_user_id BIGINT NOT NULL,
+	osc_is_deleted BOOLEAN NOT NULL DEFAULT 'n',
+	osc_deleter_user_id BIGINT DEFAULT NULL,
+	osc_datetime_deleted TIMESTAMPTZ DEFAULT NULL,
+	osc_culture VARCHAR(5) NOT NULL DEFAULT 'en',
+	osc_checksum VARCHAR(40) DEFAULT NULL,
+	osc_seq_num SMALLINT  NOT NULL Default 1,
+	osc_translated_from_id UUID DEFAULT NULL,
+	osc_is_active BOOLEAN NOT NULL DEFAULT 'y',
+	osc_is_published BOOLEAN DEFAULT 'n',
+	osc_publisher_id BIGINT DEFAULT NULL,
+	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
+	osc_version TEXT DEFAULT '1.0',
+	osc_dataset_id UUID,
+	CONSTRAINT pk_scenario PRIMARY KEY ( osc_id ),
+	CONSTRAINT fk_scenario_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
 	CONSTRAINT fk_scenario_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_scenario_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_scenario_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id)
@@ -146,10 +193,12 @@ CREATE TABLE osc_physrisk_core_scenarios.hazard (
 	osc_publisher_id BIGINT DEFAULT NULL,
 	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
 	osc_version TEXT DEFAULT '1.0',
+	osc_dataset_id UUID,
 	oed_peril_code integer,
 	oed_input_abbreviation      varchar(5) ,
 	oed_grouped_peril_code boolean,
-	CONSTRAINT pk_hazard PRIMARY KEY ( osc_id ),
+	CONSTRAINT pk_hazard PRIMARY KEY ( osc_id ),	
+	CONSTRAINT fk_hazard_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
 	CONSTRAINT fk_hazard_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_hazard_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_hazard_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id)
@@ -182,8 +231,10 @@ CREATE TABLE osc_physrisk_core_scenarios.hazard_indicator (
 	osc_publisher_id BIGINT DEFAULT NULL,
 	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
 	osc_version TEXT DEFAULT '1.0',
+	osc_dataset_id UUID,
 	osc_hazard_id	UUID  NOT NULL,
 	CONSTRAINT pk_hazard_indicator PRIMARY KEY ( osc_id ),
+	CONSTRAINT fk_hazard_indicator_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
 	CONSTRAINT fk_hazard_indicator_osc_hazard_id FOREIGN KEY ( osc_hazard_id ) REFERENCES osc_physrisk_core_scenarios.hazard(osc_id),
 	CONSTRAINT fk_hazard_indicator_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_hazard_indicator_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
@@ -217,7 +268,9 @@ COMMENT ON TABLE osc_physrisk_core_scenarios.hazard_indicator IS 'Contains a lis
 	osc_publisher_id BIGINT DEFAULT NULL,
 	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
 	osc_version TEXT DEFAULT '1.0',
+	osc_dataset_id UUID,
 	CONSTRAINT pk_exposure_function PRIMARY KEY ( osc_id ),
+	CONSTRAINT fk_exposure_function_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
 	CONSTRAINT fk_exposure_function_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_exposure_function_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_exposure_function_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
@@ -252,7 +305,9 @@ CREATE TABLE osc_physrisk_core_scenarios.vulnerability_function (
 	osc_publisher_id BIGINT DEFAULT NULL,
 	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
 	osc_version TEXT DEFAULT '1.0',
+	osc_dataset_id UUID,
 	CONSTRAINT pk_vulnerability_function PRIMARY KEY ( osc_id ),
+	CONSTRAINT fk_vulnerability_function_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
 	CONSTRAINT fk_vulnerability_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_vulnerability_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_vulnerability_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
@@ -287,7 +342,9 @@ CREATE TABLE osc_physrisk_financial.financial_function (
 	osc_publisher_id BIGINT DEFAULT NULL,
 	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
 	osc_version TEXT DEFAULT '1.0',
+	osc_dataset_id UUID,
 	CONSTRAINT pk_financial_function PRIMARY KEY ( osc_id ),
+	CONSTRAINT fk_financial_function_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
 	CONSTRAINT fk_financial_function_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_financial_function_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_financial_function_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
@@ -322,7 +379,9 @@ CREATE TABLE osc_physrisk_core_assets.asset_class (
 	osc_publisher_id BIGINT DEFAULT NULL,
 	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
 	osc_version TEXT DEFAULT '1.0',
+	osc_dataset_id UUID,
 	CONSTRAINT pk_asset_class PRIMARY KEY (osc_id ),
+	CONSTRAINT fk_asset_class_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
 	CONSTRAINT fk_asset_class_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_asset_class_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_asset_class_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id)	
@@ -355,8 +414,10 @@ CREATE TABLE osc_physrisk_core_assets.asset_type (
 	osc_publisher_id BIGINT DEFAULT NULL,
 	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
 	osc_version TEXT DEFAULT '1.0',
+	osc_dataset_id UUID,
 	osc_asset_class_id UUID,
 	CONSTRAINT pk_asset_type PRIMARY KEY (osc_id ),
+	CONSTRAINT fk_asset_type_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
 	CONSTRAINT fk_asset_type_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_asset_type_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_asset_type_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),	
@@ -391,9 +452,11 @@ CREATE TABLE osc_physrisk_core_assets.portfolio (
 	osc_publisher_id BIGINT DEFAULT NULL,
 	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
 	osc_version TEXT DEFAULT '1.0',
+	osc_dataset_id UUID,
     value_total numeric,
     value_currency_alphabetic_code char(3),
 	CONSTRAINT pk_portfolio PRIMARY KEY (osc_id ),
+	CONSTRAINT fk_portfolio_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
 	CONSTRAINT fk_portfolio_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_portfolio_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_portfolio_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
@@ -427,15 +490,16 @@ CREATE TABLE osc_physrisk_core_assets.generic_asset (
 	osc_publisher_id BIGINT DEFAULT NULL,
 	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
 	osc_version TEXT DEFAULT '1.0',
+	osc_dataset_id UUID,
     osc_portfolio_id UUID NOT NULL,
-	geo_location_name      	varchar(256),
-    geo_location_address      	text,
-    geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
-	geo_altitude numeric DEFAULT NULL, 
-	geo_altitude_confidence numeric DEFAULT NULL,
-	geo_overture_features			jsonb[], -- This asset can be described in 0 or more Overture Map schemas to cover its land use, infrastructure, building extents, etc
-	geo_h3_index H3INDEX NOT NULL,
-    geo_h3_resolution INT2 NOT NULL,
+	osc_geo_location_name      	varchar(256),
+    osc_geo_location_address      	text,
+    osc_geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
+	osc_geo_altitude numeric DEFAULT NULL, 
+	osc_geo_altitude_confidence numeric DEFAULT NULL,
+	osc_geo_overture_features			jsonb[], -- This asset can be described in 0 or more Overture Map schemas to cover its land use, infrastructure, building extents, etc
+	osc_geo_h3_index H3INDEX NOT NULL,
+    osc_geo_h3_resolution INT2 NOT NULL,
 	osc_asset_type_id UUID,
 	osc_owner_bloomberg_id	varchar(12) DEFAULT NULL,
 	osc_owner_lei_id varchar(20) DEFAULT NULL,
@@ -443,8 +507,9 @@ CREATE TABLE osc_physrisk_core_assets.generic_asset (
     value_dynamics jsonb, -- Asset Value Dynamics over time, example real estate appreciation
 	value_currency_alphabetic_code char(3),
 	CONSTRAINT pk_generic_asset PRIMARY KEY ( osc_id ),
+	CONSTRAINT fk_generic_asset_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
 	CONSTRAINT fk_generic_asset_osc_portfolio_id FOREIGN KEY ( osc_portfolio_id ) REFERENCES osc_physrisk_core_assets.portfolio(osc_id),
-    CONSTRAINT ck_generic_asset_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
+    CONSTRAINT ck_generic_asset_h3_resolution CHECK (osc_geo_h3_resolution >= 0 AND osc_geo_h3_resolution <= 15),
 	CONSTRAINT fk_generic_asset_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_generic_asset_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_generic_asset_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
@@ -461,8 +526,9 @@ CREATE TABLE osc_physrisk_core_assets.asset_realestate (
 	value_ltv text ARRAY, -- Sequence of Loan-to-Value results by date, representing the ratio of the first mortgage line as a percentage of the total appraised value of real property.
 	value_dynamics jsonb, -- Asset Value Dynamics over time, example real estate appreciation
 	CONSTRAINT pk_asset_realestate PRIMARY KEY ( osc_id ),
+	CONSTRAINT fk_asset_realestate_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
 	CONSTRAINT fk_asset_realestate_osc_portfolio_id FOREIGN KEY ( osc_portfolio_id ) REFERENCES osc_physrisk_core_assets.portfolio(osc_id),
-    CONSTRAINT ck_asset_realestate_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
+    CONSTRAINT ck_asset_realestate_h3_resolution CHECK (osc_geo_h3_resolution >= 0 AND osc_geo_h3_resolution <= 15),
 	CONSTRAINT fk_asset_realestate_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_asset_realestate_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_asset_realestate_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
@@ -477,8 +543,9 @@ CREATE TABLE osc_physrisk_core_assets.asset_powergeneratingutility (
 	availability_rate numeric NOT NULL, -- Availability factor of production.
 	value_dynamics jsonb, -- Asset Value Dynamics over time, example real estate appreciation
 	CONSTRAINT pk_asset_powergeneratingutility PRIMARY KEY ( osc_id ),
+	CONSTRAINT fk_asset_powergeneratingutility_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
 	CONSTRAINT fk_asset_powergeneratingutility_osc_portfolio_id FOREIGN KEY ( osc_portfolio_id ) REFERENCES osc_physrisk_core_assets.portfolio(osc_id),
-    CONSTRAINT ck_asset_powergeneratingutility_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
+    CONSTRAINT ck_asset_powergeneratingutility_h3_resolution CHECK (osc_geo_h3_resolution >= 0 AND osc_geo_h3_resolution <= 15),
 	CONSTRAINT fk_asset_powergeneratingutility_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_asset_powergeneratingutility_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_asset_powergeneratingutilityosc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
@@ -507,14 +574,16 @@ CREATE TABLE osc_physrisk_financial.financial_impact_type (
 	osc_culture VARCHAR(5) NOT NULL DEFAULT 'en',
 	osc_checksum VARCHAR(40) DEFAULT NULL,
 	osc_seq_num SMALLINT  NOT NULL Default 1,
-	osc_translated_from_id INTEGER DEFAULT NULL,
+	osc_translated_from_id UUID DEFAULT NULL,
 	osc_is_active BOOLEAN NOT NULL DEFAULT 'y',
 	osc_is_published BOOLEAN DEFAULT 'n',
 	osc_publisher_id BIGINT DEFAULT NULL,
 	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
 	osc_version TEXT DEFAULT '1.0',
+	osc_dataset_id UUID,
     accounting_category varchar(256),
 	CONSTRAINT pk_financial_impact_type PRIMARY KEY ( osc_id ),
+	CONSTRAINT fk_financial_impact_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
 	CONSTRAINT fk_financial_impact_type_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_financial_impact_type_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_financial_impact_type_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id)
@@ -542,14 +611,16 @@ CREATE TABLE osc_physrisk_core_impacts.impact_type (
 	osc_culture VARCHAR(5) NOT NULL DEFAULT 'en',
 	osc_checksum VARCHAR(40) DEFAULT NULL,
 	osc_seq_num SMALLINT  NOT NULL Default 1,
-	osc_translated_from_id INTEGER DEFAULT NULL,
+	osc_translated_from_id UUID DEFAULT NULL,
 	osc_is_active BOOLEAN NOT NULL DEFAULT 'y',
 	osc_is_published BOOLEAN DEFAULT 'n',
 	osc_publisher_id BIGINT DEFAULT NULL,
 	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
 	osc_version TEXT DEFAULT '1.0',
+	osc_dataset_id UUID,
     accounting_category varchar(256),
 	CONSTRAINT pk_impact_type PRIMARY KEY ( osc_id ),
+	CONSTRAINT fk_impact_type_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
 	CONSTRAINT fk_impact_type_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_impact_type_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_impact_type_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id)
@@ -583,8 +654,9 @@ CREATE TABLE osc_physrisk_financial.portfolio_impact (
 	osc_publisher_id BIGINT DEFAULT NULL,
 	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
 	osc_version TEXT DEFAULT '1.0',
+	osc_dataset_id UUID,
 	osc_portfolio_id            UUID  NOT NULL  ,
-	osc_scenario_id integer NOT NULL,
+	osc_scenario_id UUID NOT NULL,
     osc_scenario_year smallint,
 	osc_hazard_id	UUID NOT NULL,
 	annual_exceedence_probability numeric,
@@ -593,8 +665,9 @@ CREATE TABLE osc_physrisk_financial.portfolio_impact (
     value_at_risk numeric,
     value_currency_alphabetic_code char(3),
 	CONSTRAINT pk_portfolio_analysis PRIMARY KEY ( osc_id ),
+	CONSTRAINT fk_portfolio_analysis_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
 	CONSTRAINT fk_portfolio_analysis_osc_id FOREIGN KEY ( osc_portfolio_id ) REFERENCES osc_physrisk_core_assets.portfolio(osc_id),
-	CONSTRAINT fk_portfolio_osc_scenario_id FOREIGN KEY ( osc_scenario_id ) REFERENCES osc_physrisk_core_scenarios.scenario(osc_id),
+	CONSTRAINT fk_portfolio_analysis_osc_scenario_id FOREIGN KEY ( osc_scenario_id ) REFERENCES osc_physrisk_core_scenarios.scenario(osc_id),
 	CONSTRAINT fk_portfolio_analysis_osc_hazard_id FOREIGN KEY ( osc_hazard_id ) REFERENCES osc_physrisk_core_scenarios.hazard(osc_id)   ,
 	CONSTRAINT fk_portfolio_analysis_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_portfolio_analysis_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
@@ -629,24 +702,25 @@ CREATE TABLE osc_physrisk_core_impacts.asset_impact (
 	osc_publisher_id BIGINT DEFAULT NULL,
 	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
 	osc_version TEXT DEFAULT '1.0',
+	osc_dataset_id UUID,
 	osc_asset_id            UUID  NOT NULL  ,
 	osc_hazard_indicator_id UUID NOT NULL,
-    osc_hazard_intensity numeric[],
-	osc_scenario_id integer NOT NULL,
+    osc_hazard_intensity numeric[], -- Assume this includes intensity units
+	osc_scenario_id UUID NOT NULL,
     osc_scenario_year smallint,
+	osc_geo_location_name      	varchar(256),
+    osc_geo_location_address      	text ,
+    osc_geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
+	osc_geo_altitude numeric DEFAULT NULL, 
+	osc_geo_altitude_confidence numeric DEFAULT NULL,
+	osc_geo_overture_features			jsonb[], -- This location can be described in 0 or more Overture Map schemas to cover its land use, infrastructure, building extents, etc
+	osc_geo_h3_index H3INDEX NOT NULL,
+    osc_geo_h3_resolution INT2 NOT NULL,
 	analysis_data_source text NOT NULL,
-	geo_location_name      	varchar(256),
-    geo_location_address      	text ,
-    geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
-	geo_altitude numeric DEFAULT NULL, 
-	geo_altitude_confidence numeric DEFAULT NULL,
-	geo_overture_features			jsonb[], -- This location can be described in 0 or more Overture Map schemas to cover its land use, infrastructure, building extents, etc
-	geo_h3_index H3INDEX NOT NULL,
-    geo_h3_resolution INT2 NOT NULL,
 	is_impacted boolean NOT NULL,
 	is_historic_impact boolean NOT NULL,
-	historic_impact_started timestamptz,
-	historic_impact_ended timestamptz,	
+	osc_datetime_start timestamptz,
+	osc_datetime_end timestamptz,	
     osc_impact_type_id integer NOT NULL,
 	osc_financial_impact_type_id integer NOT NULL, -- this design assumes one row per impact type. If there are multiple potential impact types, there would be multiple rows.
 	impact_data_raw jsonb NOT NULL, -- we recommend that this json includes schema references so a consuming application can use json schema for parsing.	
@@ -669,11 +743,12 @@ CREATE TABLE osc_physrisk_core_impacts.asset_impact (
 	vulnerability_data_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
     financial_function_osc_ids text, -- simple way of including a delimited list of model osc_ids. A brosc_idge tble would be a normalized way to do this, but would require a lookup table. TBD.	
     CONSTRAINT pk_asset_analysis PRIMARY KEY ( osc_id ),
-    CONSTRAINT ck_asset_analysis_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
+	CONSTRAINT fk_asset_analysis_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
+    CONSTRAINT ck_asset_analysis_h3_resolution CHECK (osc_geo_h3_resolution >= 0 AND osc_geo_h3_resolution <= 15),
 	CONSTRAINT fk_asset_analysis_osc_asset_id FOREIGN KEY ( osc_asset_id ) REFERENCES osc_physrisk_core_assets.generic_asset(osc_id),
 	CONSTRAINT fk_asset_osc_scenario_id FOREIGN KEY ( osc_scenario_id ) REFERENCES osc_physrisk_core_scenarios.scenario(osc_id),
-	CONSTRAINT fk_portfolio_analysis_osc_impact_type_id FOREIGN KEY ( osc_impact_type_id ) REFERENCES osc_physrisk_core_impacts.impact_type(osc_id),
-	CONSTRAINT fk_portfolio_analysis_osc_financial_impact_type_id FOREIGN KEY ( osc_financial_impact_type_id ) REFERENCES osc_physrisk_financial.financial_impact_type(osc_id),
+	CONSTRAINT fk_asset_analysis_osc_impact_type_id FOREIGN KEY ( osc_impact_type_id ) REFERENCES osc_physrisk_core_impacts.impact_type(osc_id),
+	CONSTRAINT fk_asset_analysis_osc_financial_impact_type_id FOREIGN KEY ( osc_financial_impact_type_id ) REFERENCES osc_physrisk_financial.financial_impact_type(osc_id),
 	CONSTRAINT fk_asset_analysis_osc_hazard_indicator_id FOREIGN KEY ( osc_hazard_indicator_id ) REFERENCES osc_physrisk_core_scenarios.hazard_indicator(osc_id)    ,
 	CONSTRAINT fk_asset_analysis_osc_vulnerability_function_id FOREIGN KEY ( vulnerability_function_id ) REFERENCES osc_physrisk_core_scenarios.vulnerability_function(osc_id),	
 	CONSTRAINT fk_asset_analysis_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
@@ -709,30 +784,32 @@ CREATE TABLE osc_physrisk_core_impacts.geolocated_precalculated_impact (
 	osc_publisher_id BIGINT DEFAULT NULL,
 	osc_datetime_published TIMESTAMPTZ DEFAULT NULL,
 	osc_version TEXT DEFAULT '1.0',
+	osc_dataset_id UUID,
     osc_hazard_id UUID NOT NULL,
     osc_hazard_intensity numeric[],
-	osc_scenario_id integer NOT NULL,
+	osc_scenario_id UUID NOT NULL,
     osc_scenario_year smallint,
 	analysis_data_source text NOT NULL,
-	geo_location_name      	varchar(256),
-    geo_location_address      	text ,
-    geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
-	geo_altitude numeric DEFAULT NULL, 
-	geo_altitude_confidence numeric DEFAULT NULL,
-	geo_overture_features			jsonb[], -- This location can be described in 0 or more Overture Map schemas to cover its land use, infrastructure, building extents, etc
-	geo_h3_index H3INDEX NOT NULL,
-    geo_h3_resolution INT2 NOT NULL,
+	osc_geo_location_name      	varchar(256),
+    osc_geo_location_address      	text ,
+    osc_geo_location_coordinates      	GEOGRAPHY  NOT NULL  ,
+	osc_geo_altitude numeric DEFAULT NULL, 
+	osc_geo_altitude_confidence numeric DEFAULT NULL,
+	osc_geo_overture_features			jsonb[], -- This location can be described in 0 or more Overture Map schemas to cover its land use, infrastructure, building extents, etc
+	osc_geo_h3_index H3INDEX NOT NULL,
+    osc_geo_h3_resolution INT2 NOT NULL,
 	is_impacted boolean NOT NULL,
 	is_historic_impact boolean NOT NULL,
-	historic_impact_started timestamptz,
-	historic_impact_ended timestamptz,
+	osc_datetime_start timestamptz,
+	osc_datetime_end timestamptz,
 	impact_data_raw jsonb NOT NULL, -- we recommend that this json includes schema references so a consuming application can use json schema for parsing.	
     impact_mean    numeric[],
 	impact_std    numeric[],
 	CONSTRAINT pk_geolocated_precalculated_impact_osc_id PRIMARY KEY ( osc_id ),
+	CONSTRAINT fk_geolocated_precalculated_impact_osc_dataset_id FOREIGN KEY ( osc_dataset_id ) REFERENCES osc_physrisk_core_data.dataset(osc_id),
 	CONSTRAINT fk_geolocated_precalculated_impact_osc_hazard_id FOREIGN KEY ( osc_hazard_id ) REFERENCES osc_physrisk_core_scenarios.hazard(osc_id),	
 	CONSTRAINT fk_geolocated_precalculated_impact_osc_scenario_id FOREIGN KEY ( osc_scenario_id ) REFERENCES osc_physrisk_core_scenarios.scenario(osc_id),
-	CONSTRAINT ck_geolocated_precalculated_impact_h3_resolution CHECK (geo_h3_resolution >= 0 AND geo_h3_resolution <= 15),
+	CONSTRAINT ck_geolocated_precalculated_impact_h3_resolution CHECK (osc_geo_h3_resolution >= 0 AND osc_geo_h3_resolution <= 15),
 	CONSTRAINT fk_geolocated_precalculated_impact_osc_creator_user_id FOREIGN KEY ( osc_creator_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_geolocated_precalculated_impact_osc_last_modifier_user_id FOREIGN KEY ( osc_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(osc_id),
 	CONSTRAINT fk_geolocated_precalculated_impact_osc_deleter_user_id FOREIGN KEY ( osc_deleter_user_id ) REFERENCES osc_physrisk_backend.user(osc_id) ,
@@ -774,101 +851,100 @@ VALUES
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(-1, 'Unknown/Not Selected', 'Unknown/Not Selected', 'Unknown/Not Selected', 'Unknown/Not Selected','{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'f098938cd8cc7c4f1c71c8e97db0f075',1,-1, 'y','y', 1,'2024-07-15T00:00:01Z')
+	('8b3b38fd-a6f5-4878-b4b4-0a251ec0363a', 'Unknown/Not Selected', 'Unknown/Not Selected', 'Unknown/Not Selected', 'Unknown/Not Selected','{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'f098938cd8cc7c4f1c71c8e97db0f075',1,NULL, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(0,'en-climate-scenario-historical', 'History (before 2014). See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'History (before 2014)', 'History (- 2014)', 'History (- 2014)','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,0, 'y','y', 1,'2024-07-15T00:00:01Z')
+	('7faf5507-9a0a-4554-aef3-6efe5cffee63','en-climate-scenario-historical', 'History (before 2014). See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'History (before 2014)', 'History (- 2014)', 'History (- 2014)','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(1,'en-climate-scenario-SSP1-19', 'SSP1-1.9 -  very low GHG emissions: CO2 emissions cut to net zero around 2050. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP1-1.9', 'SSP1-1.9', 'SSP1-1.9','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,1, 'y','y', 1,'2024-07-15T00:00:01Z')
+	('0ab07b1d-864d-4f0a-9656-29e9b088df3b','en-climate-scenario-SSP1-19', 'SSP1-1.9 -  very low GHG emissions: CO2 emissions cut to net zero around 2050. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP1-1.9', 'SSP1-1.9', 'SSP1-1.9','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(2, 'en-climate-scenario-SSP1-26', 'SSP1-2.6 - low GHG emissions: CO2 emissions cut to net zero around 2075. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP1-2.6', 'SSP1-2.6', 'SSP1-2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,2, 'y','y', 1,'2024-07-15T00:00:01Z')
+	('cb68b9c6-6dff-4f0d-8650-768249f2689d', 'en-climate-scenario-SSP1-26', 'SSP1-2.6 - low GHG emissions: CO2 emissions cut to net zero around 2075. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP1-2.6', 'SSP1-2.6', 'SSP1-2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(3, 'en-climate-scenario-SSP2-45', 'SSP2-4.5 - intermediate GHG emissions: CO2 emissions around current levels until 2050, then falling but not reaching net zero by 2100. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP2-4.5', 'SSP2-4.5', 'SSP2-4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,3, 'y','y', 1,'2024-07-15T00:00:01Z')
+	('5d1081f3-fd0e-4f53-b06b-8358be82644c', 'en-climate-scenario-SSP2-45', 'SSP2-4.5 - intermediate GHG emissions: CO2 emissions around current levels until 2050, then falling but not reaching net zero by 2100. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP2-4.5', 'SSP2-4.5', 'SSP2-4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(4, 'en-climate-scenario-SSP3-70', 'SSP3-7.0 - high GHG emissions: CO2 emissions double by 2100. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP3-7.0', 'SSP3-7.0', 'SSP3-7.0','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,4, 'y','y', 1,'2024-07-15T00:00:01Z')
+	('f9ba343c-78b6-426c-be56-5d845e305d58', 'en-climate-scenario-SSP3-70', 'SSP3-7.0 - high GHG emissions: CO2 emissions double by 2100. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP3-7.0', 'SSP3-7.0', 'SSP3-7.0','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(5, 'en-climate-scenario-SSP5-85', 'SSP5-8.5 - very high GHG emissions: CO2 emissions triple by 2075. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP5-8.5', 'SSP5-8.5', 'SSP5-8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,5, 'y','y', 1,'2024-07-15T00:00:01Z')
+	('fd76becb-28e9-424b-8c6e-c96aaf6988e5', 'en-climate-scenario-SSP5-85', 'SSP5-8.5 - very high GHG emissions: CO2 emissions triple by 2075. See "Shared Socioeconomic Pathways in the IPCC Sixth Assessment Report" (https://www.ipcc.ch/report/sixth-assessment-report-working-group-i/).', 'SSP5-8.5', 'SSP5-8.5', 'SSP5-8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(6, 'en-climate-scenario-RCP26', 'RCP2.6 - Peak in radiative forcing at ~ 3 W/m2 before 2100 and decline. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP2.6', 'RCP2.6', 'RCP2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,6, 'y','y', 1,'2024-07-15T00:00:01Z')
+	('3cd34fae-620a-47ae-862c-5349533e73b8', 'en-climate-scenario-RCP26', 'RCP2.6 - Peak in radiative forcing at ~ 3 W/m2 before 2100 and decline. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP2.6', 'RCP2.6', 'RCP2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(7, 'en-climate-scenario-RCP45', 'RCP4.5 - Stabilization without overshoot pathway to 4.5 W/m2 at stabilization after 2100. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP4.5', 'RCP4.5', 'RCP4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,7, 'y','y', 1,'2024-07-15T00:00:01Z')
+	('e64b3f6a-69a6-403f-a4bb-e099fe099222', 'en-climate-scenario-RCP45', 'RCP4.5 - Stabilization without overshoot pathway to 4.5 W/m2 at stabilization after 2100. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP4.5', 'RCP4.5', 'RCP4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(8,  'en-climate-scenario-RCP6', 'RCP6 - Stabilization without overshoot pathway to 6 W/m2 at stabilization after 2100. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP6', 'RCP6', 'RCP6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,8, 'y','y', 1,'2024-07-15T00:00:01Z')
+	('bb01865e-2a53-48a3-9437-35764ba52639',  'en-climate-scenario-RCP6', 'RCP6 - Stabilization without overshoot pathway to 6 W/m2 at stabilization after 2100. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP6', 'RCP6', 'RCP6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
 	(osc_id, osc_slug, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(9, 'en-climate-scenario-RCP85', 'RCP8.5 - Rising radiative forcing pathway leading to 8.5 W/m2 in 2100. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP8.5', 'RCP8.5', 'RCP8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,9, 'y','y', 1,'2024-07-15T00:00:01Z')
+	('893a6b75-8660-47ff-80d3-08b4ddc259c3', 'en-climate-scenario-RCP85', 'RCP8.5 - Rising radiative forcing pathway leading to 8.5 W/m2 in 2100. See "REPRESENTATIVE CONCENTRATION PATHWAYS (RCPs)" (https://sedac.ciesin.columbia.edu/ddc/ar5_scenario_process/RCPs.html)', 'RCP8.5', 'RCP8.5', 'RCP8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y','y', 1,'2024-07-15T00:00:01Z')
 ;
-
 
 INSERT INTO osc_physrisk.osc_physrisk_core_impacts.impact_type
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(-1, 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z')
+	(-1, 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,NULL, 't',  't',1 ,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_impacts.impact_type
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(1, 'Damage as percentage of asset value', 'Damage as percentage of asset value', 'Damage as percentage of asset value', 'Damage as percentage of asset value','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z')
+	(1, 'Damage as percentage of asset value', 'Damage as percentage of asset value', 'Damage as percentage of asset value', 'Damage as percentage of asset value','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,NULL, 't',  't',1 ,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_impacts.impact_type
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(2, 'Disruption in number of production units', 'Disruption in number of production units', 'Disruption in number of production units', 'Disruption in number of production units','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z')
+	(2, 'Disruption in number of production units', 'Disruption in number of production units', 'Disruption in number of production units', 'Disruption in number of production units','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,NULL, 't',  't',1 ,'2024-07-15T00:00:01Z')
 ;
 
 INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
-	(-1, 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z')
+	(-1, 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption', 'Unknown Damage or Disruption','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'f',NULL,NULL, 'en', 'osc_checksum',1,NULL, 't',  't',1 ,'2024-07-15T00:00:01Z')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, accounting_category)
 VALUES 
-	(1, 'Asset repairs and construction', 'Asset repairs and construction', 'Asset repairs and construction','Asset repairs and construction', '{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','Capex' );
+	(1, 'Asset repairs and construction', 'Asset repairs and construction', 'Asset repairs and construction','Asset repairs and construction', '{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,NULL, 't',  't',1 ,'2024-07-15T00:00:01Z','Capex' );
 INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, accounting_category)
 VALUES 
-	(2, 'Revenue loss due to asset restoration', 'Revenue loss due to asset restoration', 'Revenue loss due to asset restoration','Revenue loss due to asset restoration', '{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','Revenue' );
+	(2, 'Revenue loss due to asset restoration', 'Revenue loss due to asset restoration', 'Revenue loss due to asset restoration','Revenue loss due to asset restoration', '{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,NULL, 't',  't',1 ,'2024-07-15T00:00:01Z','Revenue' );
 INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, accounting_category)
 VALUES 
-	(3, 'Revenue loss due to productivity impact', 'Revenue loss due to productivity impact', 'Revenue loss due to productivity impact','Revenue loss due to productivity impact', '{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','Revenue' );
+	(3, 'Revenue loss due to productivity impact', 'Revenue loss due to productivity impact', 'Revenue loss due to productivity impact','Revenue loss due to productivity impact', '{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,NULL, 't',  't',1 ,'2024-07-15T00:00:01Z','Revenue' );
 INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, accounting_category)
 VALUES 
-	(4, 'Recurring cost increase (chronic)', 'Recurring cost increase (chronic)', 'Recurring cost increase (chronic)','Recurring cost increase (chronic)', '{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','OpEx' );
+	(4, 'Recurring cost increase (chronic)', 'Recurring cost increase (chronic)', 'Recurring cost increase (chronic)','Recurring cost increase (chronic)', '{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,NULL, 't',  't',1 ,'2024-07-15T00:00:01Z','OpEx' );
 INSERT INTO osc_physrisk.osc_physrisk_financial.financial_impact_type
 	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published, accounting_category)
 VALUES 
-	(5, 'Recurring cost increase (acute)', 'Recurring cost increase (acute)', 'Recurring cost increase (acute)','Recurring cost increase (acute)', '{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,1, 't',  't',1 ,'2024-07-15T00:00:01Z','OpEx' );
+	(5, 'Recurring cost increase (acute)', 'Recurring cost increase (acute)', 'Recurring cost increase (acute)','Recurring cost increase (acute)', '{ "key1":"value1", "key2":"value2"}', '2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1, 'false',NULL,NULL, 'en', 'osc_checksum',1,NULL, 't',  't',1 ,'2024-07-15T00:00:01Z','OpEx' );
 INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.hazard
 	(osc_id, osc_slug, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
 VALUES 
@@ -1221,121 +1297,6 @@ VALUES
 ;
 
 -- DATA IN ENGLISH ENDS
--- DATA IN FRENCH STARTS
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(10, 'Inconnu/Aucun selection', 'Inconnu/Aucun selection', 'Inconnu/Aucun selection', 'Inconnu/Aucun selection','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,-1, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(11, 'Historique (avant 2014). Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'Historique (avant 2014)', 'Historique (avant 2014)', 'Historique (avant 2014)','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,0, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(12, 'SSP1-1,9 — émissions de GES en baisse dès 2025, zéro émission nette de CO2 avant 2050, émissions négatives ensuite. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP1-1,9', 'SSP1-1,9', 'SSP1-1,9','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,1, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(13, 'SSP1-2,6 — similaire au précédent, mais le zéro émission nette de CO2 est atteint après 2050. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP1-2,6', 'SSP1-2,6', 'SSP1-2,6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,2, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(14, 'SSP2-4,5 — maintien des émissions courantes jusqu''en 2050, division par quatre d''ici 2100. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP2-4,5', 'SSP2-4,5', 'SSP2-4,5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,3, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(15, 'SSP3-7,0 — doublement des émissions de GES en 2100. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP3-7,0', 'SSP3-7,0', 'SSP3-7,0','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,4, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(16, 'SSP5-8,5 — émissions de GES en forte augmentation, doublement en 2050. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP5-8,5', 'SSP5-8,5', 'SSP5-8,5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,5, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(17, 'RCP2.6 - le scénario d''émissions faibles, nous présente un futur où nous limitons les changements climatiques d''origine humaine. Le maximum des émissions de carbone est atteint raposc_idement, suivi d''une réduction qui mène vers une valeur presque nulle bien avant la fin du siècle. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP2.6', 'RCP2.6', 'RCP2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,6, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(18, 'RCP4.5 - un scénario d''émissions modérées, nous présente un futur où nous incluons des mesures pour limiter les changements climatiques d''origine humaine. Ce scénario exige que les émissions mondiales de carbone soient stabilisées d''ici la fin du siècle. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP4.5', 'RCP4.5', 'RCP4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,7, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(19, 'RCP6 -  Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP6', 'RCP6', 'RCP6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,8, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(20, 'RCP8.5 - le scénario d''émissions élevées, nous présente un futur où peu de restrictions aux émissions ont été mises en place. Les émissions continuent d''augmenter raposc_idement au cours de ce siècle, et se stabilisent seulement après 2250. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP8.5', 'RCP8.5', 'RCP8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,9, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
--- DATA IN FRENCH ENDS
--- DATA IN SPANISH BEGINS
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(21, 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,-1, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(22, 'Histórico (antes 2014). Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'Histórico (antes 2014)', 'Histórico (antes 2014)', 'Histórico (antes 2014)','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,0, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(23, 'SSP1-1.9 — Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP1-1,9', 'SSP1-1,9', 'SSP1-1,9','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,1, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(24, 'SSP1-2.6 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP1-2.6', 'SSP1-2.6', 'SSP1-2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,2, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(25, 'SSP2-4.5 Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP2-4.5', 'SSP2-4.5', 'SSP2-4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,3, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(26, 'SSP3-7.0 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP3-7.0', 'SSP3-7.0', 'SSP3-7.0','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,4, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(27, 'SSP5-8.5 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP5-8.5', 'SSP5-8.5', 'SSP5-8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,5, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(28, 'RCP2.6 Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP2.6', 'RCP2.6', 'RCP2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,6, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(29, 'RCP4.5 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP4.5', 'RCP4.5', 'RCP4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,7, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(30, 'RCP6 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP6', 'RCP6', 'RCP6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,8, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(31, 'RCP8.5 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP8.5', 'RCP8.5', 'RCP8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,9, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-
--- DATA IN SPANISH ENDS
 
 
 -- INSERT ASSET PORTFOLIO EXAMPLE
@@ -1479,12 +1440,12 @@ VALUES
 	('07c629be-42c6-4dbe-bd56-83e64253368d', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', 'Example Portfolio 1', '{}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z', 12345678.90, 'USD');
 
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_realestate
-	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active,osc_tenant_id, osc_is_published, osc_publisher_id, osc_datetime_published, osc_portfolio_id, geo_location_name, geo_location_coordinates, geo_overture_features, geo_h3_index, geo_h3_resolution, osc_asset_type_id, osc_owner_bloomberg_id, osc_owner_lei_id, value_total, value_currency_alphabetic_code, value_ltv)
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active,osc_tenant_id, osc_is_published, osc_publisher_id, osc_datetime_published, osc_portfolio_id, osc_geo_location_name, osc_geo_location_coordinates, osc_geo_overture_features, osc_geo_h3_index, osc_geo_h3_resolution, osc_asset_type_id, osc_owner_bloomberg_id, osc_owner_lei_id, value_total, value_currency_alphabetic_code, value_ltv)
 VALUES 
 	('281d68cc-ffd3-4740-acd6-1ea23bce902f', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', 'Commercial Real Estate asset example', '{"naics":[531111],"oed:occupancy:oed_code":1050,"oed:occupancy:air_code":301}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, '85246f30-e622-4af9-af86-16b23e8671a7', 'BBG000BLNQ16', '', 12345678.90, 'USD','{LTV value ratio}')
 ;
 INSERT INTO osc_physrisk.osc_physrisk_core_assets.asset_powergeneratingutility
-	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_tenant_id, osc_is_published, osc_publisher_id, osc_datetime_published, osc_portfolio_id, geo_location_name, geo_location_coordinates, geo_overture_features, geo_h3_index, geo_h3_resolution,osc_asset_type_id,  osc_owner_bloomberg_id, osc_owner_lei_id, value_total, value_currency_alphabetic_code, production, capacity, availability_rate)
+	(osc_id, osc_name, osc_name_display, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_tenant_id, osc_is_published, osc_publisher_id, osc_datetime_published, osc_portfolio_id, osc_geo_location_name, osc_geo_location_coordinates, osc_geo_overture_features, osc_geo_h3_index, osc_geo_h3_resolution,osc_asset_type_id,  osc_owner_bloomberg_id, osc_owner_lei_id, value_total, value_currency_alphabetic_code, production, capacity, availability_rate)
 VALUES 
 	('78cb5382-5e4f-4762-b2e8-7cb33954f788', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', '{"naics":[22111],"oed:occupancy:oed_code":1300,"oed:occupancy:air_code":361}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, '3a568df0-cf71-4598-9bc7-2fb5997fb30d', 'BBG000BLNQ16', '', 12345678.90, 'USD', 12345.0,100.00,95.00)
 ;
@@ -1492,9 +1453,9 @@ VALUES
 
 -- INSERT PRECALCULATED IMPACT EXAMPLE
 INSERT INTO osc_physrisk.osc_physrisk_core_impacts.geolocated_precalculated_impact
-	(osc_id, osc_name, osc_name_display, osc_abbreviation, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_tenant_id,osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id, osc_scenario_id, osc_scenario_year, analysis_data_source, geo_location_name, geo_location_address, geo_location_coordinates, geo_overture_features, geo_h3_index, geo_h3_resolution, is_impacted, is_historic_impact, historic_impact_started, historic_impact_ended, impact_data_raw)
+	(osc_id, osc_name, osc_name_display, osc_abbreviation, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_tenant_id,osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id, osc_scenario_id, osc_scenario_year, analysis_data_source, osc_geo_location_name, osc_geo_location_address, osc_geo_location_coordinates, osc_geo_overture_features, osc_geo_h3_index, osc_geo_h3_resolution, is_impacted, is_historic_impact, osc_datetime_start, osc_datetime_end, impact_data_raw)
 VALUES 
-	('3bbb4a0e-f719-4e78-864b-3962e7f9e3a4', 'Example stored precalculated impact damage curve for Utility', 'Example stored precalculated impact damage curve for Utility', NULL, 'Example stored precalculated impact damage curve for Utility','Example stored precalculated impact damage curve for Utility', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL,'y', 1,'y',1,'2024-07-15T00:00:01Z','63ed7943-c4c4-43ea-abd2-86bb1997a094', 3, 2040, 'WRI Data', '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, 'y', 'n',NULL ,NULL , '{
+	('3bbb4a0e-f719-4e78-864b-3962e7f9e3a4', 'Example stored precalculated impact damage curve for Utility', 'Example stored precalculated impact damage curve for Utility', NULL, 'Example stored precalculated impact damage curve for Utility','Example stored precalculated impact damage curve for Utility', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL,'y', 1,'y',1,'2024-07-15T00:00:01Z','63ed7943-c4c4-43ea-abd2-86bb1997a094', '5d1081f3-fd0e-4f53-b06b-8358be82644c', 2040, 'WRI Data', '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, 'y', 'n',NULL ,NULL , '{
     "items": [
         {
             "asset_type": "Steam/OnceThrough",
@@ -1967,8 +1928,130 @@ WHERE b.osc_name LIKE '%Utility%'
 
 -- QUERY PRECALCULATED DAMAGE CURVES AT A CERTAIN LOCATION
 SELECT
-	geo_h3_index, geo_h3_resolution, ST_X(geo_location_coordinates::geometry) as Long, ST_Y(geo_location_coordinates::geometry) as Lat, geo_overture_features, is_impacted, is_historic_impact, impact_data_raw
+	osc_geo_h3_index, osc_geo_h3_resolution, ST_X(osc_geo_location_coordinates::geometry) as Long, ST_Y(osc_geo_location_coordinates::geometry) as Lat, osc_geo_overture_features, is_impacted, is_historic_impact, impact_data_raw
 FROM
 	osc_physrisk.osc_physrisk_core_impacts.geolocated_precalculated_impact
-WHERE geo_h3_index = '1234'
+WHERE osc_geo_h3_index = '1234'
 	;
+
+
+
+
+
+
+
+	-- DATA IN FRENCH STARTS
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(10, 'Inconnu/Aucun selection', 'Inconnu/Aucun selection', 'Inconnu/Aucun selection', 'Inconnu/Aucun selection','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,-1, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(11, 'Historique (avant 2014). Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'Historique (avant 2014)', 'Historique (avant 2014)', 'Historique (avant 2014)','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,0, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(12, 'SSP1-1,9 — émissions de GES en baisse dès 2025, zéro émission nette de CO2 avant 2050, émissions négatives ensuite. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP1-1,9', 'SSP1-1,9', 'SSP1-1,9','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,1, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(13, 'SSP1-2,6 — similaire au précédent, mais le zéro émission nette de CO2 est atteint après 2050. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP1-2,6', 'SSP1-2,6', 'SSP1-2,6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,2, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(14, 'SSP2-4,5 — maintien des émissions courantes jusqu''en 2050, division par quatre d''ici 2100. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP2-4,5', 'SSP2-4,5', 'SSP2-4,5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,3, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(15, 'SSP3-7,0 — doublement des émissions de GES en 2100. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP3-7,0', 'SSP3-7,0', 'SSP3-7,0','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,4, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(16, 'SSP5-8,5 — émissions de GES en forte augmentation, doublement en 2050. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP5-8,5', 'SSP5-8,5', 'SSP5-8,5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,5, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(17, 'RCP2.6 - le scénario d''émissions faibles, nous présente un futur où nous limitons les changements climatiques d''origine humaine. Le maximum des émissions de carbone est atteint raposc_idement, suivi d''une réduction qui mène vers une valeur presque nulle bien avant la fin du siècle. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP2.6', 'RCP2.6', 'RCP2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,6, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(18, 'RCP4.5 - un scénario d''émissions modérées, nous présente un futur où nous incluons des mesures pour limiter les changements climatiques d''origine humaine. Ce scénario exige que les émissions mondiales de carbone soient stabilisées d''ici la fin du siècle. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP4.5', 'RCP4.5', 'RCP4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,7, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(19, 'RCP6 -  Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP6', 'RCP6', 'RCP6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,8, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(20, 'RCP8.5 - le scénario d''émissions élevées, nous présente un futur où peu de restrictions aux émissions ont été mises en place. Les émissions continuent d''augmenter raposc_idement au cours de ce siècle, et se stabilisent seulement après 2250. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP8.5', 'RCP8.5', 'RCP8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,9, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+-- DATA IN FRENCH ENDS
+-- DATA IN SPANISH BEGINS
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(21, 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,-1, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(22, 'Histórico (antes 2014). Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'Histórico (antes 2014)', 'Histórico (antes 2014)', 'Histórico (antes 2014)','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,0, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(23, 'SSP1-1.9 — Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP1-1,9', 'SSP1-1,9', 'SSP1-1,9','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,1, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(24, 'SSP1-2.6 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP1-2.6', 'SSP1-2.6', 'SSP1-2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,2, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(25, 'SSP2-4.5 Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP2-4.5', 'SSP2-4.5', 'SSP2-4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,3, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(26, 'SSP3-7.0 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP3-7.0', 'SSP3-7.0', 'SSP3-7.0','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,4, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(27, 'SSP5-8.5 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP5-8.5', 'SSP5-8.5', 'SSP5-8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,5, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(28, 'RCP2.6 Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP2.6', 'RCP2.6', 'RCP2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,6, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(29, 'RCP4.5 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP4.5', 'RCP4.5', 'RCP4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,7, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(30, 'RCP6 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP6', 'RCP6', 'RCP6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,8, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	(31, 'RCP8.5 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP8.5', 'RCP8.5', 'RCP8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,9, 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+
+-- DATA IN SPANISH ENDS
