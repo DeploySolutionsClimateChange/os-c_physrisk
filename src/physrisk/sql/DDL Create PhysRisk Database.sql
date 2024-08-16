@@ -1856,6 +1856,124 @@ VALUES
 }
 ');
 
+
+	-- DATA IN FRENCH STARTS
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('0c438638-0ce2-4be1-b669-4d3e0d0e97e5', 'Inconnu/Aucun selection', 'Inconnu/Aucun selection', 'Inconnu/Aucun selection', 'Inconnu/Aucun selection','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,'8b3b38fd-a6f5-4878-b4b4-0a251ec0363a', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('c7450c04-42d3-41bf-a2a7-eb9af0e70873', 'Historique (avant 2014). Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'Historique (avant 2014)', 'Historique (avant 2014)', 'Historique (avant 2014)','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,'7faf5507-9a0a-4554-aef3-6efe5cffee63', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('08501b6b-92eb-407b-8b37-e6d23645a2d8', 'SSP1-1,9 — émissions de GES en baisse dès 2025, zéro émission nette de CO2 avant 2050, émissions négatives ensuite. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP1-1,9', 'SSP1-1,9', 'SSP1-1,9','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,'0ab07b1d-864d-4f0a-9656-29e9b088df3b', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('cb86a7f4-7116-497a-8f7b-14b8b5710e6a', 'SSP1-2,6 — similaire au précédent, mais le zéro émission nette de CO2 est atteint après 2050. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP1-2,6', 'SSP1-2,6', 'SSP1-2,6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,'cb68b9c6-6dff-4f0d-8650-768249f2689d', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('877f33ef-bfc9-47ff-80ed-9fe4bc20f873', 'SSP2-4,5 — maintien des émissions courantes jusqu''en 2050, division par quatre d''ici 2100. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP2-4,5', 'SSP2-4,5', 'SSP2-4,5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,'5d1081f3-fd0e-4f53-b06b-8358be82644c', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('a29cf80d-3c13-4be4-989f-afb8e0ae4a1a', 'SSP3-7,0 — doublement des émissions de GES en 2100. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP3-7,0', 'SSP3-7,0', 'SSP3-7,0','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,'f9ba343c-78b6-426c-be56-5d845e305d58', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('8568c7aa-6052-42f0-9c7d-fb2b0962571a', 'SSP5-8,5 — émissions de GES en forte augmentation, doublement en 2050. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP5-8,5', 'SSP5-8,5', 'SSP5-8,5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,'fd76becb-28e9-424b-8c6e-c96aaf6988e5', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('38fa655f-7caf-4102-968f-f4d9420e143e', 'RCP2.6 - le scénario d''émissions faibles, nous présente un futur où nous limitons les changements climatiques d''origine humaine. Le maximum des émissions de carbone est atteint raposc_idement, suivi d''une réduction qui mène vers une valeur presque nulle bien avant la fin du siècle. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP2.6', 'RCP2.6', 'RCP2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,'3cd34fae-620a-47ae-862c-5349533e73b8', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('6cd8cb27-7682-4340-95c3-eec02dc69d07', 'RCP4.5 - un scénario d''émissions modérées, nous présente un futur où nous incluons des mesures pour limiter les changements climatiques d''origine humaine. Ce scénario exige que les émissions mondiales de carbone soient stabilisées d''ici la fin du siècle. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP4.5', 'RCP4.5', 'RCP4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,'e64b3f6a-69a6-403f-a4bb-e099fe099222', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('980ae46b-f6e6-408c-8536-0794e1e2f7a9', 'RCP6 -  Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP6', 'RCP6', 'RCP6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,'bb01865e-2a53-48a3-9437-35764ba52639', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('ab959faf-edd2-4ea1-ac1e-b824c3b8f4d8', 'RCP8.5 - le scénario d''émissions élevées, nous présente un futur où peu de restrictions aux émissions ont été mises en place. Les émissions continuent d''augmenter raposc_idement au cours de ce siècle, et se stabilisent seulement après 2250. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP8.5', 'RCP8.5', 'RCP8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,'893a6b75-8660-47ff-80d3-08b4ddc259c3', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+-- DATA IN FRENCH ENDS
+
+-- DATA IN SPANISH BEGINS
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('ad206f5e-865c-4f8c-a837-3ea65a894e07', 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,'8b3b38fd-a6f5-4878-b4b4-0a251ec0363a', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('9a50e648-2619-48af-94cb-e18cbe9b07bd', 'Histórico (antes 2014). Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'Histórico (antes 2014)', 'Histórico (antes 2014)', 'Histórico (antes 2014)','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,'7faf5507-9a0a-4554-aef3-6efe5cffee63', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('0cd4961c-2f86-4a3c-94c9-817eb0e53028', 'SSP1-1.9 — Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP1-1,9', 'SSP1-1,9', 'SSP1-1,9','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,'0ab07b1d-864d-4f0a-9656-29e9b088df3b', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('c4176c8b-be83-4e2d-8fcb-1e5660a0224e', 'SSP1-2.6 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP1-2.6', 'SSP1-2.6', 'SSP1-2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,'cb68b9c6-6dff-4f0d-8650-768249f2689d', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('41ab06bc-506e-4d73-ba2d-20f2b48075e1', 'SSP2-4.5 Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP2-4.5', 'SSP2-4.5', 'SSP2-4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,'5d1081f3-fd0e-4f53-b06b-8358be82644c', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('0190968c-5146-4bec-a3bb-c710d192517e', 'SSP3-7.0 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP3-7.0', 'SSP3-7.0', 'SSP3-7.0','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,'f9ba343c-78b6-426c-be56-5d845e305d58', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('f200a91a-bdbe-4983-a423-de84026b729e', 'SSP5-8.5 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP5-8.5', 'SSP5-8.5', 'SSP5-8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,'fd76becb-28e9-424b-8c6e-c96aaf6988e5', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('50a460ce-3eff-404c-bd51-73e8df75c2af', 'RCP2.6 Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP2.6', 'RCP2.6', 'RCP2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,'3cd34fae-620a-47ae-862c-5349533e73b8', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('61421647-083e-4f1a-8aa7-60314caec48c', 'RCP4.5 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP4.5', 'RCP4.5', 'RCP4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,'e64b3f6a-69a6-403f-a4bb-e099fe099222', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('1eb58f59-7e05-4e80-b226-2034e18fe8ac', 'RCP6 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP6', 'RCP6', 'RCP6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,'bb01865e-2a53-48a3-9437-35764ba52639', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
+	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
+VALUES 
+	('5faf38ce-ad9a-4cce-a2a8-807f61b7ec5f', 'RCP8.5 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP8.5', 'RCP8.5', 'RCP8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,'893a6b75-8660-47ff-80d3-08b4ddc259c3', 'y','y', 1,'2024-07-15T00:00:01Z')
+;
+
+-- DATA IN SPANISH ENDS
+
 -- EXAMPLE QUERIES
 -- VIEW SCENARIOS IN DIFFERENT LANGUAGES
 SELECT * FROM osc_physrisk.osc_physrisk_core_scenarios.scenario WHERE osc_culture='en';
@@ -1935,123 +2053,3 @@ WHERE osc_geo_h3_index = '1234'
 	;
 
 
-
-
-
-
-
-	-- DATA IN FRENCH STARTS
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(10, 'Inconnu/Aucun selection', 'Inconnu/Aucun selection', 'Inconnu/Aucun selection', 'Inconnu/Aucun selection','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,-1, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(11, 'Historique (avant 2014). Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'Historique (avant 2014)', 'Historique (avant 2014)', 'Historique (avant 2014)','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,0, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(12, 'SSP1-1,9 — émissions de GES en baisse dès 2025, zéro émission nette de CO2 avant 2050, émissions négatives ensuite. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP1-1,9', 'SSP1-1,9', 'SSP1-1,9','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,1, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(13, 'SSP1-2,6 — similaire au précédent, mais le zéro émission nette de CO2 est atteint après 2050. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP1-2,6', 'SSP1-2,6', 'SSP1-2,6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,2, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(14, 'SSP2-4,5 — maintien des émissions courantes jusqu''en 2050, division par quatre d''ici 2100. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP2-4,5', 'SSP2-4,5', 'SSP2-4,5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,3, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(15, 'SSP3-7,0 — doublement des émissions de GES en 2100. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP3-7,0', 'SSP3-7,0', 'SSP3-7,0','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,4, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(16, 'SSP5-8,5 — émissions de GES en forte augmentation, doublement en 2050. Voir "Scénarios d''émissions et de réchauffement futurs dans le sixième Rapport d''évaluation du GIEC" (https://www.ipcc.ch/report/ar6/wg1/downloads/report/IPCC_AR6_WG1_SPM_French.pdf).', 'SSP5-8,5', 'SSP5-8,5', 'SSP5-8,5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,5, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(17, 'RCP2.6 - le scénario d''émissions faibles, nous présente un futur où nous limitons les changements climatiques d''origine humaine. Le maximum des émissions de carbone est atteint raposc_idement, suivi d''une réduction qui mène vers une valeur presque nulle bien avant la fin du siècle. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP2.6', 'RCP2.6', 'RCP2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,6, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(18, 'RCP4.5 - un scénario d''émissions modérées, nous présente un futur où nous incluons des mesures pour limiter les changements climatiques d''origine humaine. Ce scénario exige que les émissions mondiales de carbone soient stabilisées d''ici la fin du siècle. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP4.5', 'RCP4.5', 'RCP4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,7, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(19, 'RCP6 -  Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP6', 'RCP6', 'RCP6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,8, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(20, 'RCP8.5 - le scénario d''émissions élevées, nous présente un futur où peu de restrictions aux émissions ont été mises en place. Les émissions continuent d''augmenter raposc_idement au cours de ce siècle, et se stabilisent seulement après 2250. Voir « Scénarios d''émissions : les RCP » (https://donneesclimatiques.ca/interactive/scenarios-demissions-les-rcp/)', 'RCP8.5', 'RCP8.5', 'RCP8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'fr', 'osc_checksum',1,9, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
--- DATA IN FRENCH ENDS
--- DATA IN SPANISH BEGINS
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(21, 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado', 'Desconocosc_ido/no seleccionado','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,-1, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(22, 'Histórico (antes 2014). Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'Histórico (antes 2014)', 'Histórico (antes 2014)', 'Histórico (antes 2014)','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,0, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(23, 'SSP1-1.9 — Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP1-1,9', 'SSP1-1,9', 'SSP1-1,9','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,1, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(24, 'SSP1-2.6 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP1-2.6', 'SSP1-2.6', 'SSP1-2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,2, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(25, 'SSP2-4.5 Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP2-4.5', 'SSP2-4.5', 'SSP2-4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,3, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(26, 'SSP3-7.0 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP3-7.0', 'SSP3-7.0', 'SSP3-7.0','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,4, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(27, 'SSP5-8.5 - Las trayectorias socioeconómicas compartosc_idas (SSP, por sus siglas en inglés) son escenarios de cambios socioeconómicos globales proyectados hasta 2100. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'SSP5-8.5', 'SSP5-8.5', 'SSP5-8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,5, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(28, 'RCP2.6 Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP2.6', 'RCP2.6', 'RCP2.6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,6, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(29, 'RCP4.5 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP4.5', 'RCP4.5', 'RCP4.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,7, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name,osc_tags,  osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(30, 'RCP6 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP6', 'RCP6', 'RCP6','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,8, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-INSERT INTO osc_physrisk.osc_physrisk_core_scenarios.scenario
-	(osc_id, osc_description_full, osc_description_short, osc_name_display, osc_name, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_is_published, osc_publisher_id, osc_datetime_published)
-VALUES 
-	(31, 'RCP8.5 - Una trayectoria de concentración representativa (RCP, por sus siglas en inglés) es una proyección teórica de una trayectoria de concentración de gases de efecto invernadero (no emisiones) adoptada por el IPCC. Ver "El Grupo Interguberosc_namental de Expertos sobre el Cambio Climático (IPCC)" (https://www.ipcc.ch/languages-2/spanish/).', 'RCP8.5', 'RCP8.5', 'RCP8.5','{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'es', 'osc_checksum',1,9, 'y','y', 1,'2024-07-15T00:00:01Z')
-;
-
--- DATA IN SPANISH ENDS
