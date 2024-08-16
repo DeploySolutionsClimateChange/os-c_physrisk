@@ -718,7 +718,7 @@ CREATE TABLE osc_physrisk_core_impacts.asset_impact (
     osc_geo_h3_resolution INT2 NOT NULL,
 	analysis_data_source text NOT NULL,
 	is_impacted boolean NOT NULL,
-	is_historic_impact boolean NOT NULL,
+	is_historic boolean NOT NULL,
 	osc_datetime_start timestamptz,
 	osc_datetime_end timestamptz,	
     osc_impact_type_id integer NOT NULL,
@@ -799,7 +799,7 @@ CREATE TABLE osc_physrisk_core_impacts.geolocated_precalculated_impact (
 	osc_geo_h3_index H3INDEX NOT NULL,
     osc_geo_h3_resolution INT2 NOT NULL,
 	is_impacted boolean NOT NULL,
-	is_historic_impact boolean NOT NULL,
+	is_historic boolean NOT NULL,
 	osc_datetime_start timestamptz,
 	osc_datetime_end timestamptz,
 	impact_data_raw jsonb NOT NULL, -- we recommend that this json includes schema references so a consuming application can use json schema for parsing.	
@@ -1453,7 +1453,7 @@ VALUES
 
 -- INSERT PRECALCULATED IMPACT EXAMPLE
 INSERT INTO osc_physrisk.osc_physrisk_core_impacts.geolocated_precalculated_impact
-	(osc_id, osc_name, osc_name_display, osc_abbreviation, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_tenant_id,osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id, osc_scenario_id, osc_scenario_year, analysis_data_source, osc_geo_location_name, osc_geo_location_address, osc_geo_location_coordinates, osc_geo_overture_features, osc_geo_h3_index, osc_geo_h3_resolution, is_impacted, is_historic_impact, osc_datetime_start, osc_datetime_end, impact_data_raw)
+	(osc_id, osc_name, osc_name_display, osc_abbreviation, osc_description_full, osc_description_short, osc_tags, osc_datetime_created, osc_creator_user_id, osc_datetime_last_modified, osc_last_modifier_user_id, osc_is_deleted, osc_deleter_user_id, osc_datetime_deleted, osc_culture, osc_checksum, osc_seq_num, osc_translated_from_id, osc_is_active, osc_tenant_id,osc_is_published, osc_publisher_id, osc_datetime_published, osc_hazard_id, osc_scenario_id, osc_scenario_year, analysis_data_source, osc_geo_location_name, osc_geo_location_address, osc_geo_location_coordinates, osc_geo_overture_features, osc_geo_h3_index, osc_geo_h3_resolution, is_impacted, is_historic, osc_datetime_start, osc_datetime_end, impact_data_raw)
 VALUES 
 	('3bbb4a0e-f719-4e78-864b-3962e7f9e3a4', 'Example stored precalculated impact damage curve for Utility', 'Example stored precalculated impact damage curve for Utility', NULL, 'Example stored precalculated impact damage curve for Utility','Example stored precalculated impact damage curve for Utility', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'osc_checksum',1,NULL,'y', 1,'y',1,'2024-07-15T00:00:01Z','63ed7943-c4c4-43ea-abd2-86bb1997a094', '5d1081f3-fd0e-4f53-b06b-8358be82644c', 2040, 'WRI Data', '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, 'y', 'n',NULL ,NULL , '{
     "items": [
@@ -2046,7 +2046,7 @@ WHERE b.osc_name LIKE '%Utility%'
 
 -- QUERY PRECALCULATED DAMAGE CURVES AT A CERTAIN LOCATION
 SELECT
-	osc_geo_h3_index, osc_geo_h3_resolution, ST_X(osc_geo_location_coordinates::geometry) as Long, ST_Y(osc_geo_location_coordinates::geometry) as Lat, osc_geo_overture_features, is_impacted, is_historic_impact, impact_data_raw
+	osc_geo_h3_index, osc_geo_h3_resolution, ST_X(osc_geo_location_coordinates::geometry) as Long, ST_Y(osc_geo_location_coordinates::geometry) as Lat, osc_geo_overture_features, is_impacted, is_historic, impact_data_raw
 FROM
 	osc_physrisk.osc_physrisk_core_impacts.geolocated_precalculated_impact
 WHERE osc_geo_h3_index = '1234'
