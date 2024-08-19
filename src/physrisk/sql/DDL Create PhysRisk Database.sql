@@ -634,7 +634,7 @@ CREATE TABLE osc_physrisk_vulnerability_analysis.asset_vulnerability (
 	exposure_function_id text NOT NULL,
 	exposure_data_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
 	exposure_probability numeric,
-	exposure_is_exposed numeric, -- 0.0 = not exposed at all 1.0 = fully exposed across whole area. In  between = some level of exposure, finer geographic granularity is required	
+	exposure_level numeric, -- 0.0 = not exposed at all 1.0 = fully exposed across whole area. In  between = some level of exposure, finer geographic granularity is required	
 	vulnerability_function_id UUID NOT NULL,	
 	vulnerability_historically boolean,
 	vulnerability_data_raw jsonb NOT NULL, -- we recommend that this json includes schema references so a consuming application can use json schema for parsing.	
@@ -704,7 +704,7 @@ CREATE TABLE osc_physrisk_vulnerability_analysis.geolocated_precalculated_vulner
 	exposure_function_id text NOT NULL,
 	exposure_data_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
 	exposure_probability numeric,
-	exposure_is_exposed numeric, -- 0.0 = not exposed at all 1.0 = fully exposed across whole area. In  between = some level of exposure, finer geographic granularity is required	
+	exposure_level numeric, -- 0.0 = not exposed at all 1.0 = fully exposed across whole area. In  between = some level of exposure, finer geographic granularity is required	
 	vulnerability_function_id UUID NOT NULL,
 	vulnerability_data_raw jsonb NOT NULL, -- we recommend that this json includes schema references so a consuming application can use json schema for parsing.	
     vulnerability_level numeric NOT NULL, -- 0.0 = not vulnerable at all 1.0 = highly vulnerable across whole area. In  between = some level of vulnerability, finer geographic granularity is required	
@@ -911,7 +911,7 @@ CREATE TABLE osc_physrisk_financial_analysis.asset_financial_impact (
     exposure_function_id text NOT NULL,
 	exposure_result_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
 	exposure_probability numeric,
-	exposure_is_exposed bool,	
+	exposure_level bool,	
 	vulnerability_function_id UUID NOT NULL,
 	CONSTRAINT pk_asset_financial_impact PRIMARY KEY ( std_id ),
 	CONSTRAINT fk_asset_financial_impact_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
@@ -1578,7 +1578,7 @@ VALUES
 
 -- INSERT PRECALCULATED IMPACT EXAMPLE
 INSERT INTO osc_physrisk_vulnerability_analysis.geolocated_precalculated_vulnerability
-	(std_id, std_name, std_name_display, std_abbreviation, std_description_full, std_description_short, std_tags, std_datetime_created, std_creator_user_id, std_datetime_last_modified, std_last_modifier_user_id, std_is_deleted, std_deleter_user_id, std_datetime_deleted, std_culture, std_checksum, std_seq_num, std_translated_from_id, std_is_active, std_tenant_id,std_is_published, std_publisher_id, std_datetime_published, hazard_indicator_id, scenario_id, scenario_year, std_geo_location_name, std_geo_location_address, std_geo_location_coordinates, std_geo_overture_features, std_geo_h3_index, std_geo_h3_resolution, vulnerability_level, vulnerability_historically, std_datetime_start, std_datetime_end, exposure_function_id, is_exposed, exposure_data_raw, vulnerability_function_id, vulnerability_type_id, vulnerability_data_raw)
+	(std_id, std_name, std_name_display, std_abbreviation, std_description_full, std_description_short, std_tags, std_datetime_created, std_creator_user_id, std_datetime_last_modified, std_last_modifier_user_id, std_is_deleted, std_deleter_user_id, std_datetime_deleted, std_culture, std_checksum, std_seq_num, std_translated_from_id, std_is_active, std_tenant_id,std_is_published, std_publisher_id, std_datetime_published, hazard_indicator_id, scenario_id, scenario_year, std_geo_location_name, std_geo_location_address, std_geo_location_coordinates, std_geo_overture_features, std_geo_h3_index, std_geo_h3_resolution, vulnerability_level, vulnerability_historically, std_datetime_start, std_datetime_end, exposure_function_id, exposure_level, exposure_data_raw, vulnerability_function_id, vulnerability_type_id, vulnerability_data_raw)
 VALUES 
 	('3bbb4a0e-f719-4e78-864b-3962e7f9e3a4', 'Example stored precalculated impact damage curve for Utility', 'Example stored precalculated impact damage curve for Utility', NULL, 'Example stored precalculated impact damage curve for Utility','Example stored precalculated impact damage curve for Utility', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'std_checksum',1,NULL,'y', 1,'y',1,'2024-07-15T00:00:01Z','57a7df66-420d-4730-9669-1547f8200272', '5d1081f3-fd0e-4f53-b06b-8358be82644c', 2040, '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, 0.5, 'n',NULL ,NULL ,	
 	'3f2a5033-cd68-4a04-93a6-a1ce2b5270eb',
