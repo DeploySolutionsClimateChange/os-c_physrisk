@@ -1582,7 +1582,7 @@ INSERT INTO osc_physrisk_vulnerability_analysis.geolocated_precalculated_vulnera
 VALUES 
 	('3bbb4a0e-f719-4e78-864b-3962e7f9e3a4', 'Example stored precalculated impact damage curve for Utility', 'Example stored precalculated impact damage curve for Utility', NULL, 'Example stored precalculated impact damage curve for Utility','Example stored precalculated impact damage curve for Utility', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'std_checksum',1,NULL,'y', 1,'y',1,'2024-07-15T00:00:01Z','57a7df66-420d-4730-9669-1547f8200272', '5d1081f3-fd0e-4f53-b06b-8358be82644c', 2040, '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, 0.5, 'n',NULL ,NULL ,	
 	'3f2a5033-cd68-4a04-93a6-a1ce2b5270eb',
-	'y',
+	0.6,
 	'{ "some":"exposure_data"}',
 	'0a980ae7-5c2c-4996-8d87-e0337d92c13b',
 	1,	
@@ -2177,7 +2177,7 @@ WHERE b.std_name LIKE '%Utility%'
 
 -- QUERY PRECALCULATED DAMAGE CURVES AT A CERTAIN LOCATION
 SELECT
-	std_geo_h3_index, std_geo_h3_resolution, ST_X(std_geo_location_coordinates::geometry) as Long, ST_Y(std_geo_location_coordinates::geometry) as Lat, std_geo_overture_features, vulnerability_level, vulnerability_historically, impact_data_raw
+	std_geo_h3_index, std_geo_h3_resolution, ST_X(std_geo_location_coordinates::geometry) as Long, ST_Y(std_geo_location_coordinates::geometry) as Lat, std_geo_overture_features, vulnerability_level, vulnerability_historically, vulnerability_data_raw
 FROM
 	osc_physrisk_vulnerability_analysis.geolocated_precalculated_vulnerability
 WHERE std_geo_h3_index = '1234'
