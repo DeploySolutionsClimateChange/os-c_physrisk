@@ -6,6 +6,7 @@
 
 -- Last Updated: 2024-08-19. 
 -- Split impacts into two stages: "1. vulnerability analysis" then "2. financial_impact"
+-- Fix duplicate value_dynamics column
 
 -- SETUP EXTENSIONS
 CREATE EXTENSION IF NOT EXISTS postgis; -- used for geolocation
@@ -408,7 +409,6 @@ CREATE TABLE osc_physrisk_assets.asset_realestate (
 	value_cashflows numeric ARRAY,-- Sequence of the associated cash flows (for cash flow generating assets only).
     value_loan text ARRAY, -- Sequence of Loans by date, representing the mortgage lines
 	value_ltv text ARRAY, -- Sequence of Loan-to-Value results by date, representing the ratio of the first mortgage line as a percentage of the total appraised value of real property.
-	value_dynamics jsonb, -- Asset Value Dynamics over time, example real estate appreciation
 	CONSTRAINT pk_asset_realestate PRIMARY KEY ( std_id ),
 	CONSTRAINT fk_asset_realestate_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_asset_realestate_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.portfolio(std_id),
@@ -425,7 +425,6 @@ CREATE TABLE osc_physrisk_assets.asset_powergeneratingutility (
 	production numeric NOT NULL, -- Real annual production of a power plant in Wh.
 	capacity numeric NOT NULL, -- Capacity of the power plant in W.
 	availability_rate numeric NOT NULL, -- Availability factor of production.
-	value_dynamics jsonb, -- Asset Value Dynamics over time, example real estate appreciation
 	CONSTRAINT pk_asset_powergeneratingutility PRIMARY KEY ( std_id ),
 	CONSTRAINT fk_asset_powergeneratingutility_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_asset_powergeneratingutility_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.portfolio(std_id),
@@ -578,12 +577,10 @@ CREATE TABLE osc_physrisk_vulnerability_analysis.portfolio_vulnerability (
 	portfolio_id            UUID  NOT NULL  ,
 	scenario_id UUID NOT NULL,
     scenario_year smallint,
-	hazard_id	UUID NOT NULL,
 	CONSTRAINT pk_portfolio_vulnerability PRIMARY KEY ( std_id ),
 	CONSTRAINT fk_portfolio_vulnerability_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_portfolio_vulnerability_std_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.portfolio(std_id),
 	CONSTRAINT fk_portfolio_vulnerability_scenario_id FOREIGN KEY ( scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(std_id),
-	CONSTRAINT fk_portfolio_vulnerability_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_scenarios.hazard(std_id)   ,
 	CONSTRAINT fk_portfolio_vulnerability_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_portfolio_vulnerability_std_last_modifier_user_id FOREIGN KEY ( std_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_portfolio_vulnerability_std_deleter_user_id FOREIGN KEY ( std_deleter_user_id ) REFERENCES osc_physrisk_backend.user(std_id)  ,
@@ -634,13 +631,12 @@ CREATE TABLE osc_physrisk_vulnerability_analysis.asset_vulnerability (
 	scenario_id UUID NOT NULL,
     scenario_year smallint,
     vulnerability_type_id integer NOT NULL,
-	analysis_data_source text NOT NULL,
-	is_historic boolean NOT NULL,
 	exposure_function_id text NOT NULL,
 	exposure_data_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
 	exposure_probability numeric,
 	exposure_is_exposed numeric, -- 0.0 = not exposed at all 1.0 = fully exposed across whole area. In  between = some level of exposure, finer geographic granularity is required	
-	vulnerability_function_id UUID NOT NULL,
+	vulnerability_function_id UUID NOT NULL,	
+	vulnerability_historically boolean,
 	vulnerability_data_raw jsonb NOT NULL, -- we recommend that this json includes schema references so a consuming application can use json schema for parsing.	
     vulnerability_level numeric NOT NULL, -- 0.0 = not vulnerable at all 1.0 = highly vulnerable across whole area. In  between = some level of vulnerability, finer geographic granularity is required	
 	vulnerability_mean    numeric[],
@@ -650,18 +646,18 @@ CREATE TABLE osc_physrisk_vulnerability_analysis.asset_vulnerability (
 	vulnerability_exceedance_probabilities    numeric[], -- X axis info, redundant but useful
 	vulnerability_return_periods jsonb, -- useful?	
     --parameter    numeric,
-    CONSTRAINT pk_asset_analysis PRIMARY KEY ( std_id ),
-	CONSTRAINT fk_asset_analysis_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
-    CONSTRAINT ck_asset_analysis_h3_resolution CHECK (std_geo_h3_resolution >= 0 AND std_geo_h3_resolution <= 15),
-	CONSTRAINT fk_asset_analysis_asset_id FOREIGN KEY ( asset_id ) REFERENCES osc_physrisk_assets.generic_asset(std_id),
-	CONSTRAINT fk_asset_scenario_id FOREIGN KEY ( scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(std_id),
-	CONSTRAINT fk_asset_analysis_vulnerability_type_id FOREIGN KEY ( vulnerability_type_id ) REFERENCES osc_physrisk_vulnerability_analysis.vulnerability_type(std_id),
-	CONSTRAINT fk_asset_analysis_hazard_indicator_id FOREIGN KEY ( hazard_indicator_id ) REFERENCES osc_physrisk_scenarios.hazard_indicator(std_id)    ,
-	CONSTRAINT fk_asset_analysis_std_vulnerability_function_id FOREIGN KEY ( vulnerability_function_id ) REFERENCES osc_physrisk_vulnerability_analysis.vulnerability_function(std_id),	
-	CONSTRAINT fk_asset_analysis_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
-	CONSTRAINT fk_asset_analysis_std_last_modifier_user_id FOREIGN KEY ( std_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
-	CONSTRAINT fk_asset_analysis_std_deleter_user_id FOREIGN KEY ( std_deleter_user_id ) REFERENCES osc_physrisk_backend.user(std_id)   ,
-	CONSTRAINT fk_asset_analysis_std_tenant_id FOREIGN KEY ( std_tenant_id ) REFERENCES osc_physrisk_backend.tenant(std_id)
+    CONSTRAINT pk_asset_vulnerability PRIMARY KEY ( std_id ),
+	CONSTRAINT fk_asset_vulnerability_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
+    CONSTRAINT ck_asset_vulnerability_h3_resolution CHECK (std_geo_h3_resolution >= 0 AND std_geo_h3_resolution <= 15),
+	CONSTRAINT fk_asset_vulnerability_asset_id FOREIGN KEY ( asset_id ) REFERENCES osc_physrisk_assets.generic_asset(std_id),
+	CONSTRAINT fk_asset_vulnerability_scenario_id FOREIGN KEY ( scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(std_id),
+	CONSTRAINT fk_asset_vulnerability_vulnerability_type_id FOREIGN KEY ( vulnerability_type_id ) REFERENCES osc_physrisk_vulnerability_analysis.vulnerability_type(std_id),
+	CONSTRAINT fk_asset_vulnerability_hazard_indicator_id FOREIGN KEY ( hazard_indicator_id ) REFERENCES osc_physrisk_scenarios.hazard_indicator(std_id)    ,
+	CONSTRAINT fk_asset_vulnerability_std_vulnerability_function_id FOREIGN KEY ( vulnerability_function_id ) REFERENCES osc_physrisk_vulnerability_analysis.vulnerability_function(std_id),	
+	CONSTRAINT fk_asset_vulnerability_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
+	CONSTRAINT fk_asset_vulnerability_std_last_modifier_user_id FOREIGN KEY ( std_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
+	CONSTRAINT fk_asset_vulnerability_std_deleter_user_id FOREIGN KEY ( std_deleter_user_id ) REFERENCES osc_physrisk_backend.user(std_id)   ,
+	CONSTRAINT fk_asset_vulnerability_std_tenant_id FOREIGN KEY ( std_tenant_id ) REFERENCES osc_physrisk_backend.tenant(std_id)
  );
 COMMENT ON TABLE osc_physrisk_vulnerability_analysis.asset_vulnerability IS 'The result of a physical risk & resilience analysis for a particular asset. The result is determined by the chosen scenario, year, and hazard. If multiple scenarios/years/hazards were chosen, there will be multiple other rows containing the combined set of results.';
 
@@ -700,22 +696,33 @@ CREATE TABLE osc_physrisk_vulnerability_analysis.geolocated_precalculated_vulner
 	std_geo_overture_features			jsonb[], -- This location can be described in 0 or more Overture Map schemas to cover its land use, infrastructure, building extents, etc
 	std_geo_h3_index H3INDEX NOT NULL,
     std_geo_h3_resolution INT2 NOT NULL,
-    hazard_id UUID NOT NULL,
-    hazard_intensity numeric[],
+    hazard_indicator_id UUID NOT NULL,
+    hazard_intensity numeric[], -- Assume this includes intensity units
 	scenario_id UUID NOT NULL,
     scenario_year smallint,
-	analysis_data_source text NOT NULL,
-	vulnerability_level numeric NOT NULL, -- 0.0 = not vulnerable at all 1.0 = highly vulnerable across whole area. In between = some level of vulnerability, finer geographic granularity is required	
-	vulnerability_historically boolean NOT NULL,
+    vulnerability_type_id integer NOT NULL,
+	exposure_function_id text NOT NULL,
+	exposure_data_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
+	exposure_probability numeric,
+	exposure_is_exposed numeric, -- 0.0 = not exposed at all 1.0 = fully exposed across whole area. In  between = some level of exposure, finer geographic granularity is required	
+	vulnerability_function_id UUID NOT NULL,
+	vulnerability_data_raw jsonb NOT NULL, -- we recommend that this json includes schema references so a consuming application can use json schema for parsing.	
+    vulnerability_level numeric NOT NULL, -- 0.0 = not vulnerable at all 1.0 = highly vulnerable across whole area. In  between = some level of vulnerability, finer geographic granularity is required	
+	vulnerability_mean    numeric[],
+	vulnerability_std    numeric[],
+	vulnerability_distribution_bin_edges    numeric[],
+    vulnerability_distribution_probabilities    numeric[],
+	vulnerability_exceedance_probabilities    numeric[], -- X axis info, redundant but useful
+	vulnerability_return_periods jsonb, -- useful?	
+	vulnerability_historically boolean,
 	std_datetime_start timestamptz,
 	std_datetime_end timestamptz,
-	impact_data_raw jsonb NOT NULL, -- we recommend that this json includes schema references so a consuming application can use json schema for parsing.	
-    impact_mean    numeric[],
-	impact_std    numeric[],
 	CONSTRAINT pk_geolocated_precalculated_vulnerability_std_id PRIMARY KEY ( std_id ),
 	CONSTRAINT fk_geolocated_precalculated_vulnerability_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
-	CONSTRAINT fk_geolocated_precalculated_vulnerability_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_scenarios.hazard(std_id),	
 	CONSTRAINT fk_geolocated_precalculated_vulnerability_scenario_id FOREIGN KEY ( scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(std_id),
+	CONSTRAINT fk_geolocated_precalculated_vulnerability_vulnerability_type_id FOREIGN KEY ( vulnerability_type_id ) REFERENCES osc_physrisk_vulnerability_analysis.vulnerability_type(std_id),
+	CONSTRAINT fk_geolocated_precalculated_vulnerability_hazard_indicator_id FOREIGN KEY ( hazard_indicator_id ) REFERENCES osc_physrisk_scenarios.hazard_indicator(std_id)    ,
+	CONSTRAINT fk_geolocated_precalculated_vulnerability_std_vulnerability_function_id FOREIGN KEY ( vulnerability_function_id ) REFERENCES osc_physrisk_vulnerability_analysis.vulnerability_function(std_id),	
 	CONSTRAINT ck_geolocated_precalculated_vulnerability_h3_resolution CHECK (std_geo_h3_resolution >= 0 AND std_geo_h3_resolution <= 15),
 	CONSTRAINT fk_geolocated_precalculated_vulnerability_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_geolocated_precalculated_vulnerability_std_last_modifier_user_id FOREIGN KEY ( std_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
@@ -889,16 +896,14 @@ CREATE TABLE osc_physrisk_financial_analysis.asset_financial_impact (
     scenario_year smallint,
     vulnerability_type_id integer NOT NULL,
 	financial_impact_type_id integer NOT NULL, -- this design assumes one row per impact type. If there are multiple potential impact types, there would be multiple rows.
-	analysis_data_source text NOT NULL,
-	is_impacted boolean NOT NULL,
-	--vulnerability_historically boolean NOT NULL,
-	impact_result_raw jsonb NOT NULL, -- we recommend that this json includes schema references so a consuming application can use json schema for parsing.	
-    impact_mean    numeric[],
+	impact_data_raw jsonb NOT NULL, -- we recommend that this json includes schema references so a consuming application can use json schema for parsing.	
+    impact_level numeric NOT NULL, -- 0.0 = not vulnerable at all 1.0 = highly vulnerable across whole area. In  between = some level of vulnerability, finer geographic granularity is required	
+	impact_mean    numeric[],
 	impact_std    numeric[],
 	impact_distribution_bin_edges    numeric[],
-    impact_distribution_probability   numeric[],
-    impact_exc_exceed_probability    numeric[],
-    impact_exc_values    numeric[],
+    impact_distribution_probabilities    numeric[],
+	impact_exceedance_probabilities    numeric[], -- X axis info, redundant but useful
+	impact_return_periods jsonb, -- useful?	
 	value_total numeric,
     value_at_risk numeric,
     value_currency_alphabetic_code char(3),
@@ -908,8 +913,7 @@ CREATE TABLE osc_physrisk_financial_analysis.asset_financial_impact (
 	exposure_probability numeric,
 	exposure_is_exposed bool,	
 	vulnerability_function_id UUID NOT NULL,
-	vulnerability_result_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
-    CONSTRAINT pk_asset_financial_impact PRIMARY KEY ( std_id ),
+	CONSTRAINT pk_asset_financial_impact PRIMARY KEY ( std_id ),
 	CONSTRAINT fk_asset_financial_impact_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
     CONSTRAINT ck_asset_financial_impact_h3_resolution CHECK (std_geo_h3_resolution >= 0 AND std_geo_h3_resolution <= 15),
 	CONSTRAINT fk_asset_financial_impact_asset_id FOREIGN KEY ( asset_id ) REFERENCES osc_physrisk_assets.generic_asset(std_id),
@@ -1559,12 +1563,30 @@ VALUES
 	('78cb5382-5e4f-4762-b2e8-7cb33954f788', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', 'Electrical Power Generating Utility example', '{"naics":[22111],"oed:occupancy:oed_code":1300,"oed:occupancy:air_code":361}','2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'n',NULL,NULL, 'en', 'std_checksum',1,NULL, 'y', 1,'y',1,'2024-07-25T00:00:01Z' , '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, '3a568df0-cf71-4598-9bc7-2fb5997fb30d', 'BBG000BLNQ16', '', 12345678.90, 'USD', 12345.0,100.00,95.00)
 ;
 
+-- INSERT EXPOSURE, VULNERABILITY, AND FINANCIAL MODELS
+INSERT INTO osc_physrisk.osc_physrisk_vulnerability_analysis.exposure_function
+	(std_id, std_name, std_name_display, std_slug, std_abbreviation, std_description_full, std_description_short, std_tags, std_datetime_created, std_creator_user_id, std_datetime_last_modified, std_last_modifier_user_id, std_is_active, std_is_deleted, std_deleter_user_id, std_datetime_deleted, std_tenant_id, std_culture, std_checksum, std_seq_num, std_translated_from_id, std_is_published, std_publisher_id, std_datetime_published, std_version, std_dataset_id)
+VALUES 
+	('3f2a5033-cd68-4a04-93a6-a1ce2b5270eb', 'OS-C Phys Risk Flood Exposure & Vulnerability Model', 'OS-C Phys Risk Flood Exposure & Vulnerability Model', 'osc-physrisk-model-vulnerability-flooda','OS-C Flood', 'OS-C Phys Risk Flood Vulnerability Model', 'OS-C Phys Risk Flood Vulnerability Model', '{}', '2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'y','n',NULL,NULL, 1,'en', 'std_checksum',1,NULL, 'y', 1,'2024-07-25T00:00:01Z','1.0',NULL)
+;
+
+INSERT INTO osc_physrisk.osc_physrisk_vulnerability_analysis.vulnerability_function
+	(std_id, std_name, std_name_display, std_slug, std_abbreviation, std_description_full, std_description_short, std_tags, std_datetime_created, std_creator_user_id, std_datetime_last_modified, std_last_modifier_user_id, std_is_active, std_is_deleted, std_deleter_user_id, std_datetime_deleted, std_tenant_id, std_culture, std_checksum, std_seq_num, std_translated_from_id, std_is_published, std_publisher_id, std_datetime_published, std_version, std_dataset_id)
+VALUES 
+	('0a980ae7-5c2c-4996-8d87-e0337d92c13b', 'OS-C Phys Risk Flood Vulnerability Model', 'OS-C Phys Risk Flood Vulnerability Model', 'osc-physrisk-model-vulnerability-flooda','OS-C Flood', 'OS-C Phys Risk Flood Vulnerability Model', 'OS-C Phys Risk Flood Vulnerability Model', '{}', '2024-07-25T00:00:01Z',1,'2024-07-25T00:00:01Z',1,'y','n',NULL,NULL, 1,'en', 'std_checksum',1,NULL, 'y', 1,'2024-07-25T00:00:01Z','1.0',NULL)
+;
 
 -- INSERT PRECALCULATED IMPACT EXAMPLE
 INSERT INTO osc_physrisk_vulnerability_analysis.geolocated_precalculated_vulnerability
-	(std_id, std_name, std_name_display, std_abbreviation, std_description_full, std_description_short, std_tags, std_datetime_created, std_creator_user_id, std_datetime_last_modified, std_last_modifier_user_id, std_is_deleted, std_deleter_user_id, std_datetime_deleted, std_culture, std_checksum, std_seq_num, std_translated_from_id, std_is_active, std_tenant_id,std_is_published, std_publisher_id, std_datetime_published, hazard_id, scenario_id, scenario_year, analysis_data_source, std_geo_location_name, std_geo_location_address, std_geo_location_coordinates, std_geo_overture_features, std_geo_h3_index, std_geo_h3_resolution, vulnerability_level, vulnerability_historically, std_datetime_start, std_datetime_end, impact_data_raw)
+	(std_id, std_name, std_name_display, std_abbreviation, std_description_full, std_description_short, std_tags, std_datetime_created, std_creator_user_id, std_datetime_last_modified, std_last_modifier_user_id, std_is_deleted, std_deleter_user_id, std_datetime_deleted, std_culture, std_checksum, std_seq_num, std_translated_from_id, std_is_active, std_tenant_id,std_is_published, std_publisher_id, std_datetime_published, hazard_indicator_id, scenario_id, scenario_year, std_geo_location_name, std_geo_location_address, std_geo_location_coordinates, std_geo_overture_features, std_geo_h3_index, std_geo_h3_resolution, vulnerability_level, vulnerability_historically, std_datetime_start, std_datetime_end, exposure_function_id, is_exposed, exposure_data_raw, vulnerability_function_id, vulnerability_type_id, vulnerability_data_raw)
 VALUES 
-	('3bbb4a0e-f719-4e78-864b-3962e7f9e3a4', 'Example stored precalculated impact damage curve for Utility', 'Example stored precalculated impact damage curve for Utility', NULL, 'Example stored precalculated impact damage curve for Utility','Example stored precalculated impact damage curve for Utility', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'std_checksum',1,NULL,'y', 1,'y',1,'2024-07-15T00:00:01Z','63ed7943-c4c4-43ea-abd2-86bb1997a094', '5d1081f3-fd0e-4f53-b06b-8358be82644c', 2040, 'WRI Data', '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, 0.5, 'n',NULL ,NULL , '{
+	('3bbb4a0e-f719-4e78-864b-3962e7f9e3a4', 'Example stored precalculated impact damage curve for Utility', 'Example stored precalculated impact damage curve for Utility', NULL, 'Example stored precalculated impact damage curve for Utility','Example stored precalculated impact damage curve for Utility', '{ "key1":"value1", "key2":"value2"}','2024-07-15T00:00:01Z',1,'2024-07-15T00:00:01Z',1,'n',NULL,NULL, 'en', 'std_checksum',1,NULL,'y', 1,'y',1,'2024-07-15T00:00:01Z','57a7df66-420d-4730-9669-1547f8200272', '5d1081f3-fd0e-4f53-b06b-8358be82644c', 2040, '07c629be-42c6-4dbe-bd56-83e64253368d', 'Fake location', ST_GeomFromText('POINT(-71.064544 42.28787)'), '{}', '1234', 12, 0.5, 'n',NULL ,NULL ,	
+	'3f2a5033-cd68-4a04-93a6-a1ce2b5270eb',
+	'y',
+	'{ "some":"exposure_data"}',
+	'0a980ae7-5c2c-4996-8d87-e0337d92c13b',
+	1,	
+	'{
     "items": [
         {
             "asset_type": "Steam/OnceThrough",
