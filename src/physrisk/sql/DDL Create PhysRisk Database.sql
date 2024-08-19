@@ -5,7 +5,7 @@
 -- The backend schema User and Tenant tables are derived from ASP.NET Boilerplate tables (https://aspnetboilerplate.com/). That code is available under the MIT license, here: https://github.com/aspnetboilerplate/aspnetboilerplate
 
 -- Last Updated: 2024-08-19. 
--- Update start and end datetime fields. Change tags to be a jsonb field. Updates to std_slug. Update schema structure from Arfima feedback. Add tags to Asset Class rows. Add Asset Type table. Add std_ prefix to most columns. Added Precalculated damage curve example. Added asset table inheritance examples, and some backend functionality such as user table and indexes for performance. Simplify table std_names and consolstd_idate schemas.
+-- Split impacts into two stages: "1. vulnerability analysis" then "2. financial_impact"
 
 -- SETUP EXTENSIONS
 CREATE EXTENSION IF NOT EXISTS postgis; -- used for geolocation
@@ -14,7 +14,6 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto; -- used for random UUID generation
 
 -- SETUP SCHEMAS
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_backend;
-CREATE SCHEMA IF NOT EXISTS osc_physrisk_governance;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_scenarios;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_assets;
 CREATE SCHEMA IF NOT EXISTS osc_physrisk_vulnerability_analysis;
@@ -87,9 +86,7 @@ CREATE INDEX "ix_osc_physrisk_backend_tenants_std_tenancy_name" ON osc_physrisk_
 
 COMMENT ON TABLE osc_physrisk_backend.tenant IS 'Stores tenant information to support multi-tenancy data (where appropriate). A default tenant is always provstd_ided.';
 
-
--- SCHEMA osc_physrisk_governance
-CREATE TABLE osc_physrisk_governance.dataset ( 
+CREATE TABLE osc_physrisk_backend.dataset ( 
 	std_id UUID  DEFAULT gen_random_UUID ()  NOT NULL,
 	std_name VARCHAR(256) NOT NULL,
 	std_name_display VARCHAR(256),
@@ -128,7 +125,7 @@ CREATE TABLE osc_physrisk_governance.dataset (
 	CONSTRAINT fk_scenario_std_deleter_user_id FOREIGN KEY ( std_deleter_user_id ) REFERENCES osc_physrisk_backend.user(std_id)
  ); 
 
- COMMENT ON TABLE osc_physrisk_governance.dataset IS 'Contains a list of the data sets that are in use in this database, facilitating rigourous data hygeine, governance, and reporting tasks.';
+ COMMENT ON TABLE osc_physrisk_backend.dataset IS 'Contains a list of the data sets that are in use in this database, facilitating rigourous data hygeine, governance, and reporting tasks.';
 
 -- SCHEMA osc_physrisk_scenarios
 CREATE TABLE osc_physrisk_scenarios.scenario ( 
@@ -158,7 +155,7 @@ CREATE TABLE osc_physrisk_scenarios.scenario (
 	std_version TEXT DEFAULT '1.0',
 	std_dataset_id UUID,
 	CONSTRAINT pk_scenario PRIMARY KEY ( std_id ),
-	CONSTRAINT fk_scenario_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_scenario_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_scenario_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_scenario_std_last_modifier_user_id FOREIGN KEY ( std_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_scenario_std_deleter_user_id FOREIGN KEY ( std_deleter_user_id ) REFERENCES osc_physrisk_backend.user(std_id)
@@ -196,7 +193,7 @@ CREATE TABLE osc_physrisk_scenarios.hazard (
 	oed_input_abbreviation      varchar(5) ,
 	oed_grouped_peril_code boolean,
 	CONSTRAINT pk_hazard PRIMARY KEY ( std_id ),	
-	CONSTRAINT fk_hazard_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_hazard_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_hazard_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_hazard_std_last_modifier_user_id FOREIGN KEY ( std_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_hazard_std_deleter_user_id FOREIGN KEY ( std_deleter_user_id ) REFERENCES osc_physrisk_backend.user(std_id)
@@ -231,7 +228,7 @@ CREATE TABLE osc_physrisk_scenarios.hazard_indicator (
 	std_dataset_id UUID,
 	hazard_id	UUID  NOT NULL,
 	CONSTRAINT pk_hazard_indicator PRIMARY KEY ( std_id ),
-	CONSTRAINT fk_hazard_indicator_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_hazard_indicator_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_hazard_indicator_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_scenarios.hazard(std_id),
 	CONSTRAINT fk_hazard_indicator_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_hazard_indicator_std_last_modifier_user_id FOREIGN KEY ( std_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
@@ -268,7 +265,7 @@ CREATE TABLE osc_physrisk_assets.asset_class (
 	std_version TEXT DEFAULT '1.0',
 	std_dataset_id UUID,
 	CONSTRAINT pk_asset_class PRIMARY KEY (std_id ),
-	CONSTRAINT fk_asset_class_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_asset_class_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_asset_class_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_asset_class_std_last_modifier_user_id FOREIGN KEY ( std_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_asset_class_std_deleter_user_id FOREIGN KEY ( std_deleter_user_id ) REFERENCES osc_physrisk_backend.user(std_id)	
@@ -304,7 +301,7 @@ CREATE TABLE osc_physrisk_assets.asset_type (
 	std_dataset_id UUID,
 	asset_class_id UUID,
 	CONSTRAINT pk_asset_type PRIMARY KEY (std_id ),
-	CONSTRAINT fk_asset_type_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_asset_type_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_asset_type_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_asset_type_std_last_modifier_user_id FOREIGN KEY ( std_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_asset_type_std_deleter_user_id FOREIGN KEY ( std_deleter_user_id ) REFERENCES osc_physrisk_backend.user(std_id),	
@@ -343,7 +340,7 @@ CREATE TABLE osc_physrisk_assets.portfolio (
     value_total numeric,
     value_currency_alphabetic_code char(3),
 	CONSTRAINT pk_portfolio PRIMARY KEY (std_id ),
-	CONSTRAINT fk_portfolio_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_portfolio_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_portfolio_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_portfolio_std_last_modifier_user_id FOREIGN KEY ( std_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_portfolio_std_deleter_user_id FOREIGN KEY ( std_deleter_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
@@ -394,7 +391,7 @@ CREATE TABLE osc_physrisk_assets.generic_asset (
     value_dynamics jsonb, -- Asset Value Dynamics over time, example real estate appreciation
 	value_currency_alphabetic_code char(3),
 	CONSTRAINT pk_generic_asset PRIMARY KEY ( std_id ),
-	CONSTRAINT fk_generic_asset_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_generic_asset_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_generic_asset_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.portfolio(std_id),
     CONSTRAINT ck_generic_asset_h3_resolution CHECK (std_geo_h3_resolution >= 0 AND std_geo_h3_resolution <= 15),
 	CONSTRAINT fk_generic_asset_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
@@ -413,7 +410,7 @@ CREATE TABLE osc_physrisk_assets.asset_realestate (
 	value_ltv text ARRAY, -- Sequence of Loan-to-Value results by date, representing the ratio of the first mortgage line as a percentage of the total appraised value of real property.
 	value_dynamics jsonb, -- Asset Value Dynamics over time, example real estate appreciation
 	CONSTRAINT pk_asset_realestate PRIMARY KEY ( std_id ),
-	CONSTRAINT fk_asset_realestate_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_asset_realestate_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_asset_realestate_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.portfolio(std_id),
     CONSTRAINT ck_asset_realestate_h3_resolution CHECK (std_geo_h3_resolution >= 0 AND std_geo_h3_resolution <= 15),
 	CONSTRAINT fk_asset_realestate_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
@@ -430,7 +427,7 @@ CREATE TABLE osc_physrisk_assets.asset_powergeneratingutility (
 	availability_rate numeric NOT NULL, -- Availability factor of production.
 	value_dynamics jsonb, -- Asset Value Dynamics over time, example real estate appreciation
 	CONSTRAINT pk_asset_powergeneratingutility PRIMARY KEY ( std_id ),
-	CONSTRAINT fk_asset_powergeneratingutility_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_asset_powergeneratingutility_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_asset_powergeneratingutility_portfolio_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.portfolio(std_id),
     CONSTRAINT ck_asset_powergeneratingutility_h3_resolution CHECK (std_geo_h3_resolution >= 0 AND std_geo_h3_resolution <= 15),
 	CONSTRAINT fk_asset_powergeneratingutility_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
@@ -470,7 +467,7 @@ CREATE TABLE osc_physrisk_vulnerability_analysis.exposure_function (
 	std_version TEXT DEFAULT '1.0',
 	std_dataset_id UUID,
 	CONSTRAINT pk_exposure_function PRIMARY KEY ( std_id ),
-	CONSTRAINT fk_exposure_function_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_exposure_function_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_exposure_function_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_exposure_function_std_last_modifier_user_id FOREIGN KEY ( std_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_exposure_function_std_deleter_user_id FOREIGN KEY ( std_deleter_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
@@ -506,7 +503,7 @@ CREATE TABLE osc_physrisk_vulnerability_analysis.vulnerability_function (
 	std_version TEXT DEFAULT '1.0',
 	std_dataset_id UUID,
 	CONSTRAINT pk_vulnerability_function PRIMARY KEY ( std_id ),
-	CONSTRAINT fk_vulnerability_function_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_vulnerability_function_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_vulnerability_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_vulnerability_std_last_modifier_user_id FOREIGN KEY ( std_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_vulnerability_std_deleter_user_id FOREIGN KEY ( std_deleter_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
@@ -543,7 +540,7 @@ CREATE TABLE osc_physrisk_vulnerability_analysis.vulnerability_type (
 	std_dataset_id UUID,
     accounting_category varchar(256),
 	CONSTRAINT pk_vulnerability_type PRIMARY KEY ( std_id ),
-	CONSTRAINT fk_vulnerability_type_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_vulnerability_type_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_vulnerability_type_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_vulnerability_type_std_last_modifier_user_id FOREIGN KEY ( std_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_vulnerability_type_std_deleter_user_id FOREIGN KEY ( std_deleter_user_id ) REFERENCES osc_physrisk_backend.user(std_id)
@@ -583,7 +580,7 @@ CREATE TABLE osc_physrisk_vulnerability_analysis.portfolio_vulnerability (
     scenario_year smallint,
 	hazard_id	UUID NOT NULL,
 	CONSTRAINT pk_portfolio_vulnerability PRIMARY KEY ( std_id ),
-	CONSTRAINT fk_portfolio_vulnerability_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_portfolio_vulnerability_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_portfolio_vulnerability_std_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.portfolio(std_id),
 	CONSTRAINT fk_portfolio_vulnerability_scenario_id FOREIGN KEY ( scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(std_id),
 	CONSTRAINT fk_portfolio_vulnerability_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_scenarios.hazard(std_id)   ,
@@ -654,7 +651,7 @@ CREATE TABLE osc_physrisk_vulnerability_analysis.asset_vulnerability (
 	vulnerability_return_periods jsonb, -- useful?	
     --parameter    numeric,
     CONSTRAINT pk_asset_analysis PRIMARY KEY ( std_id ),
-	CONSTRAINT fk_asset_analysis_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_asset_analysis_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
     CONSTRAINT ck_asset_analysis_h3_resolution CHECK (std_geo_h3_resolution >= 0 AND std_geo_h3_resolution <= 15),
 	CONSTRAINT fk_asset_analysis_asset_id FOREIGN KEY ( asset_id ) REFERENCES osc_physrisk_assets.generic_asset(std_id),
 	CONSTRAINT fk_asset_scenario_id FOREIGN KEY ( scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(std_id),
@@ -716,7 +713,7 @@ CREATE TABLE osc_physrisk_vulnerability_analysis.geolocated_precalculated_vulner
     impact_mean    numeric[],
 	impact_std    numeric[],
 	CONSTRAINT pk_geolocated_precalculated_vulnerability_std_id PRIMARY KEY ( std_id ),
-	CONSTRAINT fk_geolocated_precalculated_vulnerability_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_geolocated_precalculated_vulnerability_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_geolocated_precalculated_vulnerability_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_scenarios.hazard(std_id),	
 	CONSTRAINT fk_geolocated_precalculated_vulnerability_scenario_id FOREIGN KEY ( scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(std_id),
 	CONSTRAINT ck_geolocated_precalculated_vulnerability_h3_resolution CHECK (std_geo_h3_resolution >= 0 AND std_geo_h3_resolution <= 15),
@@ -757,7 +754,7 @@ CREATE TABLE osc_physrisk_financial_analysis.financial_function (
 	std_version TEXT DEFAULT '1.0',
 	std_dataset_id UUID,
 	CONSTRAINT pk_financial_function PRIMARY KEY ( std_id ),
-	CONSTRAINT fk_financial_function_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_financial_function_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_financial_function_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_financial_function_std_last_modifier_user_id FOREIGN KEY ( std_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_financial_function_std_deleter_user_id FOREIGN KEY ( std_deleter_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
@@ -793,7 +790,7 @@ CREATE TABLE osc_physrisk_financial_analysis.financial_impact_type (
 	std_dataset_id UUID,
     accounting_category varchar(256),
 	CONSTRAINT pk_financial_impact_type PRIMARY KEY ( std_id ),
-	CONSTRAINT fk_financial_impact_type_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_financial_impact_type_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_financial_impact_type_std_creator_user_id FOREIGN KEY ( std_creator_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_financial_impact_type_std_last_modifier_user_id FOREIGN KEY ( std_last_modifier_user_id ) REFERENCES osc_physrisk_backend.user(std_id),
 	CONSTRAINT fk_financial_impact_type_std_deleter_user_id FOREIGN KEY ( std_deleter_user_id ) REFERENCES osc_physrisk_backend.user(std_id)
@@ -837,7 +834,7 @@ CREATE TABLE osc_physrisk_financial_analysis.portfolio_financial_impact (
     value_at_risk numeric,
     value_currency_alphabetic_code char(3),
 	CONSTRAINT pk_portfolio_financial_impact PRIMARY KEY ( std_id ),
-	CONSTRAINT fk_portfolio_financial_impact_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_portfolio_financial_impact_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
 	CONSTRAINT fk_portfolio_financial_impact_analysis_std_id FOREIGN KEY ( portfolio_id ) REFERENCES osc_physrisk_assets.portfolio(std_id),
 	CONSTRAINT fk_portfolio_financial_impact_analysis_scenario_id FOREIGN KEY ( scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(std_id),
 	CONSTRAINT fk_portfolio_financial_impact_analysis_hazard_id FOREIGN KEY ( hazard_id ) REFERENCES osc_physrisk_scenarios.hazard(std_id)   ,
@@ -913,7 +910,7 @@ CREATE TABLE osc_physrisk_financial_analysis.asset_financial_impact (
 	vulnerability_function_id UUID NOT NULL,
 	vulnerability_result_raw jsonb NOT NULL, -- STORE RAW JSON, MAYBE OVERLAP WITH SOME COLUMNS BELOW?
     CONSTRAINT pk_asset_financial_impact PRIMARY KEY ( std_id ),
-	CONSTRAINT fk_asset_financial_impact_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_governance.dataset(std_id),
+	CONSTRAINT fk_asset_financial_impact_std_dataset_id FOREIGN KEY ( std_dataset_id ) REFERENCES osc_physrisk_backend.dataset(std_id),
     CONSTRAINT ck_asset_financial_impact_h3_resolution CHECK (std_geo_h3_resolution >= 0 AND std_geo_h3_resolution <= 15),
 	CONSTRAINT fk_asset_financial_impact_asset_id FOREIGN KEY ( asset_id ) REFERENCES osc_physrisk_assets.generic_asset(std_id),
 	CONSTRAINT fk_asset_financial_impact_scenario_id FOREIGN KEY ( scenario_id ) REFERENCES osc_physrisk_scenarios.scenario(std_id),
